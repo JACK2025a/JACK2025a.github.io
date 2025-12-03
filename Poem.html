@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>古诗 · 沉浸背诵 (Ultimate)</title>
+    <title>沉浸背诵</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         /* --- 核心变量定义 --- */
@@ -217,6 +217,9 @@
         #btn-exit-recite { left: 20px; }
         #btn-restart-recite { left: 70px; color: var(--accent-color); }
         #btn-study-reveal { left: 120px; color: var(--color-warning); font-size: 16px; }
+        #btn-pause-recite { left: 170px; font-size: 16px; } /* 新增暂停按钮 */
+
+        .study-active { background-color: var(--color-warning) !important; color: #fff !important; }
 
         #recite-timer {
             position: absolute; top: 25px; right: 20px; 
@@ -224,6 +227,20 @@
             color: var(--text-secondary); z-index: 1100;
             background: rgba(255,255,255,0.8); padding: 4px 10px; border-radius: 12px;
         }
+
+        /* 暂停全屏遮罩 */
+        #pause-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none; /* 默认隐藏 */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .pause-text { font-family: var(--font-poem); font-size: 32px; color: var(--text-primary); font-weight: 900; margin-bottom: 20px; }
+        .btn-resume { padding: 12px 40px; background: var(--accent-color); color: white; border: none; border-radius: 25px; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3); }
 
         /* 移动端专用控制栏 (底部) */
         .mobile-controls {
@@ -247,7 +264,8 @@
         }
         .btn-prev { background: #95a5a6; }
         .btn-next { background: var(--accent-color); }
-        .btn-study { background: var(--color-warning); color: #333; flex: 0.4; } /* 移动端学习按钮 */
+        .btn-study { background: var(--color-warning); color: #333; flex: 0.3; font-size: 14px; }
+        .btn-mobile-pause { background: #9b59b6; color: white; flex: 0.3; } /* 移动端暂停 */
         .btn-prev:active, .btn-next:active { transform: scale(0.95); }
 
         /* 提示层 - 仅桌面显示 */
@@ -313,7 +331,7 @@
             .mobile-controls { display: flex; }
             
             /* 隐藏 PC 端的某些顶部按钮，防止拥挤，只保留退出 */
-            #btn-restart-recite, #btn-study-reveal { display: none; }
+            #btn-restart-recite, #btn-study-reveal, #btn-pause-recite { display: none; }
             
             .analysis-grid { flex-direction: column; }
             .completion-title { font-size: 28px; }
@@ -338,7 +356,7 @@
             <div id="recitation-view" class="view-content active">
                 <div class="recitation-input-panel">
                     <div class="title">古诗背诵助手</div>
-                    <div class="subtitle">Ultimate Edition</div>
+                    <div class="subtitle">沉浸背诵 V3.2.0</div>
 
                     <button class="btn" id="continue-recitation-btn" onclick="continueLastPoem()">
                         继续背诵 <span id="continue-progress"></span>
@@ -387,22 +405,29 @@
                 <div>
                     <button class="btn btn-danger" onclick="clearHistory()">🗑️ 清除所有历史记录</button>
                 </div>
-                <p style="margin-top: 20px; color: #999; font-size: 12px;">Version 3.2.0 (Ultimate)</p>
+                <p style="margin-top: 20px; color: #999; font-size: 12px;">沉浸背诵 V3.2.0</p>
             </div>
         </div>
 
         <div id="poem-view-container">
              <div id="btn-exit-recite" class="top-icon-btn" onclick="exitMidSession()" title="退出">✕</div>
              <div id="btn-restart-recite" class="top-icon-btn" onclick="restartCurrentPoem()" title="重来">↻</div>
-             <div id="btn-study-reveal" class="top-icon-btn" onclick="revealAllForStudy()" title="学习模式 (不计分)">💡</div>
+             <div id="btn-study-reveal" class="top-icon-btn" onclick="toggleStudyMode()" title="学习模式">💡</div>
+             <div id="btn-pause-recite" class="top-icon-btn" onclick="togglePause()" title="暂停">⏸</div>
              
              <div id="recite-timer">00:00</div>
+
+             <div id="pause-overlay">
+                 <div class="pause-text">暂停背诵</div>
+                 <button class="btn-resume" onclick="togglePause()">继续背诵</button>
+             </div>
 
             <div id="poem-view"></div>
 
             <div class="mobile-controls" id="mobile-controls">
                 <button class="mobile-btn btn-prev" onclick="hidePrev()">上一句</button>
-                <button class="mobile-btn btn-study" onclick="revealAllForStudy()">💡</button>
+                <button class="mobile-btn btn-study" onclick="toggleStudyMode()">💡</button>
+                <button class="mobile-btn btn-mobile-pause" onclick="togglePause()">⏸</button>
                 <button class="mobile-btn btn-next" onclick="revealNext()">下一句</button>
             </div>
         </div>
@@ -448,46 +473,21 @@
         </div>
 
         <div class="hint-overlay">
-            右键 / → 下一句 &nbsp; | &nbsp; 左键 / ← 上一句 &nbsp; | &nbsp; 💡 点击灯泡进入学习模式
+            右键 / → 下一句 &nbsp; | &nbsp; 左键 / ← 上一句 &nbsp; | &nbsp; 💡 点击灯泡学习
         </div>
     </div>
     
     <script>
-        // --- 古诗数据 (示例) ---
+        // --- 古诗数据 ---
         const POEM_LIBRARY = [
-         // --- 九年级上册 (文言文/诗词) ---
             { category: "九上", title: "沁园春·雪", author: "毛泽东", content: "北国风光\n千里冰封\n万里雪飘\n望长城内外\n惟余莽莽\n大河上下\n顿失滔滔\n山舞银蛇\n原驰蜡象\n欲与天公试比高\n须晴日\n看红装素裹\n分外妖娆\n江山如此多娇\n引无数英雄竞折腰\n惜秦皇汉武\n略输文采\n唐宗宋祖\n稍逊风骚\n一代天骄\n成吉思汗\n只识弯弓射大雕\n俱往矣\n数风流人物\n还看今朝" },
-            { category: "九上", title: "我爱这土地", author: "艾青", content: "假如我是一只鸟\n我也应该用嘶哑的喉咙歌唱\n这被暴风雨所打击着的土地\n这永远汹涌着我们的悲愤的河流\n这无止息地吹刮着的激怒的风\n和那来自林间的无比温柔的黎明\n——然后我死了\n连羽毛也腐烂在土地里面\n为什么我的眼里常含泪水\n因为我对这土地爱得深沉" },
             { category: "九上", title: "岳阳楼记", author: "范仲淹", content: "庆历四年春\n滕子京谪守巴陵郡\n越明年\n政通人和\n百废具兴\n乃重修岳阳楼\n增其旧制\n刻唐贤今人诗赋于其上\n属予作文以记之\n\n予观夫巴陵胜状\n在洞庭一湖\n衔远山\n吞长江\n浩浩汤汤\n横无际涯\n朝晖夕阴\n气象万千\n此则岳阳楼之大观也\n前人之述备矣\n然则北通巫峡\n南极潇湘\n迁客骚人\n多会于此\n览物之情\n得无异乎\n\n若夫淫雨霏霏\n连月不开\n阴风怒号\n浊浪排空\n日星隐曜\n山岳潜形\n商旅不行\n樯倾楫摧\n薄暮冥冥\n虎啸猿啼\n登斯楼也\n则有去国怀乡\n忧谗畏讥\n满目萧然\n感极而悲者矣\n\n至若春和景明\n波澜不惊\n上下天光\n一碧万顷\n沙鸥翔集\n锦鳞游泳\n岸芷汀兰\n郁郁青青\n而或长烟一空\n皓月千里\n浮光跃金\n静影沉璧\n渔歌互答\n此乐何极\n登斯楼也\n则有心旷神怡\n宠辱偕忘\n把酒临风\n其喜洋洋者矣\n\n嗟夫\n予尝求古仁人之心\n或异二者之为\n何哉\n不以物喜\n不以己悲\n居庙堂之高\n则忧其民\n处江湖之远\n则忧其君\n是进亦忧\n退亦忧\n然则何时而乐耶\n其必曰\n先天下之忧而忧\n后天下之乐而乐欤\n噫\n微斯人\n吾谁与归" },
-            { category: "九上", title: "醉翁亭记", author: "欧阳修", content: "环滁皆山也\n其西南诸峰\n林壑尤美\n望之蔚然而深秀者\n琅琊也\n山行六七里\n渐闻水声潺潺\n而泻出于两峰之间者\n酿泉也\n峰回路转\n有亭翼然临于泉上者\n醉翁亭也\n作亭者谁\n山之僧智仙也\n名之者谁\n太守自谓也\n太守与客来饮于此\n饮少辄醉\n而年又最高\n故自号曰醉翁也\n醉翁之意不在酒\n在乎山水之间也\n山水之乐\n得之心而寓之酒也\n\n若夫日出而林霏开\n云归而岩穴暝\n晦明变化者\n山间之朝暮也\n野芳发而幽香\n佳木秀而繁阴\n风霜高洁\n水落而石出者\n山间之四时也\n朝而往\n暮而归\n四时之景不同\n而乐亦无穷也\n\n至于负者歌于途\n行者休于树\n前者呼\n后者应\n伛偻提携\n往来而不绝者\n滁人游也\n临溪而渔\n溪深而鱼肥\n酿泉为酒\n泉香而酒洌\n山肴野蔌\n杂然而前陈者\n太守宴也\n宴酣之乐\n非丝非竹\n射者中\n弈者胜\n觥筹交错\n起坐而喧哗者\n众宾欢也\n苍颜白发\n颓然乎其间者\n太守醉也\n\n已而夕阳在山\n人影散乱\n太守归而宾客从也\n树林阴翳\n鸣声上下\n游人去而禽鸟乐也\n然而禽鸟知山林之乐\n而不知人之乐\n人知从太守游而乐\n而不知太守之乐其乐也\n醉能同其乐\n醒能述以文者\n太守也\n太守谓谁\n庐陵欧阳修也" },
-            { category: "九上", title: "湖心亭看雪", author: "张岱", content: "崇祯五年十二月\n余住西湖\n大雪三日\n湖中人鸟声俱绝\n是日更定矣\n余拏一小舟\n拥毳衣炉火\n独往湖心亭看雪\n雾凇沆砀\n天与云与山与水\n上下一白\n湖上影子\n惟长堤一痕\n湖心亭一点\n与余舟一芥\n舟中人两三粒而已\n\n到亭上\n有两人铺毡对坐\n一童子烧酒炉正沸\n见余大喜曰\n湖中焉得更有此人\n拉余同饮\n余强饮三大白而别\n问其姓氏\n是金陵人\n客此\n及下船\n舟子喃喃曰\n莫说相公痴\n更有痴似相公者" },
-            { category: "九上", title: "行路难·其一", author: "李白", content: "金樽清酒斗十千\n玉盘珍羞直万钱\n停杯投箸不能食\n拔剑四顾心茫然\n欲渡黄河冰塞川\n将登太行雪满山\n闲来垂钓碧溪上\n忽复乘舟梦日边\n行路难\n行路难\n多歧路\n今安在\n长风破浪会有时\n直挂云帆济沧海" },
-            { category: "九上", title: "酬乐天扬州初逢席上见赠", author: "刘禹锡", content: "巴山楚水凄凉地\n二十三年弃置身\n怀旧空吟闻笛赋\n到乡翻似烂柯人\n沉舟侧畔千帆过\n病树前头万木春\n今日听君歌一曲\n暂凭杯酒长精神" },
             { category: "九上", title: "水调歌头", author: "苏轼", content: "明月几时有\n把酒问青天\n不知天上宫阙\n今夕是何年\n我欲乘风归去\n又恐琼楼玉宇\n高处不胜寒\n起舞弄清影\n何似在人间\n\n转朱阁\n低绮户\n照无眠\n不应有恨\n何事长向别时圆\n人有悲欢离合\n月有阴晴圆缺\n此事古难全\n但愿人长久\n千里共婵娟" },
-            { category: "九上", title: "月夜忆舍弟", author: "杜甫", content: "戍鼓断人行\n边秋一雁声\n露从今夜白\n月是故乡明\n有弟皆分散\n无家问死生\n寄书长不达\n况乃未休兵" },
-            { category: "九上", title: "长沙过贾谊宅", author: "刘长卿", content: "三年谪宦此栖迟\n万古惟留楚客悲\n秋草独寻人去后\n寒林空见日斜时\n汉文有道恩犹薄\n湘水无情吊岂知\n寂寂江山摇落处\n怜君何事到天涯" },
-            // 新增九上篇目
-            { category: "九上", title: "登飞来峰", author: "王安石", content: "飞来山上千寻塔\n闻说鸡鸣见日升\n不畏浮云遮望眼\n自缘身在最高层" },
-            { category: "九上", title: "赤壁", author: "杜牧", content: "折戟沉沙铁未销\n自将磨洗认前朝\n东风不与周郎便\n铜雀春深锁二乔" },
-            { category: "九上", title: "过零丁洋", author: "文天祥", content: "辛苦遭逢起一经\n干戈寥落四周星\n山河破碎风飘絮\n身世浮沉雨打萍\n惶恐滩头说惶恐\n零丁洋里叹零丁\n人生自古谁无死\n留取丹心照汗青" },
-            { category: "九上", title: "天净沙·秋思", author: "白朴", content: "孤村落日残霞\n轻烟老树寒鸦\n一点飞鸿影下\n青山绿水\n白草红叶黄花" },
-            { category: "九上", title: "别云间", author: "夏完淳", content: "三年羁旅客\n今日又南冠\n无限山河泪\n谁言天地宽\n独怜天地窄\n不见圣君颜\n转眼牢笼闭\n始知真是难" },
-
-            // --- 九年级下册 (文言文/诗词) ---
-            { category: "九下", title: "鱼我所欲也", author: "孟子", content: "鱼\n我所欲也\n熊掌\n亦我所欲也\n二者不可得兼\n舍鱼而取熊掌者也\n生\n亦我所欲也\n义\n亦我所欲也\n二者不可得兼\n舍生而取义者也\n生亦我所欲\n所欲有甚于生者\n故不为苟得也\n死亦我所恶\n所恶有甚于死者\n故患有所不辟也\n如使人之所欲莫甚于生\n则凡可以得生者\n何不用也\n使人之所恶莫甚于死者\n则凡可以辟患而有不为也\n由是则生而有不用也\n由是则可以辟患而有不为也\n是故所欲有甚于生者\n所恶有甚于死者\n非独贤者有是心也\n人皆有之\n贤者能勿丧耳\n\n一箪食\n一豆羹\n得之则生\n弗得则死\n呼尔而与之\n行道之人弗受\n蹴尔而与之\n乞人不屑也\n万钟则不辩礼义而受之\n万钟于我何加焉\n为宫室之美\n妻妾之奉\n所识穷乏者得我与\n乡为身死而不受\n今为宫室之美为之\n乡为身死而不受\n今为妻妾之奉为之\n乡为身死而不受\n今为所识穷乏者得我而为之\n是亦不可以已乎\n此之谓失其本心" },
-            { category: "九下", title: "送东阳马生序", author: "宋濂", content: "余幼时即嗜学\n家贫\n无从致书以观\n每假借于藏书之家\n手自笔录\n计日以还\n天大寒\n砚冰坚\n手指不可屈伸\n弗之怠\n录毕\n走送之\n不敢稍逾约\n以是人多以书假余\n余因得遍观群书\n既加冠\n益慕圣贤之道\n又患无硕师名人与游\n尝趋百里外\n从乡之先达执经叩问\n先达德隆望尊\n门人弟子填其室\n未尝稍降辞色\n余立侍左右\n援疑质理\n俯身倾耳以请\n或遇其叱咄\n色愈恭\n礼愈至\n不敢出一言以复\n俟其欣悦\n则又请焉\n故余虽愚\n卒获有所闻\n\n当余之从师也\n负箧曳屣行深山巨谷中\n穷冬烈风\n大雪深数尺\n足肤皲裂而不知\n至舍\n四支僵劲不能动\n媵人持汤沃灌\n以衾拥覆\n久而乃和\n寓逆旅\n主人日再食\n无鲜肥滋味之享\n同舍生皆被绮绣\n戴朱缨宝饰之帽\n腰白玉之环\n左佩刀\n右备容臭\n烨然若神人\n余则缊袍敝衣处其间\n略无慕艳意\n以中有足乐者\n不知口体之奉不若人也\n盖余之勤且艰若此" },
-            { category: "九下", title: "曹刿论战", author: "左传", content: "十年春\n齐师伐我\n公将战\n曹刿请见\n其乡人曰\n肉食者谋之\n又何间焉\n刿曰\n肉食者鄙\n未能远谋\n乃入见\n问\n何以战\n公曰\n衣食所安\n弗敢专也\n必以分人\n对曰\n小惠未遍\n民弗从也\n公曰\n牺牲玉帛\n弗敢加也\n必以信\n对曰\n小信未孚\n神弗福也\n公曰\n小大之狱\n虽不能察\n必以情\n对曰\n忠之属也\n可以一战\n战则请从\n\n公与之乘\n战于长勺\n公将鼓之\n刿曰未可\n齐人三鼓\n刿曰可矣\n齐师败绩\n公将驰之\n刿曰未可\n下视其辙\n登轼而望之\n曰可矣\n遂逐齐师\n\n既克\n公问其故\n对曰\n夫战\n勇气也\n一鼓作气\n再而衰\n三而竭\n彼竭我盈\n故克之\n夫大国\n难测也\n惧有伏焉\n吾视其辙乱\n望其旗靡\n故逐之" },
-            { category: "九下", title: "邹忌讽齐王纳谏", author: "战国策", content: "邹忌修八尺有余\n而形貌昳丽\n朝服衣冠\n窥镜\n谓其妻曰\n我孰与城北徐公美\n其妻曰\n君美甚\n徐公何能及君也\n城北徐公\n齐国之美丽者也\n忌不自信\n而复问其妾曰\n吾孰与徐公美\n妾曰\n徐公何能及君也\n旦日\n客从外来\n与坐谈\n问之客曰\n吾与徐公孰美\n客曰\n徐公不若君之美也\n明日徐公来\n孰视之\n自以为不如\n窥镜而自视\n又弗如远甚\n暮寝而思之\n曰\n吾妻之美我者\n私我也\n妾之美我者\n畏我也\n客之美我者\n欲有求于我也\n\n于是入朝见威王\n曰\n臣诚知不如徐公美\n臣之妻私臣\n臣之妾畏臣\n臣之客欲有求于臣\n皆以美于徐公\n今齐地方千里\n百二十城\n宫妇左右莫不私王\n朝廷之臣莫不畏王\n四境之内莫不有求于王\n由此观之\n王之蔽甚矣\n\n王曰\n善\n乃下令\n群臣吏民\n能面刺寡人之过者\n受上赏\n上书谏寡人者\n受中赏\n能谤讥于市朝\n闻寡人之耳者\n受下赏\n令初下\n群臣进谏\n门庭若市\n数月之后\n时时而间进\n期年之后\n虽欲言\n无可进者\n燕赵韩魏闻之\n皆朝于齐\n此所谓战胜于朝廷" },
+            { category: "九上", title: "行路难·其一", author: "李白", content: "金樽清酒斗十千\n玉盘珍羞直万钱\n停杯投箸不能食\n拔剑四顾心茫然\n欲渡黄河冰塞川\n将登太行雪满山\n闲来垂钓碧溪上\n忽复乘舟梦日边\n行路难\n行路难\n多歧路\n今安在\n长风破浪会有时\n直挂云帆济沧海" },
             { category: "九下", title: "出师表", author: "诸葛亮", content: "先帝创业未半而中道崩殂\n今天下三分\n益州疲弊\n此诚危急存亡之秋也\n然侍卫之臣不懈于内\n忠志之士忘身于外者\n盖追先帝之殊遇\n欲报之于陛下也\n诚宜开张圣听\n以光先帝遗德\n恢弘志士之气\n不宜妄自菲薄\n引喻失义\n以塞忠谏之路也\n\n宫中府中\n俱为一体\n陟罚臧否\n不宜异同\n若有作奸犯科及为忠善者\n宜付有司论其刑赏\n以昭陛下平明之理\n不宜偏私\n使内外异法也\n\n侍中侍郎郭攸之\n费祎\n董允等\n此皆良实\n志虑忠纯\n是以先帝简拔以遗陛下\n愚以为宫中之事\n事无大小\n悉以咨之\n然后施行\n必能裨补阙漏\n有所广益\n\n将军向宠\n性行淑均\n晓畅军事\n试用于昔日\n先帝称之曰能\n是以众议举宠为督\n愚以为营中之事\n悉以咨之\n必能使行阵和睦\n优劣得所\n\n亲贤臣\n远小人\n此先汉所以兴隆也\n亲小人\n远贤臣\n此后汉所以倾颓也\n先帝在时\n每与臣论此事\n未尝不叹息痛恨于桓灵也\n侍中尚书长史参军\n此悉贞良死节之臣\n愿陛下亲之信之\n则汉室之隆\n可计日而待也\n\n臣本布衣\n躬耕于南阳\n苟全性命于乱世\n不求闻达于诸侯\n先帝不以臣卑鄙\n猥自枉屈\n三顾臣于草庐之中\n咨臣以当世之事\n由是感激\n遂许先帝以驱驰\n后值倾覆\n受任于败军之际\n奉命于危难之间\n尔来二十有一年矣\n\n先帝知臣谨慎\n故临崩寄臣以大事也\n受命以来\n夙夜忧叹\n恐托付不效\n以伤先帝之明\n故五月渡泸\n深入不毛\n今南方已定\n兵甲已足\n当奖率三军\n北定中原\n庶竭驽钝\n攘除奸凶\n兴复汉室\n还于旧都\n此臣所以报先帝而忠陛下之职分也\n至于斟酌损益\n进尽忠言\n则攸之祎允之任也\n\n愿陛下托臣以讨贼兴复之效\n不效则治臣之罪\n以告先帝之灵\n若无兴德之言\n则责攸之祎允等之慢\n以彰其咎\n陛下亦宜自谋\n以咨诹善道\n察纳雅言\n深追先帝遗诏\n臣不胜受恩感激\n今当远离\n临表涕零\n不知所言" },
-            { category: "九下", title: "南乡子·登京口北固亭有怀", author: "辛弃疾", content: "何处望神州\n满眼风光北固楼\n千古兴亡多少事\n悠悠\n不尽长江滚滚流\n年少万兜鍪\n坐断东南战未休\n天下英雄谁敌手\n曹刘\n生子当如孙仲谋" },
-            { category: "九下", title: "山坡羊·潼关怀古", author: "张养浩", content: "峰峦如聚\n波涛如怒\n山河表里潼关路\n望西都\n意踌躇\n伤心秦汉经行处\n宫阙万间都做了土\n兴\n百姓苦\n亡\n百姓苦" },
-            { category: "九下", title: "破阵子·为陈同甫赋壮词以寄之", author: "辛弃疾", content: "醉里挑灯看剑\n梦回吹角连营\n八百里分麾下炙\n五十弦翻塞外声\n沙场秋点兵\n马作的卢飞快\n弓如霹雳弦惊\n了却君王天下事\n赢得生前身后名\n可怜白发生" },
-            // 新增九下篇目
-            { category: "九下", title: "浣溪沙·谁道人生无再少", author: "苏轼", content: "谁道人生无再少\n门前流水尚能西\n休将白发唱黄鸡\n\n昨日春风辞故里\n今朝落日忆长安\n忽思身世五十年" },
-            { category: "九下", title: "西江月·夜行黄沙道中", author: "辛弃疾", content: "明月别枝惊鹊\n清风半夜鸣蝉\n稻花香里说丰年\n听取蛙声一片\n\n七八个星天外\n两三点雨山前\n旧时茅店社林边\n路转溪头忽见" },
-            { category: "九下", title: "太常引·建康中秋夜", author: "辛弃疾", content: "一轮秋影转金波\n飞镜又重磨\n把酒问姮娥\n'被白发\n欺人奈何'\n\n乘风好去\n莫等闲\n愁如许\n何日复归来\n江山知有待\n'待与我\n共临'?" },
-            { category: "九下", title: "无题", author: "李商隐", content: "相见时难别亦难\n东风无力百花残\n春蚕到死丝方尽\n蜡炬成灰泪始干\n晓镜但愁云鬓改\n夜吟应觉月光寒\n蓬莱此去无多路\n青鸟殷勤为探看" },
-            { category: "九下", title: "卜算子·咏梅", author: "陆游", content: "驿外断桥边\n寂寞开无主\n已是黄昏独自愁\n更著风和雨\n\n无意苦争春\n一任群芳妒\n零落成泥碾作尘\n只有香如故" },
+             { category: "九下", title: "鱼我所欲也", author: "孟子", content: "鱼\n我所欲也\n熊掌\n亦我所欲也\n二者不可得兼\n舍鱼而取熊掌者也\n生\n亦我所欲也\n义\n亦我所欲也\n二者不可得兼\n舍生而取义者也\n生亦我所欲\n所欲有甚于生者\n故不为苟得也\n死亦我所恶\n所恶有甚于死者\n故患有所不辟也\n如使人之所欲莫甚于生\n则凡可以得生者\n何不用也\n使人之所恶莫甚于死者\n则凡可以辟患而有不为也\n由是则生而有不用也\n由是则可以辟患而有不为也\n是故所欲有甚于生者\n所恶有甚于死者\n非独贤者有是心也\n人皆有之\n贤者能勿丧耳\n\n一箪食\n一豆羹\n得之则生\n弗得则死\n呼尔而与之\n行道之人弗受\n蹴尔而与之\n乞人不屑也\n万钟则不辩礼义而受之\n万钟于我何加焉\n为宫室之美\n妻妾之奉\n所识穷乏者得我与\n乡为身死而不受\n今为宫室之美为之\n乡为身死而不受\n今为妻妾之奉为之\n乡为身死而不受\n今为所识穷乏者得我而为之\n是亦不可以已乎\n此之谓失其本心" },
+             { category: "九下", title: "曹刿论战", author: "左传", content: "十年春\n齐师伐我\n公将战\n曹刿请见\n其乡人曰\n肉食者谋之\n又何间焉\n刿曰\n肉食者鄙\n未能远谋\n乃入见\n问\n何以战\n公曰\n衣食所安\n弗敢专也\n必以分人\n对曰\n小惠未遍\n民弗从也\n公曰\n牺牲玉帛\n弗敢加也\n必以信\n对曰\n小信未孚\n神弗福也\n公曰\n小大之狱\n虽不能察\n必以情\n对曰\n忠之属也\n可以一战\n战则请从\n\n公与之乘\n战于长勺\n公将鼓之\n刿曰未可\n齐人三鼓\n刿曰可矣\n齐师败绩\n公将驰之\n刿曰未可\n下视其辙\n登轼而望之\n曰可矣\n遂逐齐师\n\n既克\n公问其故\n对曰\n夫战\n勇气也\n一鼓作气\n再而衰\n三而竭\n彼竭我盈\n故克之\n夫大国\n难测也\n惧有伏焉\n吾视其辙乱\n望其旗靡\n故逐之" },
+             { category: "九下", title: "邹忌讽齐王纳谏", author: "战国策", content: "邹忌修八尺有余\n而形貌昳丽\n朝服衣冠\n窥镜\n谓其妻曰\n我孰与城北徐公美\n其妻曰\n君美甚\n徐公何能及君也\n城北徐公\n齐国之美丽者也\n忌不自信\n而复问其妾曰\n吾孰与徐公美\n妾曰\n徐公何能及君也\n旦日\n客从外来\n与坐谈\n问之客曰\n吾与徐公孰美\n客曰\n徐公不若君之美也\n明日徐公来\n孰视之\n自以为不如\n窥镜而自视\n又弗如远甚\n暮寝而思之\n曰\n吾妻之美我者\n私我也\n妾之美我者\n畏我也\n客之美我者\n欲有求于我也\n\n于是入朝见威王\n曰\n臣诚知不如徐公美\n臣之妻私臣\n臣之妾畏臣\n臣之客欲有求于臣\n皆以美于徐公\n今齐地方千里\n百二十城\n宫妇左右莫不私王\n朝廷之臣莫不畏王\n四境之内莫不有求于王\n由此观之\n王之蔽甚矣\n\n王曰\n善\n乃下令\n群臣吏民\n能面刺寡人之过者\n受上赏\n上书谏寡人者\n受中赏\n能谤讥于市朝\n闻寡人之耳者\n受下赏\n令初下\n群臣进谏\n门庭若市\n数月之后\n时时而间进\n期年之后\n虽欲言\n无可进者\n燕赵韩魏闻之\n皆朝于齐\n此所谓战胜于朝廷" },
         ];
 
         // --- 全局变量 ---
@@ -513,6 +513,8 @@
         let timerInterval = null;
         let lineStats = []; // 格式: [{index:0, retreats:0, duration:0, lastRevealTime: 0}, ...]
         let isStudyMode = false;
+        let isPaused = false;
+        let pausedTimeDuration = 0; // 记录已暂停的时长(如果需要) - 实际逻辑使用重新计算startTime
 
         // --- 工具函数 ---
 
@@ -551,15 +553,15 @@
             return Math.min(...completed.map(p => p.totalTime));
         }
 
-        function saveOrUpdateHistory(title, content, progress, status, totalTime = 0, finalStats = null) {
-            if (isStudyMode) return; // 学习模式不保存进度
+        // 修改：现在即使是 in-progress 状态也会保存 lineStats (stats)
+        function saveOrUpdateHistory(title, content, progress, status, totalTime = 0, currentStats = null) {
+            if (isStudyMode) return; 
 
             let history = loadHistory();
             const fullTextForCount = `${title}\n${content}`;
             const cleanData = parsePoemLines(fullTextForCount);
             const totalLines = cleanData.length; 
 
-            // 构建新记录
             let newItem = { 
                 title, 
                 content, 
@@ -567,20 +569,12 @@
                 progress, 
                 totalLines, 
                 status,
-                totalTime: totalTime
+                totalTime: totalTime,
+                stats: currentStats // 关键：保存统计数据
             };
             
-            // 如果完成了，保存详细统计数据
-            if (status === 'completed' && finalStats) {
-                newItem.stats = finalStats;
-            }
-
-            // 更新或插入
             let existingIdx = history.findIndex(p => p.title === title);
             if(existingIdx > -1) {
-                // 保留旧的历史记录中的最佳时间等信息(如果有的话)，这里我们直接覆盖最新状态
-                // 但要确保如果不为 completed，不要把旧的 completed 状态覆盖成 in-progress 而丢失了曾经完成的事实？
-                // 简化逻辑：每次都更新到最新。如果想保留历史最佳，我们在 finish 时单独计算。
                 history.splice(existingIdx, 1);
             }
             history.unshift(newItem);
@@ -735,18 +729,37 @@
             linesData = parsePoemLines(text);
             currentIndex = initialIndex;
             isStudyMode = false;
+            isPaused = false;
+            document.getElementById('pause-overlay').style.display = 'none';
             
-            // 初始化统计数据
-            startTime = Date.now();
+            // --- 核心：继承/初始化数据 ---
+            const history = loadHistory().find(p => p.title === currentPoemTitle);
+            let inheritedTime = 0;
+
+            // 初始化 lineStats
             lineStats = linesData.map((_, idx) => ({ 
-                index: idx, 
-                retreats: 0, 
-                duration: 0,
-                lastRevealTime: 0 
+                index: idx, retreats: 0, duration: 0, lastRevealTime: 0 
             }));
 
-            // 恢复/保存初始进度
-            saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress');
+            // 如果是继续背诵 (initialIndex > -1)，尝试加载历史数据
+            if (initialIndex > -1 && history) {
+                // 继承时间
+                if (history.totalTime) inheritedTime = history.totalTime;
+                // 继承统计数据 (如果有保存的话)
+                if (history.stats && Array.isArray(history.stats)) {
+                    // 合并数据，确保长度一致
+                    lineStats = linesData.map((_, idx) => {
+                        const saved = history.stats.find(s => s.index === idx);
+                        return saved ? {...saved, lastRevealTime: 0} : {index: idx, retreats:0, duration:0, lastRevealTime:0};
+                    });
+                }
+            }
+
+            // 计算起始时间戳 (当前时间 - 已过时间)
+            startTime = Date.now() - (inheritedTime * 1000);
+
+            // 保存初始/继承后的状态
+            saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', inheritedTime, lineStats);
 
             // DOM 构建
             poemView.innerHTML = '';
@@ -769,14 +782,15 @@
                 for(let i=0; i<=currentIndex; i++) els[i].classList.add('revealed');
                 if(els[currentIndex]) {
                     els[currentIndex].scrollIntoView({block: 'center', behavior: 'instant'}); 
-                    // 恢复时，把当前行的“开始看”时间设为现在，以便计算该行的思考时间
+                    // 恢复时，重置当前行的计时点
                     lineStats[currentIndex].lastRevealTime = Date.now();
                 }
             } else {
                 poemView.scrollTo({top:0, behavior:'instant'});
             }
 
-            // 启动计时器
+            // 更新UI
+            document.querySelectorAll('#btn-study-reveal, .btn-study').forEach(b => b.classList.remove('study-active'));
             startTimer();
             updateProgress();
         }
@@ -784,10 +798,14 @@
         function startTimer() {
             clearInterval(timerInterval);
             const timerEl = document.getElementById('recite-timer');
-            timerEl.textContent = "00:00";
             
+            // 立即刷新一次显示
+            if (startTime) {
+                 timerEl.textContent = formatTime((Date.now() - startTime) / 1000);
+            }
+
             timerInterval = setInterval(() => {
-                if(!isStudyMode && startTime) {
+                if(!isStudyMode && !isPaused && startTime) {
                     const diff = (Date.now() - startTime) / 1000;
                     timerEl.textContent = formatTime(diff);
                 }
@@ -798,12 +816,51 @@
             clearInterval(timerInterval);
         }
 
+        // --- 暂停功能 ---
+        function togglePause() {
+            if (isStudyMode) return; // 学习模式无需暂停（已经停了）
+
+            const overlay = document.getElementById('pause-overlay');
+            
+            if (isPaused) {
+                // 恢复
+                isPaused = false;
+                overlay.style.display = 'none';
+                
+                // 核心：恢复时间 = 当前时间 - 之前记录的已用时长
+                // 我们在暂停时记录了 accumulatedTime，恢复时反推 startTime
+                // 简便方法：startTime = Date.now() - (pausedTimeDuration * 1000)
+                startTime = Date.now() - (pausedTimeDuration * 1000);
+                
+                // 重置当前行的计时点 (防止暂停时间算入思考时间)
+                if (currentIndex >= 0 && lineStats[currentIndex]) {
+                    lineStats[currentIndex].lastRevealTime = Date.now();
+                }
+                
+                startTimer();
+            } else {
+                // 暂停
+                isPaused = true;
+                overlay.style.display = 'flex';
+                stopTimer();
+                
+                // 记录当前已用总时长
+                pausedTimeDuration = (Date.now() - startTime) / 1000;
+                
+                // 记录暂停前那一刻的思考时间到当前句
+                if (currentIndex >= 0 && lineStats[currentIndex]) {
+                    lineStats[currentIndex].duration += (Date.now() - lineStats[currentIndex].lastRevealTime) / 1000;
+                }
+
+                // 保存数据到本地
+                saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', pausedTimeDuration, lineStats);
+            }
+        }
+
         function revealNext() {
-            if (isStudyMode) return; // 学习模式下不操作
+            if (isStudyMode || isPaused) return; 
             if (currentIndex >= linesData.length - 1) return finish();
 
-            // 1. 计算当前行的停留时长 (Think Time)
-            // 逻辑：当你看着 Line A 时，你是在回忆 Line B。所以时间记在 Line A 上。
             if (currentIndex >= 0 && lineStats[currentIndex]) {
                 const duration = (Date.now() - lineStats[currentIndex].lastRevealTime) / 1000;
                 lineStats[currentIndex].duration += duration;
@@ -816,23 +873,17 @@
                 els[currentIndex].classList.add('revealed');
                 els[currentIndex].scrollIntoView({behavior: "smooth", block: "center"});
                 
-                // 记录新的一行被揭示的时间点
                 lineStats[currentIndex].lastRevealTime = Date.now();
-                
-                // 保存进度
-                saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', (Date.now()-startTime)/1000);
+                saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', (Date.now()-startTime)/1000, lineStats);
             }
             updateProgress();
         }
 
         function hidePrev() {
-            if (isStudyMode || currentIndex < 0) return;
+            if (isStudyMode || isPaused || currentIndex < 0) return;
             
-            // 记录“退回”统计：
-            // 如果你在 Line B 处退回，说明你对 Line B 或 C 有疑问，这里记在当前显示的最后一行上
             if (currentIndex >= 0 && lineStats[currentIndex]) {
                 lineStats[currentIndex].retreats++;
-                // 同时把这之前的停留时间也加上
                 const duration = (Date.now() - lineStats[currentIndex].lastRevealTime) / 1000;
                 lineStats[currentIndex].duration += duration;
             }
@@ -845,30 +896,56 @@
             
             if(currentIndex >= 0 && els[currentIndex]) {
                 els[currentIndex].scrollIntoView({behavior: "smooth", block: "center"});
-                // 重置时间点
                 lineStats[currentIndex].lastRevealTime = Date.now();
             } else {
                 poemView.scrollTo({top:0, behavior:'smooth'});
             }
 
-            saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', (Date.now()-startTime)/1000);
+            saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', (Date.now()-startTime)/1000, lineStats);
             updateProgress();
         }
 
-        // --- 学习模式 ---
-        function revealAllForStudy() {
-            if(isStudyMode) return;
-            if(!confirm("进入学习模式？\n计时将暂停，本次背诵将不计入成绩。")) return;
+        // --- 学习模式 (切换) ---
+        function toggleStudyMode() {
+            if (isPaused) return; // 暂停时不能切换学习模式
+
+            const btns = document.querySelectorAll('#btn-study-reveal, .btn-study');
             
-            isStudyMode = true;
-            stopTimer();
-            document.getElementById('recite-timer').textContent = "学习中...";
-            
-            const els = document.querySelectorAll('.poem-line');
-            els.forEach(el => el.classList.add('revealed'));
-            
-            // 不保存进度，也不算完成
-            alert("已展开全文。你可以自由朗读或查阅。\n点击退出按钮可结束。");
+            if (isStudyMode) {
+                // 退出学习模式
+                isStudyMode = false;
+                btns.forEach(b => b.classList.remove('study-active'));
+                
+                // 恢复遮罩 (隐藏 currentIndex 之后的行)
+                const els = document.querySelectorAll('.poem-line');
+                els.forEach((el, i) => {
+                    if (i > currentIndex) el.classList.remove('revealed');
+                });
+
+                // 恢复计时器
+                // 注意：学习期间的时间不应该计入总时间
+                // 逻辑：startTime = Date.now() - (学习模式开始前已用的时间)
+                startTime = Date.now() - (pausedTimeDuration * 1000);
+                
+                // 重置当前行的思考计时点
+                if(currentIndex >= 0 && lineStats[currentIndex]) {
+                    lineStats[currentIndex].lastRevealTime = Date.now();
+                }
+
+                startTimer();
+
+            } else {
+                // 进入学习模式
+                isStudyMode = true;
+                btns.forEach(b => b.classList.add('study-active'));
+                
+                stopTimer();
+                // 记录进入学习模式前的时间，以便退出时恢复
+                pausedTimeDuration = (Date.now() - startTime) / 1000;
+                
+                // 展开全文
+                document.querySelectorAll('.poem-line').forEach(el => el.classList.add('revealed'));
+            }
         }
 
         // --- 完成与结算 ---
@@ -876,37 +953,32 @@
             stopTimer();
             const totalTime = (Date.now() - startTime) / 1000;
             
-            // 记录最后一行的停留时间
             if (currentIndex >= 0 && lineStats[currentIndex]) {
                 lineStats[currentIndex].duration += (Date.now() - lineStats[currentIndex].lastRevealTime) / 1000;
             }
 
-            // 保存完成状态
+            // 保存完成状态及最终统计
             saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'completed', totalTime, lineStats);
 
-            // 准备结算数据
             const bestTime = loadBestTime(currentPoemTitle);
             const totalRetreats = lineStats.reduce((sum, item) => sum + item.retreats, 0);
-            
-            // 排序找出最难和最慢的句子 (排除标题行 index 0)
-            const validStats = lineStats.slice(1); // 假设第一行是标题
+            const validStats = lineStats.slice(1); 
             const hardest = [...validStats].sort((a,b) => b.retreats - a.retreats).filter(i => i.retreats > 0).slice(0, 3);
             const longest = [...validStats].sort((a,b) => b.duration - a.duration).filter(i => i.duration > 1).slice(0, 3);
 
-            // 渲染结算页
             document.getElementById('completion-title').textContent = currentPoemTitle;
             document.getElementById('score-time').textContent = formatTime(totalTime);
             document.getElementById('score-best').textContent = bestTime ? formatTime(bestTime) : formatTime(totalTime);
             document.getElementById('score-retreats').textContent = totalRetreats;
             
+            const timeEl = document.getElementById('score-time');
             if (bestTime && totalTime < bestTime) {
-                document.getElementById('score-time').classList.add('score-highlight');
-                document.getElementById('score-time').innerHTML += ' <span style="font-size:12px">新纪录!</span>';
+                timeEl.classList.add('score-highlight');
+                timeEl.innerHTML += ' <span style="font-size:12px">新纪录!</span>';
             } else {
-                document.getElementById('score-time').classList.remove('score-highlight');
+                timeEl.classList.remove('score-highlight');
             }
 
-            // 渲染列表
             const renderList = (arr, type) => {
                 if(arr.length === 0) return '<li><span>完美通过，无明显卡顿！🎉</span></li>';
                 return arr.map(item => `
@@ -929,8 +1001,9 @@
 
         function exitMidSession() {
             if(confirm("确定退出？(进度已保存)")) {
-                if(!isStudyMode) {
-                    saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', (Date.now()-startTime)/1000);
+                if(!isStudyMode && !isPaused) {
+                    const currentTime = (Date.now() - startTime) / 1000;
+                    saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', currentTime, lineStats);
                 }
                 goToHomeAfterCompletion(false);
             }
@@ -938,6 +1011,11 @@
 
         function goToHomeAfterCompletion(completed=true) {
             completionView.style.opacity = 0; poemViewContainer.style.opacity = 0;
+            // 重置状态
+            isStudyMode = false;
+            isPaused = false;
+            document.getElementById('pause-overlay').style.display = 'none';
+
             setTimeout(() => {
                 completionView.style.display = 'none'; poemViewContainer.style.display = 'none';
                 updateProgress(true); 
@@ -988,21 +1066,20 @@
         
         // 键盘控制
         document.addEventListener('keydown', e => {
-            if(poemViewContainer.style.display !== 'flex' || isMobile() || isStudyMode) return; 
+            if(poemViewContainer.style.display !== 'flex' || isMobile() || isStudyMode || isPaused) return; 
             if(completionView.style.display === 'flex') return;
             if(['ArrowRight', 'ArrowDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); revealNext(); }
             else if(['ArrowLeft', 'ArrowUp', 'Backspace'].includes(e.key)) { e.preventDefault(); hidePrev(); }
             else if(e.key === 'Escape') exitMidSession();
         });
-        // 鼠标控制 (右键前进)
+        // 鼠标控制
         document.addEventListener('contextmenu', e => {
-            if(!isMobile() && poemViewContainer.style.display === 'flex' && completionView.style.display !== 'flex' && !isStudyMode) { 
+            if(!isMobile() && poemViewContainer.style.display === 'flex' && completionView.style.display !== 'flex' && !isStudyMode && !isPaused) { 
                 e.preventDefault(); revealNext(); 
             }
         });
-        // 鼠标点击 (任意处后退，排除按钮)
         document.addEventListener('click', e => {
-            if(!isMobile() && poemViewContainer.style.display === 'flex' && completionView.style.display !== 'flex' && !isStudyMode) {
+            if(!isMobile() && poemViewContainer.style.display === 'flex' && completionView.style.display !== 'flex' && !isStudyMode && !isPaused) {
                 if(!e.target.closest('.top-icon-btn') && !e.target.closest('.mobile-controls')) hidePrev();
             }
         });
@@ -1021,7 +1098,6 @@
             e.target.value = '';
         });
 
-        // 初始化
         window.onload = function() { loadSettings(); renderMain(); };
 
     </script>
