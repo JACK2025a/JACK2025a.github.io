@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>沉浸背诵</title>
+    <title>古诗 · 沉浸背诵 (Ultimate)</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         /* --- 核心变量定义 --- */
@@ -19,6 +19,7 @@
             --btn-secondary-text: #5f6368;
             --color-success: #34a853; 
             --color-danger: #e74c3c; 
+            --color-warning: #f1c40f;
             --font-poem: 'Noto Serif SC', 'Songti SC', serif;
             --transition-curve: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -34,7 +35,7 @@
             align-items: center;
             overflow: hidden;
             user-select: none;
-            -webkit-tap-highlight-color: transparent; /* 移动端点击去除高亮 */
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* --- 主容器 --- */
@@ -56,12 +57,12 @@
         .nav-bar {
             display: flex;
             justify-content: space-around;
-            padding: 15px 20px 0; /* 适应移动端，缩小内边距 */
+            padding: 15px 20px 0;
             border-bottom: 1px solid #f0f0f0;
             flex-shrink: 0;
         }
         .nav-tab {
-            padding: 10px 15px; /* 适应移动端，缩小内边距 */
+            padding: 10px 15px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 500;
@@ -70,13 +71,8 @@
             transition: all 0.3s;
             white-space: nowrap;
         }
-        .nav-tab:hover {
-            color: var(--text-primary);
-        }
-        .nav-tab.active {
-            color: var(--accent-color);
-            border-bottom-color: var(--accent-color);
-        }
+        .nav-tab:hover { color: var(--text-primary); }
+        .nav-tab.active { color: var(--accent-color); border-bottom-color: var(--accent-color); }
 
         /* --- 内容区域 --- */
         .main-content {
@@ -95,15 +91,10 @@
             display: none;
             flex-direction: column;
         }
-        .view-content.active {
-            display: flex; 
-        }
+        .view-content.active { display: flex; }
 
         /* --- 视图1: 背诵 (Recitation) --- */
-        #recitation-view {
-            display: flex;
-            flex-direction: row; /* 电脑端默认左右分栏 */
-        }
+        #recitation-view { display: flex; flex-direction: row; }
         
         .recitation-input-panel {
             flex: 1.5;
@@ -118,124 +109,50 @@
             border-left: 1px solid #e0e0e0;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* 让内部列表滚动 */
+            overflow: hidden;
         }
-
+        
         /* 搜索和分类栏 */
-        .library-header {
-            flex-shrink: 0;
-            margin-bottom: 15px;
-        }
+        .library-header { flex-shrink: 0; margin-bottom: 15px; }
         .search-box {
-            width: 100%;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            background: #f9f9f9;
-            font-size: 14px;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-            outline: none;
+            width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd;
+            background: #f9f9f9; font-size: 14px; box-sizing: border-box; margin-bottom: 10px; outline: none;
         }
-        .search-box:focus {
-            border-color: var(--accent-color);
-            background: #fff;
-        }
-        .category-tags {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 5px;
-            scrollbar-width: none;
-        }
-        .category-tags::-webkit-scrollbar {
-             display: none;
-        }
+        .search-box:focus { border-color: var(--accent-color); background: #fff; }
+        
+        .category-tags { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .category-tags::-webkit-scrollbar { display: none; }
         .category-tag {
-            padding: 4px 10px;
-            border-radius: 12px;
-            background: #f1f3f4;
-            color: #5f6368;
-            font-size: 12px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-            user-select: none;
+            padding: 4px 10px; border-radius: 12px; background: #f1f3f4; color: #5f6368;
+            font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s;
         }
-        .category-tag.active {
-            background: var(--accent-color);
-            color: white;
-        }
+        .category-tag.active { background: var(--accent-color); color: white; }
 
-        .recitation-list-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
+        .recitation-list-container { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
         
         .title {
-            font-family: var(--font-poem);
-            font-size: 28px;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-            font-weight: 900;
-            text-align: center;
-            letter-spacing: 2px;
+            font-family: var(--font-poem); font-size: 28px; color: var(--text-primary);
+            margin-bottom: 5px; font-weight: 900; text-align: center; letter-spacing: 2px;
         }
-        .subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-            text-align: center;
-        }
+        .subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; text-align: center; }
 
         .input-wrapper {
-            flex-grow: 1;
-            min-height: 200px;
-            position: relative;
-            border-radius: 16px;
-            border: 2px solid #edf2f7;
-            background: #fcfcfc;
-            transition: border-color 0.3s;
-            overflow: hidden;
-            margin-bottom: 15px;
+            flex-grow: 1; min-height: 200px; position: relative; border-radius: 16px;
+            border: 2px solid #edf2f7; background: #fcfcfc; transition: border-color 0.3s;
+            overflow: hidden; margin-bottom: 15px;
         }
         textarea {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: transparent;
-            padding: 20px;
-            font-family: var(--font-poem);
-            font-size: 16px;
-            line-height: 1.8;
-            color: #444;
-            resize: none;
-            outline: none;
-            box-sizing: border-box;
+            width: 100%; height: 100%; border: none; background: transparent; padding: 20px;
+            font-family: var(--font-poem); font-size: 16px; line-height: 1.8; color: #444;
+            resize: none; outline: none; box-sizing: border-box;
         }
         
-        .action-bar {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .action-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .btn {
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s;
-            flex: 1;
+            padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500;
+            cursor: pointer; border: none; display: flex; align-items: center; justify-content: center;
+            gap: 6px; transition: all 0.2s; flex: 1;
         }
-
         .btn-primary { background: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3); flex: 2; }
         .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
         .btn-secondary { background: var(--btn-secondary-bg); color: var(--btn-secondary-text); }
@@ -243,16 +160,9 @@
         #continue-recitation-btn { background: var(--color-success); color: white; margin-bottom: 15px; display: none; width: 100%; box-sizing: border-box;}
         
         .poem-list-item {
-            padding: 12px;
-            margin-bottom: 8px;
-            background: #f7f9fb;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            color: var(--text-primary);
-            transition: all 0.2s;
-            line-height: 1.4;
-            position: relative;
+            padding: 12px; margin-bottom: 8px; background: #f7f9fb; border-radius: 8px;
+            cursor: pointer; font-size: 14px; color: var(--text-primary); transition: all 0.2s;
+            line-height: 1.4; position: relative;
         }
         .poem-list-item:hover { background: #e9eff5; transform: translateX(2px); }
         .poem-list-item small { display: block; color: var(--text-secondary); font-size: 11px; margin-top: 4px; }
@@ -301,40 +211,43 @@
             position: absolute; top: 20px; width: 36px; height: 36px; border-radius: 50%;
             background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             display: flex; align-items: center; justify-content: center; cursor: pointer;
-            color: #555; font-size: 18px; z-index: 1100;
+            color: #555; font-size: 18px; z-index: 1100; transition: all 0.2s;
         }
+        .top-icon-btn:hover { transform: scale(1.1); }
         #btn-exit-recite { left: 20px; }
         #btn-restart-recite { left: 70px; color: var(--accent-color); }
+        #btn-study-reveal { left: 120px; color: var(--color-warning); font-size: 16px; }
+
+        #recite-timer {
+            position: absolute; top: 25px; right: 20px; 
+            font-family: 'Roboto', sans-serif; font-weight: 500; font-size: 16px; 
+            color: var(--text-secondary); z-index: 1100;
+            background: rgba(255,255,255,0.8); padding: 4px 10px; border-radius: 12px;
+        }
 
         /* 移动端专用控制栏 (底部) */
         .mobile-controls {
-            position: fixed; /* 使用 fixed 确保在移动端固定在底部 */
+            position: fixed;
             bottom: 0; left: 0; width: 100%; height: 80px;
             background: rgba(255,255,255,0.95);
             border-top: 1px solid #eee;
-            display: none; /* JS控制显示，PC端默认隐藏 */
+            display: none; /* 默认隐藏，通过 media query 控制 */
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px 10px; /* 增加底部内边距，避免被home bar遮挡 */
+            padding: 0 20px 10px;
             box-sizing: border-box;
             z-index: 1100;
             backdrop-filter: blur(10px);
         }
         .mobile-btn {
-            flex: 1;
-            height: 50px;
-            border-radius: 12px;
-            border: none;
-            font-size: 16px;
-            font-weight: 600;
-            margin: 0 5px;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            user-select: none;
+            flex: 1; height: 50px; border-radius: 12px; border: none;
+            font-size: 16px; font-weight: 600; margin: 0 5px; color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
         .btn-prev { background: #95a5a6; }
         .btn-next { background: var(--accent-color); }
+        .btn-study { background: var(--color-warning); color: #333; flex: 0.4; } /* 移动端学习按钮 */
         .btn-prev:active, .btn-next:active { transform: scale(0.95); }
 
         /* 提示层 - 仅桌面显示 */
@@ -346,56 +259,47 @@
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- 完成界面 --- */
+        /* --- 完成界面 (Completion View) --- */
         #completion-view {
             display: none; height: 100%; width: 100%; position: absolute; top: 0; left: 0;
             background: var(--card-bg); padding: 30px; box-sizing: border-box;
-            align-items: center; justify-content: center; flex-direction: column;
+            align-items: center; justify-content: flex-start; flex-direction: column;
             text-align: center; opacity: 0; z-index: 1200; transition: opacity 0.4s ease;
+            overflow-y: auto;
         }
-        .completion-title { font-family: var(--font-poem); font-size: 42px; font-weight: 900; margin-bottom: 20px; }
-        .completion-percent { font-size: 80px; color: var(--accent-color); margin-bottom: 40px; }
-        .btn-success { background: var(--color-success); color: white; padding: 12px 30px; }
-        
-        /* * 更新日志样式 (现在应用于弹窗内容) 
-         */
-        #log-content-modal h4 {
-            color: var(--text-primary);
-            margin-top: 25px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-            font-size: 18px;
+        .completion-header { margin-top: 40px; margin-bottom: 20px; }
+        .completion-title { font-family: var(--font-poem); font-size: 36px; font-weight: 900; margin-bottom: 10px; }
+        .completion-score-card {
+            background: #fff; width: 100%; max-width: 600px;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            padding: 25px; margin-bottom: 30px; border: 1px solid #f0f0f0;
         }
-        #log-content-modal ul {
-            margin-top: 0;
-            padding-left: 20px;
-            color: #555;
-            line-height: 1.6;
-        }
-        #log-content-modal ul ul {
-            padding-left: 15px;
-        }
-        #log-content-modal li {
-            margin-bottom: 8px;
-        }
+        .score-row { display: flex; justify-content: space-around; margin-bottom: 20px; text-align: center; }
+        .score-item h4 { margin: 0 0 5px; color: #7f8c8d; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .score-item p { margin: 0; font-size: 24px; font-weight: 700; color: var(--text-primary); }
+        .score-highlight { color: var(--color-success) !important; }
 
+        .analysis-grid { display: flex; gap: 20px; width: 100%; max-width: 800px; text-align: left; }
+        .analysis-col { flex: 1; background: #f9f9fb; border-radius: 16px; padding: 20px; }
+        .analysis-col h3 { margin-top: 0; font-size: 16px; color: var(--text-primary); border-bottom: 2px solid #eee; padding-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+        .analysis-list { list-style: none; padding: 0; margin: 0; }
+        .analysis-list li { 
+            padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 14px; color: #555; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .analysis-list li:last-child { border-bottom: none; }
+        .analysis-tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .tag-red { background: #fee2e2; color: #c0392b; }
+        .tag-blue { background: #e8f0fe; color: #1967d2; }
 
         /* --- 响应式适配 (Media Queries) --- */
         @media (max-width: 768px) {
             body { background: var(--card-bg); height: 100%; align-items: flex-start; }
             .app-container { width: 100%; height: 100vh; max-width: none; border-radius: 0; box-shadow: none; }
-            .log-modal-content { 
-                width: 100%; 
-                height: 100vh; 
-                border-radius: 0; 
-                max-width: none;
-            }
             .nav-bar { padding: 10px 10px 0; }
             .nav-tab { font-size: 14px; padding: 10px; }
             .view-content { padding: 20px; }
             
-            /* Recitation View 变为垂直排列 */
             #recitation-view { flex-direction: column; }
             .recitation-input-panel { flex: none; border-bottom: 1px solid #eee; padding-bottom: 20px; padding-right: 0; margin-bottom: 20px; height: auto; max-height: 40vh; }
             .recitation-recommended-panel { padding-left: 0; border-left: none; flex: 1; border-top: 1px solid #f0f0f0; padding-top: 20px; }
@@ -404,15 +308,15 @@
             .text-content { font-size: 24px; }
             .is-title .text-content { font-size: 32px; }
             
-            /* 隐藏桌面提示，显示移动控制栏 */
             .hint-overlay { display: none; }
+            /* 只有在移动端才显示底部控制栏 */
+            .mobile-controls { display: flex; }
             
-            /* 调整按钮 */
-            .action-bar .btn { padding: 10px; font-size: 13px; }
+            /* 隐藏 PC 端的某些顶部按钮，防止拥挤，只保留退出 */
+            #btn-restart-recite, #btn-study-reveal { display: none; }
             
-            /* 完成页适配 */
-            .completion-title { font-size: 32px; }
-            .completion-percent { font-size: 60px; }
+            .analysis-grid { flex-direction: column; }
+            .completion-title { font-size: 28px; }
         }
     </style>
 </head>
@@ -431,11 +335,10 @@
         </div>
 
         <div class="main-content">
-            
             <div id="recitation-view" class="view-content active">
                 <div class="recitation-input-panel">
                     <div class="title">古诗背诵助手</div>
-                    <div class="subtitle">九年级古诗文专项版</div>
+                    <div class="subtitle">Ultimate Edition</div>
 
                     <button class="btn" id="continue-recitation-btn" onclick="continueLastPoem()">
                         继续背诵 <span id="continue-progress"></span>
@@ -462,25 +365,19 @@
                         </div>
                     </div>
                     
-                    <div id="recommended-list" class="recitation-list-container">
-                        </div>
+                    <div id="recommended-list" class="recitation-list-container"></div>
                 </div>
             </div>
 
             <div id="review-view" class="view-content">
-                <h3>⏱️ 背诵历史与进度</h3>
+                <h3>⏱️ 背诵历史与成绩</h3>
                 <div id="history-list"></div>
             </div>
 
             <div id="settings-view" class="view-content">
-                <h3>⚙️ 通用设置</h3>
-                
-                <div class="setting-item" onclick="showLogModal()" style="cursor: pointer; padding: 10px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s;">
-                    <span>当前版本: <span id="current-version" style="font-size: 0.85em; font-weight: 500; color: #555;">Poem 3.03</span></span>
-                    <span style="color: var(--accent-color); font-size: 14px;">📖 查看更新日志 →</span>
-                </div>
+                <h3>⚙️ 设置</h3>
                 <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #f0f0f0; border-radius: 12px;">
-                    <label for="hide-step-input">⬅️ 电脑端退回行数：</label>
+                    <label for="hide-step-input">⬅️ 退回行数：</label>
                     <select id="hide-step-input" style="padding: 5px;">
                         <option value="1">1行 (默认)</option>
                         <option value="2">2行</option>
@@ -490,153 +387,75 @@
                 <div>
                     <button class="btn btn-danger" onclick="clearHistory()">🗑️ 清除所有历史记录</button>
                 </div>
+                <p style="margin-top: 20px; color: #999; font-size: 12px;">Version 3.2.0 (Ultimate)</p>
             </div>
-            
         </div>
 
         <div id="poem-view-container">
              <div id="btn-exit-recite" class="top-icon-btn" onclick="exitMidSession()" title="退出">✕</div>
              <div id="btn-restart-recite" class="top-icon-btn" onclick="restartCurrentPoem()" title="重来">↻</div>
+             <div id="btn-study-reveal" class="top-icon-btn" onclick="revealAllForStudy()" title="学习模式 (不计分)">💡</div>
+             
+             <div id="recite-timer">00:00</div>
 
-            <div id="poem-view">
-                </div>
+            <div id="poem-view"></div>
 
             <div class="mobile-controls" id="mobile-controls">
                 <button class="mobile-btn btn-prev" onclick="hidePrev()">上一句</button>
+                <button class="mobile-btn btn-study" onclick="revealAllForStudy()">💡</button>
                 <button class="mobile-btn btn-next" onclick="revealNext()">下一句</button>
             </div>
         </div>
         
         <div id="completion-view">
-            <div class="completion-title" id="completion-title"></div>
-            <div class="completion-percent">100%</div>
-            <p>🎉 背诵完成！</p>
-            <button class="btn btn-success" onclick="goToHomeAfterCompletion()">返回主页</button>
-            <div style="margin-top: 20px; font-size: 12px; color: #999;" id="system-details"></div>
+            <div class="completion-header">
+                <div class="completion-title" id="completion-title"></div>
+                <div style="color: #7f8c8d;">🎉 背诵完成</div>
+            </div>
+
+            <div class="completion-score-card">
+                <div class="score-row">
+                    <div class="score-item">
+                        <h4>本次用时</h4>
+                        <p id="score-time">00:00</p>
+                    </div>
+                    <div class="score-item">
+                        <h4>历史最佳</h4>
+                        <p id="score-best">--:--</p>
+                    </div>
+                    <div class="score-item">
+                        <h4>退回次数</h4>
+                        <p id="score-retreats">0</p>
+                    </div>
+                </div>
+                <button class="btn btn-success" style="width: 100%;" onclick="goToHomeAfterCompletion()">返回主页</button>
+            </div>
+
+            <div class="analysis-grid">
+                <div class="analysis-col">
+                    <h3>🤕 最难背的句子 <span style="font-weight: normal; font-size: 12px; margin-left: auto; color: #999;">(退回次数最多)</span></h3>
+                    <ul class="analysis-list" id="list-hardest">
+                        <li><span>暂无数据</span></li>
+                    </ul>
+                </div>
+                <div class="analysis-col">
+                    <h3>🧠 思考最久的句子 <span style="font-weight: normal; font-size: 12px; margin-left: auto; color: #999;">(停留时间最长)</span></h3>
+                    <ul class="analysis-list" id="list-longest">
+                        <li><span>暂无数据</span></li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <div class="hint-overlay">
-            右键 / → 下一句 &nbsp; | &nbsp; 左键 / ← 上一句
+            右键 / → 下一句 &nbsp; | &nbsp; 左键 / ← 上一句 &nbsp; | &nbsp; 💡 点击灯泡进入学习模式
         </div>
     </div>
     
-    <div id="update-log-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; display: none; align-items: center; justify-content: center;">
-        <div class="log-modal-content" style="background: var(--card-bg); border-radius: 24px; width: 90%; max-width: 1000px; height: 85vh; box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden;">
-            <div style="padding: 20px 30px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-                <h3 style="margin: 0; color: var(--text-primary);">📖 更新日志</h3>
-                <button onclick="hideLogModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999; line-height: 1;">✕</button>
-            </div>
-            
-            <div id="log-content-modal" style="flex-grow: 1; overflow-y: auto; padding: 20px 30px;">
-                <p style="font-size: 18px; font-weight: 600; margin-top: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">更新日志</p>
-                
-                <h4>V3.03</h4>
-                <ul style="padding-left: 20px;">
-                    <li><strong style="color: var(--accent-color);">✨ 新功能/重大更新</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>全面移动端适配: 优化了页面在手机和平板上的显示效果，实现全屏沉浸式体验。</li>
-                            <li>移动端控制按钮: 在背诵界面底部新增了“上一句”和“下一句”的移动端专用控制按钮，方便触摸操作。</li>
-                            <li>诗词分类与搜索: 在主页“背诵”视图的推荐列表中加入了分类标签和搜索功能，方便用户筛选和查找诗词。</li>
-                            <li>UI 优化: 调整了 PC 端背诵页面的布局，将输入/推荐侧栏和核心背诵区域进行更合理的划分。</li>
-                        </ul>
-                    </li>
-                    <li><strong style="color: var(--color-success);">🔧 优化与改进</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>标题更新为<strong>“古诗 · 沉浸背诵 (Pro)”</strong>。</li>
-                            <li>**核心BUG修复:** 彻底解决了背诵进度百分比在外显示80%一旦点击背诵就会自动降低的BUG。</li>
-                            <li>**内容更新:** 增加中国人教版语文9年级的全部古诗文，并进行分类。</li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <h4>V2.1.1 (LAST)</h4>
-                <ul style="padding-left: 20px;">
-                    <li><strong style="color: var(--color-success);">🔧 优化与改进</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>历史记录上限提升: 将本地保存的背诵历史记录数量从 10 条增加到 20 条。</li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <h4>V2.1.0</h4>
-                <ul style="padding-left: 20px;">
-                    <li><strong style="color: var(--accent-color);">✨ 新功能</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>背诵中断操作: 在背诵模式下新增了“中途退出”（✕）和“重来”（↻）按钮，允许用户随时中断或重新开始当前诗词的背诵。（注：中途退出会保存进度）</li>
-                        </ul>
-                    </li>
-                    <li><strong style="color: #999;">🎨 样式</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>新增危险操作颜色变量（--color-danger）。</li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <h4>V2.0.2</h4>
-                <ul style="padding-left: 20px;">
-                    <li><strong style="color: var(--color-danger);">🐛 修复与改进</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>修复进度计算错误: 解决了在加载推荐诗词时，如果存在历史记录，进度计算可能与实际行数不匹配的问题。</li>
-                            <li>优化完成触发逻辑: 在背诵完最后一句并揭示后，再次点击或按键会直接弹出完成页面。</li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <h4>V2.0.0 (重大版本更新)</h4>
-                <ul style="padding-left: 20px;">
-                    <li><strong style="color: var(--accent-color);">✨ 新功能/重大更新</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>全新的应用架构: 将单一的设置页面拆分为<strong>“背诵”、“回顾”、“设置”</strong>三个主要视图。</li>
-                            <li>顶部导航栏 (Tab): 引入选项卡导航栏，实现视图快速切换。</li>
-                            <li>背诵进度保存与恢复: 实现了基于 localStorage 的背诵进度自动保存功能，下次打开可从上次中断的地方继续背诵。</li>
-                            <li>新增完成状态颜色: 引入新的主题色变量（--color-success）用于表示成功完成的状态。</li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <h4>V1.4.1</h4>
-                <ul style="padding-left: 20px;">
-                    <li><strong style="color: var(--accent-color);">✨ 新功能</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>背诵完成页面: 新增完成后的结算界面（#completion-view），在背诵完成后显示完成信息。</li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <h4>V1.31</h4>
-                <ul style="padding-left: 20px;">
-                    <li><strong style="color: var(--accent-color);">✨ 新功能</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>历史记录功能: 引入本地历史记录，用于保存和展示用户背诵过的诗词。</li>
-                            <li>推荐诗词列表: 在主界面新增推荐诗词列表，内置示例诗词供用户选择。</li>
-                        </ul>
-                    </li>
-                    <li><strong style="color: #999;">🎨 样式</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>主容器（.app-container）宽度拓宽，以容纳新增的侧栏列表。</li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <h4>V1.0 (初始版本)</h4>
-                <ul style="padding-left: 20px;">
-                    <li><strong style="color: var(--accent-color);">✨ 核心功能</strong>
-                        <ul style="list-style-type: disc; padding-left: 15px;">
-                            <li>基础沉浸式背诵模式: 支持输入诗词文本，通过遮罩、揭示的方式进行逐句背诵。</li>
-                            <li>基本交互: 支持鼠标右键/方向右键（→）揭示下一句，左键/方向左键（←）回退上一句。</li>
-                            <li>文件上传: 支持通过文件上传功能导入诗词文本。</li>
-                            <li>进度条: 显示当前背诵进度。</li>
-                        </ul>
-                    </li>
-                </ul>
-                <p style="margin-top: 30px; font-size: 12px; color: #999;">注意：日志中 V3.0.3 已统一更新为 V3.03。</p>
-            </div>
-        </div>
-    </div>
     <script>
-        // --- 核心古诗数据库 (人教版九年级全册) ---
+        // --- 古诗数据 (示例) ---
         const POEM_LIBRARY = [
-            // --- 九年级上册 (文言文/诗词) ---
+         // --- 九年级上册 (文言文/诗词) ---
             { category: "九上", title: "沁园春·雪", author: "毛泽东", content: "北国风光\n千里冰封\n万里雪飘\n望长城内外\n惟余莽莽\n大河上下\n顿失滔滔\n山舞银蛇\n原驰蜡象\n欲与天公试比高\n须晴日\n看红装素裹\n分外妖娆\n江山如此多娇\n引无数英雄竞折腰\n惜秦皇汉武\n略输文采\n唐宗宋祖\n稍逊风骚\n一代天骄\n成吉思汗\n只识弯弓射大雕\n俱往矣\n数风流人物\n还看今朝" },
             { category: "九上", title: "我爱这土地", author: "艾青", content: "假如我是一只鸟\n我也应该用嘶哑的喉咙歌唱\n这被暴风雨所打击着的土地\n这永远汹涌着我们的悲愤的河流\n这无止息地吹刮着的激怒的风\n和那来自林间的无比温柔的黎明\n——然后我死了\n连羽毛也腐烂在土地里面\n为什么我的眼里常含泪水\n因为我对这土地爱得深沉" },
             { category: "九上", title: "岳阳楼记", author: "范仲淹", content: "庆历四年春\n滕子京谪守巴陵郡\n越明年\n政通人和\n百废具兴\n乃重修岳阳楼\n增其旧制\n刻唐贤今人诗赋于其上\n属予作文以记之\n\n予观夫巴陵胜状\n在洞庭一湖\n衔远山\n吞长江\n浩浩汤汤\n横无际涯\n朝晖夕阴\n气象万千\n此则岳阳楼之大观也\n前人之述备矣\n然则北通巫峡\n南极潇湘\n迁客骚人\n多会于此\n览物之情\n得无异乎\n\n若夫淫雨霏霏\n连月不开\n阴风怒号\n浊浪排空\n日星隐曜\n山岳潜形\n商旅不行\n樯倾楫摧\n薄暮冥冥\n虎啸猿啼\n登斯楼也\n则有去国怀乡\n忧谗畏讥\n满目萧然\n感极而悲者矣\n\n至若春和景明\n波澜不惊\n上下天光\n一碧万顷\n沙鸥翔集\n锦鳞游泳\n岸芷汀兰\n郁郁青青\n而或长烟一空\n皓月千里\n浮光跃金\n静影沉璧\n渔歌互答\n此乐何极\n登斯楼也\n则有心旷神怡\n宠辱偕忘\n把酒临风\n其喜洋洋者矣\n\n嗟夫\n予尝求古仁人之心\n或异二者之为\n何哉\n不以物喜\n不以己悲\n居庙堂之高\n则忧其民\n处江湖之远\n则忧其君\n是进亦忧\n退亦忧\n然则何时而乐耶\n其必曰\n先天下之忧而忧\n后天下之乐而乐欤\n噫\n微斯人\n吾谁与归" },
@@ -679,9 +498,6 @@
         const recommendedList = document.getElementById('recommended-list');
         const searchInput = document.getElementById('search-input');
         const categoryTagsContainer = document.getElementById('category-filter');
-        const mobileControls = document.getElementById('mobile-controls');
-        
-        // 获取推荐古诗面板的引用
         const recommendedPanel = document.querySelector('.recitation-recommended-panel'); 
         
         let linesData = [];
@@ -692,11 +508,16 @@
         let lastViewId = 'recitation-view';
         let currentCategory = 'all';
 
-        // --- 核心逻辑：工具函数 ---
+        // 统计与计时变量
+        let startTime = null;
+        let timerInterval = null;
+        let lineStats = []; // 格式: [{index:0, retreats:0, duration:0, lastRevealTime: 0}, ...]
+        let isStudyMode = false;
+
+        // --- 工具函数 ---
 
         function parsePoemLines(text) {
             if (!text) return [];
-            // 严格以换行符分割，并去除空行和首尾空格
             return text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         }
 
@@ -704,25 +525,68 @@
             return window.innerWidth <= 768; 
         }
 
-        // --- 状态存储与管理 ---
+        // 格式化时间 (秒 -> MM:SS)
+        function formatTime(seconds) {
+            if(!seconds || isNaN(seconds)) return "00:00";
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+        
+        // 格式化短时间 (秒 -> 3.5s)
+        function formatDuration(seconds) {
+            return seconds.toFixed(1) + 's';
+        }
+
+        // --- 存储与设置 ---
 
         function loadHistory() {
             try { return JSON.parse(localStorage.getItem('poemHistory')) || []; } catch { return []; }
         }
 
-        function saveOrUpdateHistory(title, content, progress, status) {
+        function loadBestTime(title) {
+            const history = loadHistory();
+            const completed = history.filter(p => p.title === title && p.status === 'completed' && p.totalTime);
+            if (completed.length === 0) return null;
+            return Math.min(...completed.map(p => p.totalTime));
+        }
+
+        function saveOrUpdateHistory(title, content, progress, status, totalTime = 0, finalStats = null) {
+            if (isStudyMode) return; // 学习模式不保存进度
+
             let history = loadHistory();
             const fullTextForCount = `${title}\n${content}`;
             const cleanData = parsePoemLines(fullTextForCount);
             const totalLines = cleanData.length; 
 
-            const newPoem = { title, content, date: new Date().toISOString(), progress, totalLines, status };
-            // 使用标题定位，如果历史中存在，则更新，否则添加
-            history = history.filter(p => p.title !== title);
-            history.unshift(newPoem);
+            // 构建新记录
+            let newItem = { 
+                title, 
+                content, 
+                date: new Date().toISOString(), 
+                progress, 
+                totalLines, 
+                status,
+                totalTime: totalTime
+            };
+            
+            // 如果完成了，保存详细统计数据
+            if (status === 'completed' && finalStats) {
+                newItem.stats = finalStats;
+            }
+
+            // 更新或插入
+            let existingIdx = history.findIndex(p => p.title === title);
+            if(existingIdx > -1) {
+                // 保留旧的历史记录中的最佳时间等信息(如果有的话)，这里我们直接覆盖最新状态
+                // 但要确保如果不为 completed，不要把旧的 completed 状态覆盖成 in-progress 而丢失了曾经完成的事实？
+                // 简化逻辑：每次都更新到最新。如果想保留历史最佳，我们在 finish 时单独计算。
+                history.splice(existingIdx, 1);
+            }
+            history.unshift(newItem);
             localStorage.setItem('poemHistory', JSON.stringify(history.slice(0, 30)));
         }
-        
+
         function loadSettings() {
             const settings = localStorage.getItem('poemSettings');
             if (settings) {
@@ -731,63 +595,36 @@
                 document.getElementById('hide-step-input').value = hideStep;
             }
         }
-
         function saveSettings() {
-            const settings = {
-                hideStep: hideStep,
-            };
-            localStorage.setItem('poemSettings', JSON.stringify(settings));
+            localStorage.setItem('poemSettings', JSON.stringify({ hideStep }));
         }
 
-        // --- 界面渲染与切换 ---
-        
+        // --- 视图渲染 ---
+
         function switchView(id) {
             document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             
-            // 只有主导航栏的Tab需要同步选中状态
-            const navTabs = document.querySelectorAll('.nav-tab');
-            navTabs.forEach(t => t.classList.remove('active'));
-            
-            // 如果切换到主导航栏的视图，则同步选中状态
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             const targetTab = document.querySelector(`.nav-tab[data-view="${id}"]`);
-            if (targetTab) {
-                targetTab.classList.add('active');
-            }
+            if (targetTab) targetTab.classList.add('active');
             
-            // 根据视图 ID 隐藏或显示推荐古诗面板
             if (recommendedPanel) {
-                if (id === 'recitation-view') {
-                    recommendedPanel.style.display = 'flex'; 
-                } else {
-                    recommendedPanel.style.display = 'none';
-                }
+                recommendedPanel.style.display = (id === 'recitation-view') ? 'flex' : 'none';
             }
-            
             renderMain();
         }
-        
-        // --- 核心BUG修复：进度标签渲染逻辑 ---
+
         function renderStatusTag(poem) {
-            const total = poem.totalLines;
-            const revealedCount = poem.progress + 1; // 已完成的行数 (index + 1)
-            let pct = total > 0 ? Math.round((revealedCount / total) * 100) : 0;
+            const total = poem.totalLines || 0;
+            const revealedCount = poem.progress + 1;
             
-            if (poem.status === 'completed') {
-                // 状态为 'completed' 时，显示完成标签
-                return `<span class="poem-status-tag status-completed">✅ 已完成</span>`;
-            } 
-            
+            if (poem.status === 'completed') return `<span class="poem-status-tag status-completed">✅ 已完成</span>`;
             if (revealedCount > 0 && revealedCount <= total) {
-                // 解决 '100% in-progress' 导致的视觉和逻辑冲突。
-                // 如果已揭示行数等于总行数，且尚未标记为 'completed'，则强制显示 99% 
-                if (revealedCount === total) {
-                    pct = 99; 
-                }
-                
+                let pct = Math.round((revealedCount / total) * 100);
+                if (revealedCount === total) pct = 99; // 避免未完成显示100%
                 return `<span class="poem-status-tag status-in-progress">${pct}%</span>`;
             }
-            
             return `<span class="poem-status-tag" style="background:#eee; color:#999">未开始</span>`;
         }
 
@@ -813,72 +650,53 @@
                 const calculatedTotal = parsePoemLines(fullText).length;
                 
                 const hist = historyMap.get(p.title) || {
-                    title: p.title,
-                    author: p.author,
-                    content: p.content,
-                    progress: -1,
-                    totalLines: calculatedTotal,
-                    status: 'new'
+                    title: p.title, author: p.author, content: p.content,
+                    progress: -1, totalLines: calculatedTotal, status: 'new'
                 };
                 
                 const item = document.createElement('div');
                 item.className = 'poem-list-item';
-                
-                // 渲染状态标签
-                const statusHtml = renderStatusTag(hist);
-
-                item.innerHTML = `
-                    ${statusHtml}
-                    <strong>${p.title}</strong>
-                    <small>[${p.category}] ${p.author}</small>
-                `;
+                item.innerHTML = `${renderStatusTag(hist)}<strong>${p.title}</strong><small>[${p.category}] ${p.author}</small>`;
                 
                 item.onclick = () => {
-                    poemInput.value = `${p.title}\n${p.author}\n\n${p.content}`; // 填入输入框
-                    
-                    // 如果已完成，询问是否重来
+                    poemInput.value = `${p.title}\n${p.author}\n\n${p.content}`;
                     let loadIndex = hist.progress;
                     if (hist.status === 'completed') {
                         if(!confirm(`《${p.title}》已背诵完成，是否重新开始？`)) return;
                         loadIndex = -1;
                     }
-                    
                     directStartPoem(p.title, p.content, loadIndex);
                 };
                 recommendedList.appendChild(item);
             });
         }
-        
+
         function renderHistory() {
             const list = document.getElementById('history-list');
             list.innerHTML = '';
             const history = loadHistory();
-            if(!history.length) list.innerHTML = '<p style="color:#aaa">暂无记录</p>';
+            if(!history.length) list.innerHTML = '<p style="color:#aaa; text-align:center;">暂无记录</p>';
+            
             history.forEach(p => {
                 const d = document.createElement('div');
                 d.className = 'poem-list-item';
+                const date = new Date(p.date).toLocaleDateString();
+                let info = `日期：${date}`;
+                if (p.totalTime) info += ` | 用时: ${formatTime(p.totalTime)}`;
                 
-                const statusHtml = renderStatusTag(p);
-                const date = new Date(p.date).toLocaleString();
-                
-                d.innerHTML = `${statusHtml}<strong>${p.title}</strong><small>上次：${date}</small>`;
+                d.innerHTML = `${renderStatusTag(p)}<strong>${p.title}</strong><small>${info}</small>`;
                 d.onclick = () => directStartPoem(p.title, p.content, p.progress);
                 list.appendChild(d);
             });
         }
 
         function checkContinue() {
-            // 查找状态不是 'completed' 的最新一条记录
             const last = loadHistory().find(p => p.status === 'in-progress' && p.progress < p.totalLines - 1);
             const btn = document.getElementById('continue-recitation-btn');
-            
             if(last) {
-                // 这里的百分比也需要使用修复后的逻辑进行计算
                 const revealedCount = last.progress + 1;
                 let pct = last.totalLines ? Math.round((revealedCount / last.totalLines) * 100) : 0;
-                if (revealedCount === last.totalLines) {
-                    pct = 99; // 避免 100%
-                }
+                if (revealedCount === last.totalLines) pct = 99;
                 
                 btn.style.display = 'flex';
                 document.getElementById('continue-progress').textContent = ` - ${last.title} (${pct}%)`;
@@ -889,33 +707,26 @@
         }
         
         function renderMain() {
-            renderLibrary();
-            renderHistory();
-            checkContinue();
+            renderLibrary(); renderHistory(); checkContinue();
         }
 
-        // --- 背诵核心逻辑 ---
-        
-        function directStartPoem(title, content, index) {
-            if(document.getElementById('review-view').classList.contains('active')) lastViewId = 'review-view';
-            else lastViewId = 'recitation-view';
+        // --- 核心背诵逻辑 ---
 
+        function directStartPoem(title, content, index) {
+            lastViewId = document.getElementById('review-view').classList.contains('active') ? 'review-view' : 'recitation-view';
             currentPoemTitle = title;
             currentPoemContent = content;
             startRecitation(title + '\n' + content, index);
         }
-        
+
         function startPoemFromInput() {
             const text = poemInput.value.trim();
             if(!text) return alert("请先选择古诗或粘贴文本");
             const lines = parsePoemLines(text);
-            
             if(lines.length > 0) {
                 currentPoemTitle = lines[0];
-                // 确保 currentPoemContent 只包含诗文，不包含标题
                 const firstBreak = text.indexOf('\n');
                 currentPoemContent = firstBreak > -1 ? text.substring(firstBreak + 1).trim() : '';
-
                 startRecitation(text, -1);
             }
         }
@@ -923,12 +734,21 @@
         function startRecitation(text, initialIndex) {
             linesData = parsePoemLines(text);
             currentIndex = initialIndex;
+            isStudyMode = false;
             
-            // 确保在渲染前保存状态，以便进度条计算正确
-            // 如果 index 为 linesData.length - 1 (最后一行已揭示)，状态仍为 in-progress
+            // 初始化统计数据
+            startTime = Date.now();
+            lineStats = linesData.map((_, idx) => ({ 
+                index: idx, 
+                retreats: 0, 
+                duration: 0,
+                lastRevealTime: 0 
+            }));
+
+            // 恢复/保存初始进度
             saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress');
-            
-            // 渲染DOM
+
+            // DOM 构建
             poemView.innerHTML = '';
             linesData.forEach((line, i) => {
                 const div = document.createElement('div');
@@ -937,107 +757,199 @@
                 poemView.appendChild(div);
                 poemView.appendChild(document.createElement('div')).className = 'break';
             });
-            poemView.appendChild(document.createElement('div')).style.height = isMobile() ? '150px' : '60px'; // 底部留白
+            poemView.appendChild(document.createElement('div')).style.height = isMobile() ? '150px' : '60px';
 
+            // 显示界面
             poemViewContainer.style.display = 'flex';
             setTimeout(() => poemViewContainer.style.opacity = 1, 50);
-            
-            // 移动端/PC端控制切换
-            if (isMobile()) {
-                mobileControls.style.display = 'flex';
-                document.querySelector('.hint-overlay').style.display = 'none';
-            } else {
-                 mobileControls.style.display = 'none';
-                 document.querySelector('.hint-overlay').style.display = 'block';
-            }
 
-            // 恢复进度
+            // 恢复已揭示行
             if(currentIndex >= 0) {
                 const els = document.querySelectorAll('.poem-line');
                 for(let i=0; i<=currentIndex; i++) els[i].classList.add('revealed');
-                // 使用 instant 快速跳到位置
                 if(els[currentIndex]) {
                     els[currentIndex].scrollIntoView({block: 'center', behavior: 'instant'}); 
+                    // 恢复时，把当前行的“开始看”时间设为现在，以便计算该行的思考时间
+                    lineStats[currentIndex].lastRevealTime = Date.now();
                 }
             } else {
-                 poemView.scrollTo({top:0, behavior:'instant'});
+                poemView.scrollTo({top:0, behavior:'instant'});
             }
+
+            // 启动计时器
+            startTimer();
             updateProgress();
         }
 
+        function startTimer() {
+            clearInterval(timerInterval);
+            const timerEl = document.getElementById('recite-timer');
+            timerEl.textContent = "00:00";
+            
+            timerInterval = setInterval(() => {
+                if(!isStudyMode && startTime) {
+                    const diff = (Date.now() - startTime) / 1000;
+                    timerEl.textContent = formatTime(diff);
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
         function revealNext() {
+            if (isStudyMode) return; // 学习模式下不操作
             if (currentIndex >= linesData.length - 1) return finish();
+
+            // 1. 计算当前行的停留时长 (Think Time)
+            // 逻辑：当你看着 Line A 时，你是在回忆 Line B。所以时间记在 Line A 上。
+            if (currentIndex >= 0 && lineStats[currentIndex]) {
+                const duration = (Date.now() - lineStats[currentIndex].lastRevealTime) / 1000;
+                lineStats[currentIndex].duration += duration;
+            }
+
             currentIndex++;
+            
             const els = document.querySelectorAll('.poem-line');
             if (els[currentIndex]) {
                 els[currentIndex].classList.add('revealed');
                 els[currentIndex].scrollIntoView({behavior: "smooth", block: "center"});
-                saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress');
+                
+                // 记录新的一行被揭示的时间点
+                lineStats[currentIndex].lastRevealTime = Date.now();
+                
+                // 保存进度
+                saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', (Date.now()-startTime)/1000);
             }
             updateProgress();
         }
 
         function hidePrev() {
-            if(currentIndex < 0) return;
-            // hideStep 从设置中读取
+            if (isStudyMode || currentIndex < 0) return;
+            
+            // 记录“退回”统计：
+            // 如果你在 Line B 处退回，说明你对 Line B 或 C 有疑问，这里记在当前显示的最后一行上
+            if (currentIndex >= 0 && lineStats[currentIndex]) {
+                lineStats[currentIndex].retreats++;
+                // 同时把这之前的停留时间也加上
+                const duration = (Date.now() - lineStats[currentIndex].lastRevealTime) / 1000;
+                lineStats[currentIndex].duration += duration;
+            }
+
             const newIndex = Math.max(-1, currentIndex - hideStep);
             const els = document.querySelectorAll('.poem-line');
             for(let i=currentIndex; i>newIndex; i--) if(i>=0 && els[i]) els[i].classList.remove('revealed');
+            
             currentIndex = newIndex;
+            
             if(currentIndex >= 0 && els[currentIndex]) {
                 els[currentIndex].scrollIntoView({behavior: "smooth", block: "center"});
+                // 重置时间点
+                lineStats[currentIndex].lastRevealTime = Date.now();
+            } else {
+                poemView.scrollTo({top:0, behavior:'smooth'});
             }
-            else poemView.scrollTo({top:0, behavior:'smooth'});
-            saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress');
+
+            saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', (Date.now()-startTime)/1000);
             updateProgress();
         }
 
+        // --- 学习模式 ---
+        function revealAllForStudy() {
+            if(isStudyMode) return;
+            if(!confirm("进入学习模式？\n计时将暂停，本次背诵将不计入成绩。")) return;
+            
+            isStudyMode = true;
+            stopTimer();
+            document.getElementById('recite-timer').textContent = "学习中...";
+            
+            const els = document.querySelectorAll('.poem-line');
+            els.forEach(el => el.classList.add('revealed'));
+            
+            // 不保存进度，也不算完成
+            alert("已展开全文。你可以自由朗读或查阅。\n点击退出按钮可结束。");
+        }
+
+        // --- 完成与结算 ---
         function finish() {
-            // 状态标记为 'completed'
-            saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'completed');
+            stopTimer();
+            const totalTime = (Date.now() - startTime) / 1000;
+            
+            // 记录最后一行的停留时间
+            if (currentIndex >= 0 && lineStats[currentIndex]) {
+                lineStats[currentIndex].duration += (Date.now() - lineStats[currentIndex].lastRevealTime) / 1000;
+            }
+
+            // 保存完成状态
+            saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'completed', totalTime, lineStats);
+
+            // 准备结算数据
+            const bestTime = loadBestTime(currentPoemTitle);
+            const totalRetreats = lineStats.reduce((sum, item) => sum + item.retreats, 0);
+            
+            // 排序找出最难和最慢的句子 (排除标题行 index 0)
+            const validStats = lineStats.slice(1); // 假设第一行是标题
+            const hardest = [...validStats].sort((a,b) => b.retreats - a.retreats).filter(i => i.retreats > 0).slice(0, 3);
+            const longest = [...validStats].sort((a,b) => b.duration - a.duration).filter(i => i.duration > 1).slice(0, 3);
+
+            // 渲染结算页
             document.getElementById('completion-title').textContent = currentPoemTitle;
-            document.getElementById('system-details').innerHTML = getSystemInfo();
+            document.getElementById('score-time').textContent = formatTime(totalTime);
+            document.getElementById('score-best').textContent = bestTime ? formatTime(bestTime) : formatTime(totalTime);
+            document.getElementById('score-retreats').textContent = totalRetreats;
+            
+            if (bestTime && totalTime < bestTime) {
+                document.getElementById('score-time').classList.add('score-highlight');
+                document.getElementById('score-time').innerHTML += ' <span style="font-size:12px">新纪录!</span>';
+            } else {
+                document.getElementById('score-time').classList.remove('score-highlight');
+            }
+
+            // 渲染列表
+            const renderList = (arr, type) => {
+                if(arr.length === 0) return '<li><span>完美通过，无明显卡顿！🎉</span></li>';
+                return arr.map(item => `
+                    <li>
+                        <span>${linesData[item.index]}</span>
+                        <span class="analysis-tag ${type === 'retreat' ? 'tag-red' : 'tag-blue'}">
+                            ${type === 'retreat' ? item.retreats + '次' : formatDuration(item.duration)}
+                        </span>
+                    </li>
+                `).join('');
+            };
+
+            document.getElementById('list-hardest').innerHTML = renderList(hardest, 'retreat');
+            document.getElementById('list-longest').innerHTML = renderList(longest, 'duration');
+
             completionView.style.display = 'flex';
             setTimeout(() => completionView.style.opacity = 1, 50);
             renderMain();
         }
 
         function exitMidSession() {
-            if(confirm("确定退出？进度已保存。")) goToHomeAfterCompletion(false);
+            if(confirm("确定退出？(进度已保存)")) {
+                if(!isStudyMode) {
+                    saveOrUpdateHistory(currentPoemTitle, currentPoemContent, currentIndex, 'in-progress', (Date.now()-startTime)/1000);
+                }
+                goToHomeAfterCompletion(false);
+            }
         }
 
         function goToHomeAfterCompletion(completed=true) {
             completionView.style.opacity = 0; poemViewContainer.style.opacity = 0;
-            
-            // 确保移动端控制隐藏
-            mobileControls.style.display = 'none';
-
             setTimeout(() => {
                 completionView.style.display = 'none'; poemViewContainer.style.display = 'none';
-                updateProgress(true); // 重置进度条
+                updateProgress(true); 
                 renderMain();
                 switchView(completed ? 'review-view' : lastViewId);
             }, 300);
-        }
-        
-        function getSystemInfo() {
-            const now = new Date();
-            const timeString = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-            return `
-                <div>
-                    <strong>完成时间:</strong> ${timeString}
-                </div>
-            `;
         }
 
         function updateProgress(reset = false) {
             const revealedCount = currentIndex + 1;
             let pct = reset ? 0 : (linesData.length ? Math.round((revealedCount / linesData.length) * 100) : 0);
-            
-            // 背诵视图中，如果所有行都已揭示，显示 100% (finish() 会被调用)
-            if (revealedCount === linesData.length && !reset) {
-                pct = 100;
-            }
+            if (revealedCount === linesData.length && !reset) pct = 100;
             
             const fill = document.getElementById('progress-fill');
             const num = document.getElementById('progress-percent');
@@ -1047,49 +959,24 @@
             document.body.classList.toggle('is-reciting', pct > 0 && !reset);
         }
         
-        // --- 辅助功能事件绑定 ---
-        
         function clearHistory() {
-             if(confirm("清空历史记录？")) { 
+             if(confirm("确定清空所有历史记录？")) { 
                 localStorage.removeItem('poemHistory'); 
                 renderMain(); 
-                alert("历史记录已清除");
             }
         }
-        
         function restartCurrentPoem() {
-            if(confirm("重来？")) { currentIndex = -1; startRecitation(currentPoemTitle+'\n'+currentPoemContent, -1); }
-        }
-        
-        // --- 新增：更新日志弹窗控制函数 ---
-        function showLogModal() {
-            document.getElementById('update-log-modal').style.display = 'flex';
+            if(confirm("确定重新开始？")) { startRecitation(currentPoemTitle+'\n'+currentPoemContent, -1); }
         }
 
-        function hideLogModal() {
-            document.getElementById('update-log-modal').style.display = 'none';
-        }
-        // --- /新增：更新日志弹窗控制函数 ---
-
-
-        // 绑定导航栏切换
+        // --- 事件绑定 ---
         document.getElementById('nav-bar').addEventListener('click', e => { 
-            if(e.target.dataset.view) {
-                // 如果点击主导航栏的Tab，则切换
-                switchView(e.target.dataset.view);
-            }
+            if(e.target.dataset.view) switchView(e.target.dataset.view);
         });
-        
-        // 绑定设置
         document.getElementById('hide-step-input').addEventListener('change', function() { 
-            hideStep = parseInt(this.value); 
-            saveSettings();
+            hideStep = parseInt(this.value); saveSettings();
         });
-
-        // 绑定搜索框
         searchInput.addEventListener('input', renderLibrary);
-        
-        // 绑定分类标签
         categoryTagsContainer.addEventListener('click', e => {
             if(e.target.classList.contains('category-tag')) {
                 document.querySelectorAll('.category-tag').forEach(t => t.classList.remove('active'));
@@ -1098,71 +985,44 @@
                 renderLibrary();
             }
         });
-
-        // --- 键盘/鼠标/移动端触摸事件处理 ---
         
-        // 键盘控制 (PC端)
+        // 键盘控制
         document.addEventListener('keydown', e => {
-            // 弹窗打开时禁用键盘控制
-            if(document.getElementById('update-log-modal').style.display === 'flex') return;
-            
-            if(poemViewContainer.style.display !== 'flex' || isMobile()) return; // 移动端禁用键盘
+            if(poemViewContainer.style.display !== 'flex' || isMobile() || isStudyMode) return; 
             if(completionView.style.display === 'flex') return;
-
             if(['ArrowRight', 'ArrowDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); revealNext(); }
             else if(['ArrowLeft', 'ArrowUp', 'Backspace'].includes(e.key)) { e.preventDefault(); hidePrev(); }
             else if(e.key === 'Escape') exitMidSession();
         });
-
-        // 桌面模式：右键下一句，左键上一句
+        // 鼠标控制 (右键前进)
         document.addEventListener('contextmenu', e => {
-            if(!isMobile() && poemViewContainer.style.display === 'flex' && completionView.style.display !== 'flex') { 
-                e.preventDefault(); 
-                revealNext(); 
+            if(!isMobile() && poemViewContainer.style.display === 'flex' && completionView.style.display !== 'flex' && !isStudyMode) { 
+                e.preventDefault(); revealNext(); 
             }
         });
+        // 鼠标点击 (任意处后退，排除按钮)
         document.addEventListener('click', e => {
-            // 仅在 PC 模式下，且点击的不是顶部按钮或移动端按钮时触发
-            if(!isMobile() && poemViewContainer.style.display === 'flex' && completionView.style.display !== 'flex' && !e.target.closest('.top-icon-btn') && !e.target.closest('.mobile-controls')) {
-                hidePrev();
+            if(!isMobile() && poemViewContainer.style.display === 'flex' && completionView.style.display !== 'flex' && !isStudyMode) {
+                if(!e.target.closest('.top-icon-btn') && !e.target.closest('.mobile-controls')) hidePrev();
             }
         });
         
-        // 文件上传处理
+        // 文件上传
         document.getElementById('file-upload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
-                const text = e.target.result;
-                poemInput.value = text;
-                const wrapper = document.querySelector('.input-wrapper');
-                wrapper.style.borderColor = '#34a853';
-                setTimeout(() => {
-                    wrapper.style.borderColor = '#edf2f7';
-                }, 500);
+                poemInput.value = e.target.result;
+                document.querySelector('.input-wrapper').style.borderColor = '#34a853';
+                setTimeout(() => document.querySelector('.input-wrapper').style.borderColor = '#edf2f7', 500);
             };
             reader.readAsText(file, 'UTF-8');
             e.target.value = '';
         });
 
-        // 窗口大小变化时重新判断是否需要显示移动控制
-        window.addEventListener('resize', () => {
-             if (poemViewContainer.style.display === 'flex') {
-                if (isMobile()) {
-                    mobileControls.style.display = 'flex';
-                } else {
-                    mobileControls.style.display = 'none';
-                }
-            }
-        });
-
-
-        window.onload = function() {
-            loadSettings();
-            renderMain();
-        };
+        // 初始化
+        window.onload = function() { loadSettings(); renderMain(); };
 
     </script>
 </body>
