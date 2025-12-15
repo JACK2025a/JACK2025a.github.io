@@ -265,11 +265,10 @@
   <script>
     // 1. 初始化：从 LocalStorage 读取数据
     // 如果没有数据，就放几个默认的
-    const defaultLinks = [
-      { name: "Google", url: "https://www.google.com" },
-      { name: "GitHub", url: "https://github.com" },
-      { name: "ChatGPT", url: "https://chat.openai.com" }
-    ];
+  const defaultLinks = [
+    { name: "Poem", url: "JACK2025a.github.io/Poem.html" }, // <-- 正确，添加了逗号
+    { name: "LexiconLab", url: "JACK2025a.github.io/LexiconLab.html" },
+];
 
     let links = JSON.parse(localStorage.getItem('myTools')) || defaultLinks;
 
