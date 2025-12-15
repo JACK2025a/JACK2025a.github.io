@@ -3,164 +3,341 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>战地风云™ 6 - 购买网站</title>
+  <title>我的个人导航站</title>
   <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #4285F4, #34A853); /* Google Blue to Green */
+      --glass-bg: rgba(20, 20, 20, 0.75);
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --text-color: #ffffff;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      outline: none;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-image: url('https://drop-assets.ea.com/images/1bpD5zqqp6ndkbOtPnZeqO/f95a145e1e8fb8b6c97170a420958641/battlefield-6-phantom-edition-16x9.jpg');
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      /* 换了一个高质量的抽象背景，更符合工具箱的感觉 */
+      background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      color: #fff;
+      background-attachment: fixed;
+      color: var(--text-color);
       min-height: 100vh;
-      overflow-x: hidden;
       display: flex;
       justify-content: center;
-      align-items: center;
-      text-align: center;
+      align-items: flex-start; /* 改为从顶部开始布局，防止内容过多遮挡 */
+      padding-top: 5vh;
+      padding-bottom: 5vh;
     }
 
     .container {
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(4px);
-      border-radius: 16px;
-      padding: 2rem;
-      max-width: 800px;
-      width: 90%;
-      margin: 2rem auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 3rem;
+      max-width: 1000px;
+      width: 95%;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      transition: all 0.3s ease;
+    }
+
+    /* Google 风格搜索标题 */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
     }
 
     h1 {
-      font-size: 3.2rem;
-      margin-bottom: 1rem;
-      background: linear-gradient(to right, #ff5e62, #ff9966);
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(to right, #4285F4, #EA4335, #FBBC05, #34A853);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 0 10px rgba(255, 94, 98, 0.4);
+      letter-spacing: -1px;
     }
 
-    .subtitle {
+    /* Google 搜索框样式 */
+    .search-box {
+      margin: 0 auto 2rem auto;
+      max-width: 600px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 14px 24px;
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1);
+      color: white;
       font-size: 1.1rem;
-      color: #ddd;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .search-box input:focus {
+      background: rgba(255,255,255,0.2);
+      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+      border-color: #4285F4;
+    }
+
+    /* 添加新网站的控制台 */
+    .admin-panel {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1.5rem;
+      border-radius: 16px;
       margin-bottom: 2rem;
-    }
-
-    .music-player {
-      margin: 1.5rem auto;
-      max-width: 330px;
-    }
-
-    .platforms {
       display: flex;
       flex-wrap: wrap;
+      gap: 10px;
       justify-content: center;
-      gap: 1.2rem;
-      margin-top: 2rem;
+      align-items: center;
+      border: 1px dashed rgba(255,255,255,0.2);
+    }
+
+    .input-group input {
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #222;
+      color: #fff;
+      font-size: 0.95rem;
+      min-width: 200px;
+    }
+
+    .btn-add {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      background: #4285F4;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-add:hover {
+      background: #3367D6;
+    }
+
+    /* 网站卡片区域 */
+    .platforms {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
     }
 
     .card {
-      background: rgba(10, 10, 20, 0.7);
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 1.3rem;
-      width: 180px;
-      transition: transform 0.3s, box-shadow 0.3s;
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 140px;
     }
 
     .card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 20px rgba(255, 94, 98, 0.4);
-      border-color: #ff5e62;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
     }
 
     .card h3 {
-      margin-bottom: 0.8rem;
-      color: #ff9966;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #eee;
+      word-break: break-all;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .card a {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      background: linear-gradient(to right, #ff5e62, #ff9966);
-      color: white;
+      display: block;
+      padding: 0.5rem;
+      margin-top: auto;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 0.95rem;
-      transition: opacity 0.3s;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: background 0.3s;
     }
 
     .card a:hover {
-      opacity: 0.9;
+      background: var(--primary-gradient);
+    }
+
+    /* 删除按钮 */
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 0, 0, 0.6);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0; /* 默认隐藏 */
+      transition: opacity 0.2s;
+    }
+
+    .card:hover .delete-btn {
+      opacity: 1; /* 悬停显示 */
+    }
+
+    .delete-btn:hover {
+      background: red;
     }
 
     footer {
-      margin-top: 2.5rem;
-      color: #aaa;
-      font-size: 0.85rem;
+      margin-top: 3rem;
+      text-align: center;
+      color: #888;
+      font-size: 0.8rem;
     }
 
+    /* 响应式 */
     @media (max-width: 768px) {
-      h1 {
-        font-size: 2.3rem;
-      }
-      .card {
-        width: 100%;
-        max-width: 280px;
-      }
+      .container { padding: 1.5rem; }
+      .admin-panel { flex-direction: column; align-items: stretch; }
+      .input-group input { width: 100%; }
+      .platforms { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
+
   <div class="container">
     <header>
-      <h1>战地风云™ 6</h1>
-      <p class="subtitle">现已于 2025 年 10 月 10 日正式发售！登陆 PC、PS5、Xbox Series X|S 平台</p>
+      <h1>My Workspace</h1>
+      <p style="color: #aaa;">快捷启动 & 工具箱</p>
     </header>
 
-    <div class="music-player">
-      <iframe 
-        frameborder="0" 
-        width="330" 
-        height="86"
-        src="//music.163.com/outchain/player?type=2&id=441491244&auto=0&height=66">
-      </iframe>
+    <div class="search-box">
+      <form action="https://www.google.com/search" method="get" target="_blank">
+        <input type="text" name="q" placeholder="在 Google 上搜索..." autocomplete="off">
+      </form>
     </div>
 
-    <div class="platforms">
-      <div class="card">
-        <h3>EA 官网</h3>
-        <a href="https://www.ea.com/zh-hans/games/battlefield/battlefield-6" target="_blank">立即购买</a>
+    <div class="admin-panel">
+      <div class="input-group">
+        <input type="text" id="siteName" placeholder="网站名称 (例如: B站)">
       </div>
-      <div class="card">
-        <h3>Steam</h3>
-        <a href="https://www.ea.com/zh-hans/games/battlefield/battlefield-6/buy" target="_blank">立即购买</a>
+      <div class="input-group">
+        <input type="text" id="siteUrl" placeholder="网址 (例如: bilibili.com)">
       </div>
-      <div class="card">
-        <h3>Epic Games</h3>
-        <a href="https://store.epicgames.com/zh-CN/p/battlefield-6--phantom-edition" target="_blank">立即购买</a>
-      </div>
-      <div class="card">
-        <h3>PlayStation</h3>
-        <a href="https://store.playstation.com/en-sg/product/UP0006-PPSA19534_00-SANTIAGODELUXE00/" target="_blank">立即购买</a>
-      </div>
+      <button class="btn-add" onclick="addSite()">+ 添加到工具箱</button>
     </div>
-    <p>友情链接</p>
-    <a href =https://liwangyu917813.github.io/>Liwangyu的个人网站</a>
-    <a href =王府必吃图鉴.html>Liwangyu的个人网站（备份）</a>
-    <a href =Poem.html>Poem</a>
+
+    <div class="platforms" id="linkContainer">
+      </div>
 
     <footer>
-      <p>请在中国大陆访问本网站，否则将导致iframe无法使用。Battlefield™ 6 是 EA 的注册商标。</p>
+      <p>© 2025 个人专属导航站 | 数据存储在本地浏览器中</p>
     </footer>
   </div>
+
+  <script>
+    // 1. 初始化：从 LocalStorage 读取数据
+    // 如果没有数据，就放几个默认的
+    const defaultLinks = [
+      { name: "Google", url: "https://www.google.com" },
+      { name: "GitHub", url: "https://github.com" },
+      { name: "ChatGPT", url: "https://chat.openai.com" }
+    ];
+
+    let links = JSON.parse(localStorage.getItem('myTools')) || defaultLinks;
+
+    const container = document.getElementById('linkContainer');
+    const nameInput = document.getElementById('siteName');
+    const urlInput = document.getElementById('siteUrl');
+
+    // 2. 渲染函数：把数据变成 HTML 卡片
+    function renderLinks() {
+      container.innerHTML = ''; // 清空当前列表
+      links.forEach((link, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <button class="delete-btn" onclick="deleteLink(${index})" title="删除">×</button>
+          <h3>${link.name}</h3>
+          <a href="${link.url}" target="_blank">立即访问</a>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // 3. 添加网站函数
+    function addSite() {
+      const name = nameInput.value.trim();
+      let url = urlInput.value.trim();
+
+      if (!name || !url) {
+        alert("请输入网站名称和网址！");
+        return;
+      }
+
+      // 自动补全 http:// 防止跳转错误
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+
+      links.push({ name, url });
+      saveAndRender();
+      
+      // 清空输入框
+      nameInput.value = '';
+      urlInput.value = '';
+    }
+
+    // 4. 删除网站函数
+    function deleteLink(index) {
+      if(confirm('确定要删除这个书签吗？')) {
+        links.splice(index, 1); // 从数组中删除
+        saveAndRender();
+      }
+    }
+
+    // 5. 保存并重新渲染
+    function saveAndRender() {
+      localStorage.setItem('myTools', JSON.stringify(links)); // 保存到浏览器
+      renderLinks();
+    }
+
+    // 页面加载时执行一次渲染
+    renderLinks();
+
+    // 支持按回车键添加
+    urlInput.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        addSite();
+      }
+    });
+  </script>
 </body>
 </html>
