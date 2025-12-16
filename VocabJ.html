@@ -67,27 +67,6 @@
             color: var(--primary-color);
         }
 
-        .redirect-btn {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 12px;
-        }
-
-        .redirect-btn:hover {
-            filter: brightness(0.95);
-            transform: translateY(-1px);
-        }
-
         .secondary-link {
             font-size: 14px;
             color: #999;
@@ -96,6 +75,18 @@
 
         .secondary-link:hover {
             text-decoration: underline;
+        }
+
+        .countdown-text {
+            color: #888;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        #timer-num {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin: 0 2px;
         }
 
         /* 动画 */
@@ -126,8 +117,8 @@
         </div>
 
         <div id="action-area">
-            <div style="color: #888; font-size: 14px;">
-                正在为您自动跳转<span class="loading-dots"></span>
+            <div class="countdown-text">
+                将在 <span id="timer-num">5</span> 秒后自动跳转<span class="loading-dots"></span>
             </div>
         </div>
 
@@ -138,38 +129,46 @@
 
     <script>
         // --- 配置区域 ---
-        const PC_URL = "https://jack2025a.github.io/Vocab.html";         // 电脑端文件名
-        const PHONE_URL = "https://jack2025a.github.io/VocabM.html"; // 手机端文件名
+        const PC_URL = "https://jack2025a.github.io/Vocab.html";         
+        const PHONE_URL = "https://jack2025a.github.io/VocabM.html"; 
 
         function detectDevice() {
             const ua = navigator.userAgent;
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-            return isMobile ? 'Mobile' : 'PC';
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) ? 'Mobile' : 'PC';
         }
 
         function startRedirect() {
             const device = detectDevice();
             const deviceSpan = document.getElementById('device-type');
             const manualLink = document.getElementById('manual-switch');
+            const timerSpan = document.getElementById('timer-num');
             
+            let targetUrl = "";
+            let timeLeft = 5; // 这里设置倒计时的秒数
+
+            // 1. 识别设备并设置初始 UI
             if (device === 'Mobile') {
                 deviceSpan.textContent = "📱 移动端 (手机/平板)";
                 manualLink.textContent = "强制访问电脑版";
                 manualLink.href = PC_URL;
-                
-                // 5秒后自动跳转
-                setTimeout(() => {
-                    window.location.href = PHONE_URL;
-                }, 5000);
+                targetUrl = PHONE_URL;
             } else {
                 deviceSpan.textContent = "💻 桌面端 (PC/Mac)";
                 manualLink.textContent = "切换到手机预览版";
                 manualLink.href = PHONE_URL;
-
-                setTimeout(() => {
-                    window.location.href = PC_URL;
-                }, 5000);
+                targetUrl = PC_URL;
             }
+
+            // 2. 启动倒计时器
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timerSpan.textContent = timeLeft; // 更新页面上的数字
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdown); // 停止计时器
+                    window.location.href = targetUrl; // 跳转
+                }
+            }, 1000); // 每 1000 毫秒（1秒）执行一次
         }
 
         // 初始化
