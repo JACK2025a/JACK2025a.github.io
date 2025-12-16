@@ -1,15 +1,11 @@
 {
-  "background_color": "#ffffff",
-  "dir": "ltr",
-  "display": "standalone",
   "name": "J-Portal",
-  "orientation": "any",
-  "scope": "/",
   "short_name": "J-Portal",
+  "description": "Jack的个人门户",
   "start_url": "/",
-  "theme_color": "#ffffff",
-  "id": "778811339911",
-  "description": "J-Portal"
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4285F4",
   "icons": [
     {
       "src": "Github.png",
