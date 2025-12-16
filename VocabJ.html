@@ -157,10 +157,10 @@
                 manualLink.textContent = "强制访问电脑版";
                 manualLink.href = PC_URL;
                 
-                // 1.5秒后自动跳转
+                // 5秒后自动跳转
                 setTimeout(() => {
                     window.location.href = PHONE_URL;
-                }, 1500);
+                }, 5000);
             } else {
                 deviceSpan.textContent = "💻 桌面端 (PC/Mac)";
                 manualLink.textContent = "切换到手机预览版";
@@ -168,7 +168,7 @@
 
                 setTimeout(() => {
                     window.location.href = PC_URL;
-                }, 1500);
+                }, 5000);
             }
         }
 
