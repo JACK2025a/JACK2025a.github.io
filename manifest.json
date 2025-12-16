@@ -1,0 +1,13 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "J-Portal",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "J-Portal",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "id": "778811339911",
+  "description": "J-Portal"
+}
