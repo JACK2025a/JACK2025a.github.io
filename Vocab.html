@@ -820,34 +820,34 @@
         }
 
         function goToPhase2() {
-            const p1 = document.getElementById('phase-1');
-            p1.classList.add('hidden');
-            
-            const p2 = document.getElementById('phase-2');
-            p2.classList.remove('hidden');
-            p2.classList.remove('animate-enter');
-            void p2.offsetWidth;
-            p2.classList.add('animate-enter');
-            
-            // 显示英文单词作为题目 (English Word -> Choose Meaning)
-            document.getElementById('quiz-word-prompt').textContent = currentWord.word;
-            document.getElementById('quiz-word-prompt').onclick = () => speak(currentWord.word);
-
-            const isSpelling = document.getElementById('spelling-mode-toggle').checked;
-            
-            if (isSpelling) {
-                document.getElementById('quiz-options-container').classList.add('hidden');
-                document.getElementById('spelling-container').classList.remove('hidden');
-                const input = document.getElementById('spelling-input');
-                input.value = '';
-                input.className = 'spelling-input'; // Reset classes
-                input.focus();
-            } else {
-                document.getElementById('spelling-container').classList.add('hidden');
-                document.getElementById('quiz-options-container').classList.remove('hidden');
-                generateQuizOptions();
-            }
-        }
+    const p1 = document.getElementById('phase-1');
+    p1.classList.add('hidden');
+    
+    const p2 = document.getElementById('phase-2');
+    p2.classList.remove('hidden');
+    
+    const isSpelling = document.getElementById('spelling-mode-toggle').checked;
+    
+    if (isSpelling) {
+        // --- 默写模式：上方显示中文释义 ---
+        document.getElementById('quiz-word-prompt').textContent = currentWord.meaning;
+        
+        document.getElementById('quiz-options-container').classList.add('hidden');
+        document.getElementById('spelling-container').classList.remove('hidden');
+        const input = document.getElementById('spelling-input');
+        input.value = '';
+        input.className = 'spelling-input'; 
+        input.focus();
+    } else {
+        // --- 选择题模式：上方显示英文单词 ---
+        document.getElementById('quiz-word-prompt').textContent = currentWord.word;
+        
+        document.getElementById('spelling-container').classList.add('hidden');
+        document.getElementById('quiz-options-container').classList.remove('hidden');
+        generateQuizOptions();
+    }
+}
+        
 
         function generateQuizOptions() {
             const container = document.getElementById('quiz-options-container');
@@ -875,27 +875,32 @@
         }
 
         function checkSpelling() {
-            const input = document.getElementById('spelling-input');
-            const val = input.value.trim().toLowerCase();
-            const correct = currentWord.word.toLowerCase();
-            
-            if (val === correct) {
-                input.classList.remove('wrong');
-                input.classList.add('correct');
-                input.classList.add('animate-pop'); // 成功弹跳
-                setTimeout(() => handleResult(true), 800);
-            } else {
-                input.classList.add('wrong');
-                input.classList.add('animate-shake'); // 错误晃动
-                showToast("再试一次");
-                
-                // 移除动画类以便下次触发
-                setTimeout(() => input.classList.remove('animate-shake'), 400);
-                
-                // 错误后不自动显示答案，让用户再试，或者用户可以点提示
-                input.focus();
-            }
-        }
+    const input = document.getElementById('spelling-input');
+    
+    // 清理输入：转小写，去空格，去掉末尾常见的标点（如 . 或 ,）
+    const userVal = input.value.trim().toLowerCase().replace(/[.,!?;]$/, "");
+    // 清理答案：同上
+    const correctAnswer = currentWord.word.toLowerCase().replace(/[.,!?;]$/, "").trim();
+    
+    if (userVal === correctAnswer) {
+        input.classList.remove('wrong');
+        input.classList.add('correct');
+        input.classList.add('animate-pop'); // 绿色弹跳动画
+        
+        speak(currentWord.word); // 拼对了读一遍增加记忆
+        setTimeout(() => handleResult(true), 800);
+    } else {
+        input.classList.add('wrong');
+        input.classList.add('animate-shake'); // 红色晃动动画
+        
+        // 如果拼错了，提示一下正确答案
+        showToast(`拼写错误，正确应为: ${currentWord.word}`);
+        
+        setTimeout(() => {
+            input.classList.remove('animate-shake');
+        }, 400);
+    }
+}
 
         function checkAnswer(isCorrect, btnElement) {
             if (isCorrect) {
