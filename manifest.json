@@ -10,4 +10,12 @@
   "theme_color": "#ffffff",
   "id": "778811339911",
   "description": "J-Portal"
+  "icons": [
+    {
+      "src": "Github.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
 }
