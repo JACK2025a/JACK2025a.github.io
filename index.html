@@ -67,16 +67,6 @@
             color: var(--primary-color);
         }
 
-        .secondary-link {
-            font-size: 14px;
-            color: #999;
-            text-decoration: none;
-        }
-
-        .secondary-link:hover {
-            text-decoration: underline;
-        }
-
         .countdown-text {
             color: #888;
             font-size: 14px;
@@ -137,11 +127,10 @@
         function startRedirect() {
             const device = detectDevice();
             const deviceSpan = document.getElementById('device-type');
-            const manualLink = document.getElementById('manual-switch');
             const timerSpan = document.getElementById('timer-num');
             
             let targetUrl = "";
-            let timeLeft = 2; // 这里设置倒计时的秒数
+            let timeLeft = 2; // 修改此处为 2 秒
 
             // 1. 识别设备并设置初始 UI
             if (device === 'Mobile') {
@@ -161,7 +150,7 @@
                     clearInterval(countdown); // 停止计时器
                     window.location.href = targetUrl; // 跳转
                 }
-            }, 1000); // 每 1000 毫秒（1秒）执行一次
+            }, 1000); 
         }
 
         // 初始化
