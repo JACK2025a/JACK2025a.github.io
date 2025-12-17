@@ -141,11 +141,11 @@
             const timerSpan = document.getElementById('timer-num');
             
             let targetUrl = "";
-            let timeLeft = 5; // 这里设置倒计时的秒数
+            let timeLeft = 2; // 这里设置倒计时的秒数
 
             // 1. 识别设备并设置初始 UI
             if (device === 'Mobile') {
-                deviceSpan.textContent = "📱 小爱老师（移动端）";
+                deviceSpan.textContent = "📱 移动端（小爱老师）";
                 targetUrl = PHONE_URL;
             } else {
                 deviceSpan.textContent = "💻 桌面端 (PC/Mac)";
