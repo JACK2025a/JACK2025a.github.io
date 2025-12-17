@@ -1,289 +1,172 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-  <title>Workspace</title>
-  <style>
-    :root {
-      /* 针对 WVGA 屏幕优化的色彩 */
-      --primary: #4285F4;
-      --bg-dark: #000000;
-      --glass-card: rgba(45, 45, 45, 0.8);
-      --border-light: rgba(255, 255, 255, 0.15);
-      --text-main: #FFFFFF;
-      --text-dim: #A0A0A0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>验证系统</title>
+    <style>
+        :root {
+            --primary-color: #007aff;
+            --success-color: #2ecc71;
+            --bg-color: #f9fbfd;
+            --text-main: #2c3e50;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
 
-    body {
-      background: var(--bg-dark);
-      background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 10px;
-    }
+        .container {
+            text-align: center;
+            padding: 32px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            max-width: 450px;
+            width: 90%;
+            transition: transform 0.3s ease;
+        }
 
-    /* 容器：针对 800x480 特别调整 */
-    .container {
-      width: 100%;
-      max-width: 780px; /* 适配横屏最大宽度 */
-      margin: 0 auto;
-    }
+        .logo-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
 
-    header {
-      padding: 10px 0;
-      text-align: center;
-    }
+        h2 {
+            margin: 0 0 8px;
+            color: var(--text-main);
+            font-size: 24px;
+            font-weight: 700;
+        }
 
-    h1 {
-      font-size: 1.4rem; /* 针对 4英寸屏微调 */
-      font-weight: 600;
-      letter-spacing: 1px;
-      background: linear-gradient(90deg, #4285F4, #34A853);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+        p {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 24px;
+        }
 
-    /* 搜索框：在小屏上占据黄金位置 */
-    .search-section {
-      margin-bottom: 15px;
-    }
+        .status-area {
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid #eee;
+        }
 
-    .search-box {
-      display: flex;
-      background: var(--glass-card);
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      padding: 8px 15px;
-      align-items: center;
-    }
+        .device-info {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
 
-    .search-box input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: white;
-      font-size: 16px; /* 防止 iOS/Android 自动缩放的最小字号 */
-      height: 24px;
-    }
+        .secondary-link {
+            font-size: 14px;
+            color: #999;
+            text-decoration: none;
+        }
 
-    /* 管理面板：采用抽屉式视觉或极简排布 */
-    .admin-panel {
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 8px;
-      margin-bottom: 15px;
-      padding: 10px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-    }
+        .secondary-link:hover {
+            text-decoration: underline;
+        }
 
-    .admin-panel input {
-      background: #111;
-      border: 1px solid #333;
-      border-radius: 6px;
-      color: white;
-      padding: 6px 8px;
-      font-size: 13px;
-    }
+        .countdown-text {
+            color: #888;
+            font-size: 14px;
+            font-weight: 500;
+        }
 
-    .btn-add {
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 0 12px;
-      font-weight: bold;
-      font-size: 13px;
-    }
+        #timer-num {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin: 0 2px;
+        }
 
-    /* 重点：卡片布局适配 15:9 比例 */
-    .grid {
-      display: grid;
-      /* 在 480px 宽度下（小爱横屏），自动排列 3 或 4 列 */
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 10px;
-      padding-bottom: 20px;
-    }
+        /* 动画 */
+        .loading-dots::after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
 
-    .card {
-      background: var(--glass-card);
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      height: 80px;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.1s;
-      text-decoration: none;
-    }
-
-    /* 点击效果 */
-    .card:active {
-      transform: scale(0.95);
-      background: #333;
-    }
-
-    .card .title {
-      font-size: 14px;
-      font-weight: 500;
-      color: #efefef;
-      margin-top: 4px;
-      max-width: 90%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    /* 删除按钮：适配触控，加大感应区 */
-    .del-zone {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 2;
-    }
-
-    .del-icon {
-      width: 16px;
-      height: 16px;
-      background: rgba(234, 67, 53, 0.8);
-      color: white;
-      border-radius: 50%;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 10px;
-      color: var(--text-dim);
-      padding: 10px 0;
-    }
-
-    /* 针对小爱老师横屏 (800x480) 的特别调整 */
-    @media (orientation: landscape) {
-      .admin-panel { grid-template-columns: 1fr 1.5fr auto; }
-      h1 { display: inline-block; margin-right: 15px; }
-      header { text-align: left; }
-    }
-
-    /* 针对手机竖屏 */
-    @media (max-width: 400px) {
-      .grid { grid-template-columns: 1fr 1fr; }
-      .admin-panel { grid-template-columns: 1fr; }
-    }
-  </style>
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="container">
-  <header>
-    <h1>My Workspace</h1>
-  </header>
+    <div class="container">
+        <div class="logo-icon">📖</div>
+        <h2>验证系统</h2>
+        <p>验证设备是否为手机端</p>
 
-  <div class="search-section">
-    <form action="https://www.google.com/search" method="get" target="_blank">
-      <div class="search-box">
-        <input type="text" name="q" placeholder="搜索..." autocomplete="off">
-      </div>
-    </form>
-  </div>
+        <div class="status-area">
+            检测到当前设备：<br>
+            <span id="device-type" class="device-info">识别中...</span>
+        </div>
 
-  <div class="admin-panel">
-    <input type="text" id="siteName" placeholder="名称">
-    <input type="text" id="siteUrl" placeholder="网址">
-    <button class="btn-add" onclick="addSite()">添加</button>
-  </div>
+        <div id="action-area">
+            <div class="countdown-text">
+                将在 <span id="timer-num">5</span> 秒后自动跳转<span class="loading-dots"></span>
+            </div>
+        </div>
 
-  <div class="grid" id="linkContainer">
     </div>
 
-  <footer>
-    <p>LocalStorage Mode | 2025</p>
-  </footer>
-</div>
+    <script>
+        // --- 配置区域 ---
+        const PC_URL = "https://jack2025a.github.io/Vocab.html";         
+        const PHONE_URL = "https://jack2025a.github.io/VocabM.html"; 
 
-<script>
-  const defaultLinks = [
-    { name: "Poem", url: "https://YunfanShi.github.io/Poem.html" }, 
-    { name: "Vocab", url: "https://YunfanShi.github.io/VocabJ.html" },
-    { name: "ADN", url: "https://YunfanShi.github.io/ADN.html" },
-    { name: "LexiconLab", url: "https://YunfanShi.github.io/LexiconLab.html" },
-    { name: "BF6", url: "https://YunfanShi.github.io/bf6.html" },
-  ];
-
-  let links = JSON.parse(localStorage.getItem('myTools_v2')) || defaultLinks;
-
-  function render() {
-    const container = document.getElementById('linkContainer');
-    container.innerHTML = '';
-    links.forEach((link, index) => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.onclick = (e) => {
-        if (!e.target.closest('.del-zone')) {
-          window.location.href = link.url; // 针对小爱老师系统浏览器，当前页跳转更流畅
+        function detectDevice() {
+            const ua = navigator.userAgent;
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) ? 'Mobile' : 'PC';
         }
-      };
-      
-      card.innerHTML = `
-        <div class="del-zone" onclick="deleteLink(${index})">
-          <div class="del-icon">×</div>
-        </div>
-        <div class="title">${link.name}</div>
-        <div style="font-size:10px; color:#555; margin-top:2px;">点击进入</div>
-      `;
-      container.appendChild(card);
-    });
-  }
 
-  function addSite() {
-    const name = document.getElementById('siteName').value.trim();
-    let url = document.getElementById('siteUrl').value.trim();
-    if (name && url) {
-      if (!url.startsWith('http')) url = 'https://' + url;
-      links.push({ name, url });
-      save();
-    }
-  }
+        function startRedirect() {
+            const device = detectDevice();
+            const deviceSpan = document.getElementById('device-type');
+            const manualLink = document.getElementById('manual-switch');
+            const timerSpan = document.getElementById('timer-num');
+            
+            let targetUrl = "";
+            let timeLeft = 5; // 这里设置倒计时的秒数
 
-  function deleteLink(index) {
-    event.stopPropagation();
-    if (confirm('删除该卡片？')) {
-      links.splice(index, 1);
-      save();
-    }
-  }
+            // 1. 识别设备并设置初始 UI
+            if (device === 'Mobile') {
+                deviceSpan.textContent = "📱 小爱老师（移动端）";
+                targetUrl = PHONE_URL;
+            } else {
+                deviceSpan.textContent = "💻 桌面端 (PC/Mac)";
+                targetUrl = PC_URL;
+            }
 
-  function save() {
-    localStorage.setItem('myTools_v2', JSON.stringify(links));
-    render();
-    document.getElementById('siteName').value = '';
-    document.getElementById('siteUrl').value = '';
-  }
+            // 2. 启动倒计时器
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timerSpan.textContent = timeLeft; // 更新页面上的数字
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdown); // 停止计时器
+                    window.location.href = targetUrl; // 跳转
+                }
+            }, 1000); // 每 1000 毫秒（1秒）执行一次
+        }
 
-  render();
-</script>
-
+        // 初始化
+        document.addEventListener('DOMContentLoaded', startRedirect);
+    </script>
 </body>
+
 </html>
