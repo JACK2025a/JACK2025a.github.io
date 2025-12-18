@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LexiFlow Pro - 科学记忆</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --md-sys-color-primary: #006495;
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-primary-container: #cbeafl;
+            --md-sys-color-on-primary-container: #001f31;
+            --md-sys-color-secondary: #4d616c;
+            --md-sys-color-surface: #fdfcff;
+            --md-sys-color-surface-container: #f0f4f8;
+            --md-sys-color-on-surface: #1a1c1e;
+            --md-sys-color-error: #ba1a1a;
+            --md-sys-color-success: #14a34b;
+        }
+
+        .dark {
+            --md-sys-color-primary: #9ccbfb;
+            --md-sys-color-on-primary: #003351;
+            --md-sys-color-primary-container: #004b72;
+            --md-sys-color-on-primary-container: #cbeaff;
+            --md-sys-color-surface: #1a1c1e;
+            --md-sys-color-surface-container: #202429;
+            --md-sys-color-on-surface: #e2e2e6;
+        }
+
+        body {
+            font-family: 'Roboto', 'Noto Sans SC', sans-serif;
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            transition: all 0.3s ease;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Material Design Utilities */
+        .card {
+            background-color: var(--md-sys-color-surface-container);
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        
+        .btn-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-weight: 500;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-action:active { transform: scale(0.96); }
+
+        .btn-primary { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+        .btn-error { background: #ffebeb; color: var(--md-sys-color-error); border: 1px solid #ffcccc; }
+        .dark .btn-error { background: #3e1212; color: #ffb4ab; border: 1px solid #93000a; }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            padding: 8px 16px;
+            border-radius: 16px;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+        .nav-item.active {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            opacity: 1;
+            font-weight: 600;
+        }
+        .nav-item .material-icons-round { font-size: 24px; margin-bottom: 4px; }
+
+        /* Animations */
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
+
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .animate-slide-up { animation: slideUp 0.3s ease-out forwards; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+        .dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+        /* Layout Helpers */
+        .page-container {
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 80px; /* Space for bottom nav */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="h-full flex flex-col max-w-md mx-auto relative shadow-2xl bg-[var(--md-sys-color-surface)]">
+        
+        <header class="p-4 flex justify-between items-center sticky top-0 bg-[var(--md-sys-color-surface)] z-20 border-b border-black/5 dark:border-white/5">
+            <div class="flex items-center gap-2">
+                <span class="material-icons-round text-[var(--md-sys-color-primary)]">psychology</span>
+                <h1 class="text-xl font-bold tracking-tight">LexiFlow Pro</h1>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="App.toggleTheme()" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10">
+                    <span class="material-icons-round" id="icon-theme">dark_mode</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-hidden relative">
+            
+            <div id="view-dashboard" class="page-container p-4 space-y-4">
+                <div class="card p-5 bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="text-sm opacity-80">今日学习时长</div>
+                            <div class="text-3xl font-bold font-mono mt-1" id="stat-time">0m</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm opacity-80">已掌握 / 总量</div>
+                            <div class="text-xl font-bold mt-1"><span id="stat-mastered">0</span> / <span id="stat-total">0</span></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-white/20 flex gap-4 text-sm">
+                        <div>🔥 <span id="stat-today-count">0</span> 今日学习</div>
+                        <div>📅 <span id="stat-due">0</span> 待复习</div>
+                    </div>
+                </div>
+
+                <div class="card p-3 overflow-hidden">
+                    <div class="flex justify-between items-center mb-2 px-1">
+                        <span class="text-xs font-bold text-[var(--md-sys-color-primary)]">🏆 本次新掌握</span>
+                    </div>
+                    <div id="mastered-ticker" class="flex gap-2 overflow-x-auto pb-2 text-sm text-gray-500 whitespace-nowrap">
+                        <span class="italic opacity-60">暂无新掌握单词，加油！</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="App.startSession('new')" class="card p-4 text-left hover:scale-[1.02] active:scale-95 transition-all bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]">
+                        <span class="material-icons-round text-3xl mb-2">add_circle</span>
+                        <div class="font-bold">学习新词</div>
+                        <div class="text-xs opacity-70">Batch Mode (10词/组)</div>
+                    </button>
+                    <button onclick="App.nav('review')" class="card p-4 text-left hover:scale-[1.02] active:scale-95 transition-all relative overflow-hidden">
+                        <span class="material-icons-round text-3xl mb-2 text-orange-500">update</span>
+                        <div class="font-bold">智能复习</div>
+                        <div class="text-xs opacity-70">Ebbinghaus 算法</div>
+                        <span id="badge-due" class="absolute top-3 right-3 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span>
+                    </button>
+                </div>
+
+                <div class="space-y-2">
+                    <h3 class="text-sm font-bold opacity-60 px-1">特色模式</h3>
+                    <div onclick="App.startSession('immersive')" class="card p-3 flex items-center gap-3 cursor-pointer hover:bg-black/5">
+                        <span class="material-icons-round text-purple-500 bg-purple-100 dark:bg-purple-900 p-2 rounded-lg">bolt</span>
+                        <div>
+                            <div class="font-bold text-sm">沉浸刷词</div>
+                            <div class="text-xs opacity-60">快速回顾已学单词</div>
+                        </div>
+                    </div>
+                    <div onclick="App.startSession('spell')" class="card p-3 flex items-center gap-3 cursor-pointer hover:bg-black/5">
+                        <span class="material-icons-round text-pink-500 bg-pink-100 dark:bg-pink-900 p-2 rounded-lg">keyboard</span>
+                        <div>
+                            <div class="font-bold text-sm">随手拼</div>
+                            <div class="text-xs opacity-60">专注拼写练习</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-review" class="page-container p-4 hidden">
+                <div class="flex items-center gap-2 mb-4">
+                    <button onclick="App.nav('dashboard')" class="p-1 rounded-full hover:bg-black/5"><span class="material-icons-round">arrow_back</span></button>
+                    <h2 class="text-xl font-bold">复习计划</h2>
+                </div>
+
+                <div class="card p-4 mb-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-2xl font-bold text-orange-600 dark:text-orange-400" id="review-total-count">0</div>
+                            <div class="text-xs opacity-70">当前所有待复习</div>
+                        </div>
+                        <button onclick="App.startSession('review_all')" class="btn-primary text-sm px-4 py-2 rounded-full shadow-md">
+                            全部复习
+                        </button>
+                    </div>
+                </div>
+
+                <div id="review-list" class="space-y-3">
+                    </div>
+            </div>
+
+            <div id="view-library" class="page-container p-4 hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold">我的内容</h2>
+                    <button onclick="App.showImport()" class="text-sm bg-black/5 dark:bg-white/10 px-3 py-1 rounded-lg">
+                        + 导入
+                    </button>
+                </div>
+                
+                <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
+                    <button onclick="App.renderLibrary('all')" class="px-3 py-1 rounded-full text-xs border border-gray-300 dark:border-gray-700 active-filter bg-[var(--md-sys-color-primary)] text-white">全部</button>
+                    <button onclick="App.renderLibrary('mastered')" class="px-3 py-1 rounded-full text-xs border border-gray-300 dark:border-gray-700">已掌握</button>
+                    <button onclick="App.renderLibrary('learning')" class="px-3 py-1 rounded-full text-xs border border-gray-300 dark:border-gray-700">学习中</button>
+                </div>
+
+                <div id="lib-list" class="space-y-2 pb-20">
+                    </div>
+            </div>
+
+            <div id="view-settings" class="page-container p-4 hidden">
+                <h2 class="text-xl font-bold mb-4">设置</h2>
+                <div class="card divide-y dark:divide-gray-800">
+                    <div class="p-4 flex justify-between items-center">
+                        <span>自动发音</span>
+                        <input type="checkbox" id="set-auto-speak" class="w-5 h-5 accent-[var(--md-sys-color-primary)]" onchange="App.saveSettings()">
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between mb-2">
+                            <span>每次学习数量</span>
+                            <span id="set-batch-disp">10</span>
+                        </div>
+                        <input type="range" id="set-batch" min="5" max="30" step="5" class="w-full accent-[var(--md-sys-color-primary)]" oninput="App.saveSettings()">
+                    </div>
+                     <div class="p-4">
+                        <div class="flex justify-between mb-2">
+                            <span>语速</span>
+                            <span id="set-rate-disp">1.0</span>
+                        </div>
+                        <input type="range" id="set-rate" min="0.5" max="1.5" step="0.1" class="w-full accent-[var(--md-sys-color-primary)]" oninput="App.saveSettings()">
+                    </div>
+                </div>
+
+                <div class="mt-6 card p-4 border border-red-200 dark:border-red-900">
+                    <h3 class="text-red-500 font-bold mb-2">危险区域</h3>
+                    <div class="flex gap-2">
+                        <button onclick="if(confirm('确定清空所有数据？')) { localStorage.clear(); location.reload(); }" class="flex-1 py-2 text-red-500 border border-red-500 rounded-lg text-sm">重置数据</button>
+                        <button onclick="App.exportData()" class="flex-1 py-2 text-gray-500 border border-gray-500 rounded-lg text-sm">导出JSON</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-session" class="absolute inset-0 bg-[var(--md-sys-color-surface)] z-30 hidden flex flex-col">
+                <div class="h-14 px-4 flex items-center justify-between border-b border-black/5 dark:border-white/5">
+                    <button onclick="App.endSession()" class="p-2 -ml-2 text-gray-500"><span class="material-icons-round">close</span></button>
+                    <div class="flex flex-col items-center">
+                        <span class="text-xs font-bold uppercase tracking-widest opacity-50" id="session-phase-label">PHASE 1</span>
+                        <div class="flex gap-1 mt-1">
+                            <span id="session-progress" class="text-xs font-mono">1/10</span>
+                        </div>
+                    </div>
+                    <div class="w-8"></div>
+                </div>
+
+                <div class="flex-1 flex flex-col items-center justify-center p-6 relative">
+                    <div id="undo-toast" class="absolute top-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-full text-sm shadow-lg transform -translate-y-10 opacity-0 transition-all z-50 flex items-center gap-2">
+                        <span>已标记认识</span>
+                        <button onclick="Session.undo()" class="text-yellow-400 font-bold">撤销</button>
+                    </div>
+
+                    <div id="study-card" class="w-full max-w-sm">
+                        </div>
+                </div>
+
+                <div id="session-controls" class="p-6 pb-8 bg-[var(--md-sys-color-surface-container)] rounded-t-3xl shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+                    </div>
+            </div>
+
+        </main>
+
+        <nav class="h-20 bg-[var(--md-sys-color-surface)] border-t border-black/5 dark:border-white/5 flex justify-around items-center px-2 pb-2">
+            <button onclick="App.nav('dashboard')" id="nav-dashboard" class="nav-item active">
+                <span class="material-icons-round">dashboard</span>
+                <span>概览</span>
+            </button>
+            <button onclick="App.nav('review')" id="nav-review" class="nav-item">
+                <span class="material-icons-round">event_repeat</span>
+                <span>复习</span>
+            </button>
+            <button onclick="App.nav('library')" id="nav-library" class="nav-item">
+                <span class="material-icons-round">book</span>
+                <span>词库</span>
+            </button>
+            <button onclick="App.nav('settings')" id="nav-settings" class="nav-item">
+                <span class="material-icons-round">settings</span>
+                <span>设置</span>
+            </button>
+        </nav>
+
+        <div id="modal-import" class="absolute inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+            <div class="card w-full max-w-sm p-6 animate-slide-up">
+                <h3 class="text-xl font-bold mb-4">导入单词</h3>
+                <textarea id="import-input" class="w-full h-32 p-3 border rounded-xl bg-transparent text-sm font-mono mb-4" placeholder="单词|释义|例句|翻译 (每行一个)"></textarea>
+                <div class="flex justify-end gap-3">
+                    <button onclick="document.getElementById('modal-import').classList.add('hidden')" class="px-4 py-2 text-sm font-medium">取消</button>
+                    <button onclick="App.doImport()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">导入</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-full shadow-lg text-sm opacity-0 transition-opacity pointer-events-none z-50"></div>
+    </div>
+
+    <script>
+        // --- DATA STORE ---
+        const DB = {
+            key: 'LexiFlowData_v3',
+            state: {
+                words: [], // { id, term, def, ex, cn, status, stage, nextReview, interval, history:[], learnedDate }
+                stats: { todayTime: 0, learnedCount: 0, todayDate: new Date().toDateString() },
+                settings: { autoSpeak: true, batchSize: 10, rate: 1.0, theme: 'light' }
+            },
+            init() {
+                const saved = localStorage.getItem(this.key);
+                if (saved) this.state = JSON.parse(saved);
+                else this.seed();
+                
+                // New Day Reset
+                if (this.state.stats.todayDate !== new Date().toDateString()) {
+                    this.state.stats.todayTime = 0;
+                    this.state.stats.learnedCount = 0;
+                    this.state.stats.todayDate = new Date().toDateString();
+                    this.save();
+                }
+            },
+            save() { localStorage.setItem(this.key, JSON.stringify(this.state)); },
+            seed() {
+                const demos = [
+                    {t:"ephemeral", d:"短暂的", e:"Fashion is ephemeral.", c:"时尚是短暂的。"},
+                    {t:"serendipity", d:"意外发现珍奇事物的本领", e:"It was pure serendipity.", c:"这纯属机缘巧合。"},
+                    {t:"ubiquitous", d:"无所不在的", e:"Smartphones are ubiquitous.", c:"智能手机无处不在。"},
+                    {t:"resilience", d:"韧性；恢复力", e:"She showed great resilience.", c:"她展现了极大的韧性。"},
+                    {t:"meticulous", d:"一丝不苟的", e:"He is meticulous about details.", c:"他对细节一丝不苟。"}
+                ];
+                demos.forEach(d => this.addWord(d.t, d.d, d.e, d.c));
+            },
+            addWord(t, d, e='', c='') {
+                const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
+                this.state.words.push({
+                    id, term:t, def:d, ex:e, cn:c,
+                    status: 'new', // new, learning, review, mastered
+                    stage: 0, // 0=new, 4=mastered
+                    nextReview: 0,
+                    interval: 0,
+                    learnedDate: null
+                });
+                this.save();
+            }
+        };
+
+        // --- CORE ENGINE ---
+        const SRS = {
+            // Ebbinghaus-ish Intervals (mins): 1, 10, 60 (1h), 720 (12h), 1440 (1d), 2880 (2d), 5760 (4d), 10080 (7d)
+            intervals: [1, 10, 60, 720, 1440, 2880, 5760, 10080, 21600],
+            
+            getDue() {
+                const now = Date.now();
+                return DB.state.words.filter(w => w.status !== 'new' && w.status !== 'mastered' && w.nextReview <= now);
+            },
+            
+            processResult(word, isCorrect) {
+                const now = Date.now();
+                
+                if (!isCorrect) {
+                    // Fail: Reset interval, immediate review
+                    word.interval = 0; 
+                    word.nextReview = now; // Due now
+                    // Keep status but reset interval strength
+                    return;
+                }
+
+                // Success
+                if (word.status === 'learning') {
+                    // Handled by Session logic (Phase 1->2->3), here we just prep for SRS
+                    // Real update happens when Session says "Batch Done" or "Word Mastered"
+                } else {
+                    // Review Mode
+                    let idx = this.intervals.findIndex(i => i > word.interval);
+                    if (idx === -1) idx = this.intervals.length - 1; // Maxed out
+                    word.interval = this.intervals[idx];
+                    word.nextReview = now + (word.interval * 60 * 1000);
+                }
+            }
+        };
+
+        // --- SESSION LOGIC (Batch Processing) ---
+        const Session = {
+            active: false,
+            mode: null, // 'new', 'review', 'immersive', 'spell'
+            queue: [], // Words in current session
+            
+            // Queues for phases (Batch Logic)
+            q1: [], // Recognition
+            q2: [], // Selection
+            q3: [], // Spelling
+            
+            currentWord: null,
+            currentPhase: 1,
+            undoTimer: null,
+            batchOriginalSize: 0,
+
+            start(mode, dateFilter = null) {
+                let list = [];
+                const now = Date.now();
+                const limit = DB.state.settings.batchSize;
+
+                if (mode === 'new') {
+                    // Priority: Wrong words in learning > New words
+                    const learning = DB.state.words.filter(w => w.status === 'learning');
+                    const newWords = DB.state.words.filter(w => w.status === 'new').slice(0, limit);
+                    list = [...learning, ...newWords].slice(0, limit);
+                } else if (mode === 'review') {
+                     if (dateFilter) {
+                        list = DB.state.words.filter(w => w.learnedDate === dateFilter);
+                     } else {
+                        list = SRS.getDue();
+                     }
+                } else if (mode === 'review_all') {
+                    list = SRS.getDue();
+                } else if (mode === 'immersive' || mode === 'spell') {
+                    // Random learned words
+                    list = DB.state.words.filter(w => w.status !== 'new').sort(()=>0.5-Math.random()).slice(0, 20);
+                }
+
+                if (list.length === 0) return alert("当前没有符合条件的单词！");
+
+                this.mode = mode;
+                this.active = true;
+                
+                // Initialize Queues
+                // Review/Immersive usually skip Phase 2 (Selection) to be faster, unless strictly requested.
+                // Prompt: "New words need ... multi-round".
+                if (mode === 'new') {
+                    this.q1 = [...list];
+                    this.q2 = [];
+                    this.q3 = [];
+                } else {
+                    // Reviews: Typically Phase 1 (Recall) -> Phase 3 (Spell) or just Phase 1.
+                    // Let's do Phase 1 -> Phase 3 for rigor.
+                    this.q1 = [...list];
+                    this.q2 = []; // Skip selection for reviews
+                    this.q3 = mode === 'spell' ? [] : [...list]; // If strictly spell mode, handle differently
+                    
+                    if (mode === 'spell') { this.q1 = []; this.q3 = [...list]; } // Only spell
+                    if (mode === 'immersive') { this.q1 = [...list]; this.q3 = []; } // Only recall
+                }
+
+                this.batchOriginalSize = list.length;
+                this.next();
+                App.showView('session');
+            },
+
+            next() {
+                // Determine Phase
+                if (this.q1.length > 0) {
+                    this.currentPhase = 1;
+                    this.currentWord = this.q1.shift();
+                } else if (this.q2.length > 0) {
+                    this.currentPhase = 2;
+                    this.currentWord = this.q2.shift();
+                } else if (this.q3.length > 0) {
+                    this.currentPhase = 3;
+                    this.currentWord = this.q3.shift();
+                } else {
+                    this.finish();
+                    return;
+                }
+                
+                App.renderCard(this.currentWord, this.currentPhase, this.mode);
+            },
+
+            handleResult(success) {
+                const w = this.currentWord;
+                const phase = this.currentPhase;
+
+                // Stop Undo availability
+                clearTimeout(this.undoTimer);
+                document.getElementById('undo-toast').classList.remove('translate-y-0', 'opacity-100');
+
+                if (!success) {
+                    // PENALTY: Reset flow.
+                    // Remove from all future queues of this batch
+                    this.q2 = this.q2.filter(x => x.id !== w.id);
+                    this.q3 = this.q3.filter(x => x.id !== w.id);
+                    
+                    // Push back to END of Phase 1 queue
+                    this.q1.push(w);
+                    
+                    // SRS Update: Fail
+                    SRS.processResult(w, false);
+                    
+                    // Show "Wrong" feedback, then next
+                    App.showFeedback(false, w);
+                    return; // Wait for user to click "Next" on feedback screen
+                } else {
+                    // Success logic
+                    if (phase === 1) {
+                        // Allow Undo for "Know"
+                        this.showUndo(w);
+                        
+                        // Move to next relevant phase
+                        if (this.mode === 'new') this.q2.push(w);
+                        else if (this.mode === 'review' && this.q3.length < this.batchOriginalSize) { /* Already populated q3 */ } 
+                    } else if (phase === 2) {
+                        this.q3.push(w);
+                    } else if (phase === 3) {
+                        // Final success for this batch
+                        if (this.mode === 'new') {
+                            w.status = 'review'; // Promoted from learning
+                            w.learnedDate = new Date().toDateString();
+                            w.interval = 1440; // 1 day
+                            w.nextReview = Date.now() + (w.interval * 60000);
+                            DB.state.stats.learnedCount++;
+                            App.showToast(`已掌握: ${w.term}`);
+                        } else {
+                            SRS.processResult(w, true);
+                        }
+                    }
+                    DB.save();
+                    this.next();
+                }
+            },
+
+            showUndo(word) {
+                const toast = document.getElementById('undo-toast');
+                toast.classList.add('translate-y-0', 'opacity-100');
+                this.lastPassedWord = word;
+                this.undoTimer = setTimeout(() => {
+                    toast.classList.remove('translate-y-0', 'opacity-100');
+                    this.lastPassedWord = null;
+                }, 2000);
+            },
+
+            undo() {
+                if(!this.lastPassedWord) return;
+                const w = this.lastPassedWord;
+                
+                // Pull back from q2/q3
+                this.q2 = this.q2.filter(x => x.id !== w.id);
+                this.q3 = this.q3.filter(x => x.id !== w.id);
+                
+                // Treat as fail
+                this.q1.unshift(w); // Put back to front
+                SRS.processResult(w, false);
+                
+                document.getElementById('undo-toast').classList.remove('translate-y-0', 'opacity-100');
+                this.next(); // Reload
+            },
+
+            finish() {
+                this.active = false;
+                App.nav('dashboard');
+                App.showToast('🎉 批次学习完成！', 'success');
+            }
+        };
+
+        // --- UI CONTROLLER ---
+        const App = {
+            init() {
+                DB.init();
+                this.applySettings();
+                this.nav('dashboard');
+                
+                // Timer
+                setInterval(() => {
+                    if(!document.hidden) DB.state.stats.todayTime += (1/60); // Add minutes? No, let's track seconds and format.
+                }, 1000);
+
+                // Keyboard
+                document.addEventListener('keydown', (e) => {
+                    if(!Session.active) return;
+                    if(e.code === 'Space') { 
+                        // Logic: If feedback showing -> Next. If Phase 1 -> Next(Know).
+                        const btnNext = document.getElementById('btn-next');
+                        if(btnNext) { e.preventDefault(); btnNext.click(); }
+                    }
+                    if(e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4') {
+                        const btns = document.querySelectorAll('.choice-btn');
+                        if(btns[parseInt(e.key)-1]) btns[parseInt(e.key)-1].click();
+                    }
+                });
+            },
+
+            applySettings() {
+                const s = DB.state.settings;
+                document.body.className = s.theme;
+                document.getElementById('set-batch').value = s.batchSize;
+                document.getElementById('set-batch-disp').innerText = s.batchSize;
+                document.getElementById('set-rate').value = s.rate;
+                document.getElementById('set-rate-disp').innerText = s.rate;
+                document.getElementById('set-auto-speak').checked = s.autoSpeak;
+                document.getElementById('icon-theme').innerText = s.theme === 'dark' ? 'light_mode' : 'dark_mode';
+            },
+
+            nav(view) {
+                // Hide all views
+                document.querySelectorAll('.view-page, #view-session').forEach(el => el.classList.add('hidden'));
+                // Show target
+                document.getElementById(`view-${view}`).classList.remove('hidden');
+                
+                // Nav state
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                const navBtn = document.getElementById(`nav-${view}`);
+                if(navBtn) navBtn.classList.add('active');
+
+                if(view === 'dashboard') this.renderDashboard();
+                if(view === 'review') this.renderReviewList();
+                if(view === 'library') this.renderLibrary('all');
+            },
+
+            renderDashboard() {
+                const s = DB.state.stats;
+                const due = SRS.getDue().length;
+                const mastered = DB.state.words.filter(w=>w.status==='mastered').length;
+                const total = DB.state.words.length;
+
+                document.getElementById('stat-time').innerText = Math.floor(DB.state.stats.todayTime / 60) + 'm';
+                document.getElementById('stat-mastered').innerText = mastered;
+                document.getElementById('stat-total').innerText = total;
+                document.getElementById('stat-today-count').innerText = s.learnedCount;
+                document.getElementById('stat-due').innerText = due;
+
+                // Ticker
+                const recent = DB.state.words.filter(w=>w.status==='mastered').slice(-5).reverse();
+                const ticker = document.getElementById('mastered-ticker');
+                if(recent.length) {
+                    ticker.innerHTML = recent.map(w => `<span class="bg-green-100 text-green-800 px-2 py-1 rounded dark:bg-green-900 dark:text-green-200">${w.term}</span>`).join('');
+                }
+
+                // Badge
+                const badge = document.getElementById('badge-due');
+                if(due > 0) { badge.classList.remove('hidden'); badge.innerText = due; }
+                else badge.classList.add('hidden');
+            },
+
+            renderReviewList() {
+                const list = document.getElementById('review-list');
+                const due = SRS.getDue();
+                document.getElementById('review-total-count').innerText = due.length;
+                document.getElementById('review-total-count').className = due.length > 0 ? "text-2xl font-bold text-orange-600" : "text-2xl font-bold text-green-600";
+
+                // Group by Learned Date
+                const groups = {};
+                DB.state.words.forEach(w => {
+                    if(w.learnedDate) {
+                        if(!groups[w.learnedDate]) groups[w.learnedDate] = [];
+                        groups[w.learnedDate].push(w);
+                    }
+                });
+
+                const sortedDates = Object.keys(groups).sort((a,b) => new Date(b) - new Date(a));
+                
+                let html = '';
+                sortedDates.forEach(date => {
+                    const words = groups[date];
+                    const day = new Date(date).toLocaleDateString('zh-CN', {weekday:'short'});
+                    const dueCount = words.filter(w => w.nextReview <= Date.now() && w.status !== 'mastered').length;
+                    
+                    html += `
+                        <div class="card p-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <div>
+                                    <span class="font-bold">${date}</span> 
+                                    <span class="text-xs opacity-60 ml-2">${day}</span>
+                                </div>
+                                ${dueCount > 0 ? `<span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-bold">${dueCount} 待复习</span>` : `<span class="text-xs opacity-50">完成</span>`}
+                            </div>
+                            <div class="text-xs opacity-60 truncate">
+                                ${words.slice(0,4).map(w=>w.term).join(', ')}...
+                            </div>
+                            <button onclick="App.startSession('review', '${date}')" class="mt-2 w-full py-2 bg-black/5 dark:bg-white/5 rounded text-sm font-medium hover:bg-black/10">复习此组</button>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html || '<div class="text-center opacity-50 py-10">暂无历史记录</div>';
+            },
+
+            renderLibrary(filter) {
+                const list = document.getElementById('lib-list');
+                let words = DB.state.words;
+                if(filter === 'mastered') words = words.filter(w=>w.status==='mastered');
+                if(filter === 'learning') words = words.filter(w=>w.status==='learning' || w.status==='new');
+                
+                // Style tabs
+                document.querySelectorAll('#view-library button').forEach(b => b.classList.remove('bg-[var(--md-sys-color-primary)]', 'text-white'));
+                event.target.classList.add('bg-[var(--md-sys-color-primary)]', 'text-white');
+
+                list.innerHTML = words.map(w => `
+                    <div class="p-3 border-b border-black/5 dark:border-white/5 flex justify-between items-center">
+                        <div>
+                            <div class="font-bold">${w.term}</div>
+                            <div class="text-xs opacity-60">${w.def}</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700">${w.status}</span>
+                            <button onclick="App.deleteWord('${w.id}')" class="text-red-400"><span class="material-icons-round text-sm">delete</span></button>
+                        </div>
+                    </div>
+                `).join('') || '<div class="text-center p-4">空</div>';
+            },
+
+            // --- SESSION UI ---
+            startSession(mode, filter) {
+                Session.start(mode, filter);
+            },
+
+            endSession() {
+                Session.active = false;
+                this.nav('dashboard');
+            },
+
+            renderCard(word, phase, mode) {
+                const card = document.getElementById('study-card');
+                const controls = document.getElementById('session-controls');
+                const phaseLabel = document.getElementById('session-phase-label');
+                const progress = document.getElementById('session-progress');
+
+                // Label Update
+                let pText = "";
+                if(phase === 1) pText = "自测 (Recall)";
+                if(phase === 2) pText = "选义 (Select)";
+                if(phase === 3) pText = "拼写 (Spell)";
+                phaseLabel.innerText = pText;
+                
+                // Audio
+                if(DB.state.settings.autoSpeak) this.speak(word.term);
+
+                // HTML Construction
+                let cardHtml = '';
+                let btnHtml = '';
+
+                if (phase === 1 || mode === 'immersive') {
+                    // Phase 1: Flashcard
+                    cardHtml = `
+                        <div class="text-4xl font-bold mb-4 animate-slide-up">${word.term}</div>
+                        <div class="text-gray-500 text-sm mb-8 cursor-pointer" onclick="App.speak('${word.term}')">🔊 点击发音</div>
+                        ${mode === 'immersive' ? `<div class="text-xl font-medium animate-slide-up">${word.def}</div>` : ''}
+                    `;
+                    // Google Style: Next Left, Don't Know Right
+                    btnHtml = `
+                        <div class="grid grid-cols-2 gap-4">
+                             <button id="btn-next" onclick="Session.handleResult(true)" class="btn-action btn-primary">
+                                <span class="material-icons-round mr-2">check</span> 认识 / 下一个
+                            </button>
+                            <button onclick="Session.handleResult(false)" class="btn-action bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200">
+                                不认识 / 斩
+                                <span class="material-icons-round ml-2">close</span>
+                            </button>
+                        </div>
+                        <div class="text-center mt-4 text-xs opacity-40">空格键 = 认识</div>
+                    `;
+                    if(mode === 'immersive') {
+                         btnHtml = `<button id="btn-next" onclick="Session.handleResult(true)" class="btn-action btn-primary w-full">下一个</button>`;
+                    }
+
+                } else if (phase === 2) {
+                    // Phase 2: Multiple Choice
+                    const distractors = DB.state.words.filter(w=>w.id!==word.id).sort(()=>0.5-Math.random()).slice(0,3).map(w=>w.def);
+                    const options = [word.def, ...distractors].sort(()=>0.5-Math.random());
+                    
+                    cardHtml = `<div class="text-3xl font-bold mb-6">${word.term}</div>`;
+                    btnHtml = `<div class="grid grid-cols-1 gap-3">
+                        ${options.map((opt, i) => `
+                            <button onclick="Session.handleResult('${opt}'==='${word.def}')" class="choice-btn btn-action bg-white dark:bg-gray-800 justify-start text-left border border-black/5 dark:border-white/5 hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                                <span class="w-6 h-6 rounded bg-gray-200 dark:bg-gray-700 text-xs flex items-center justify-center mr-3">${i+1}</span>
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>`;
+
+                } else if (phase === 3) {
+                    // Phase 3: Spelling
+                    cardHtml = `
+                        <div class="text-lg opacity-70 mb-2">拼写单词</div>
+                        <div class="text-2xl font-bold mb-6">${word.def}</div>
+                        <input type="text" id="spell-input" class="w-full bg-transparent border-b-2 border-[var(--md-sys-color-primary)] text-center text-3xl p-2 outline-none font-mono" autocomplete="off" placeholder="...">
+                    `;
+                    btnHtml = `
+                        <button id="btn-next" onclick="App.checkSpelling('${word.term}')" class="btn-action btn-primary w-full">提交</button>
+                        <div class="flex justify-between mt-4 px-2">
+                             <button onclick="App.hint('${word.term}')" class="text-sm text-blue-500">提示 (Hint)</button>
+                             <button onclick="Session.handleResult(false)" class="text-sm text-red-500">不会拼 (判负)</button>
+                        </div>
+                    `;
+                    setTimeout(() => document.getElementById('spell-input').focus(), 100);
+                }
+
+                card.innerHTML = cardHtml;
+                controls.innerHTML = btnHtml;
+            },
+
+            showFeedback(success, word) {
+                // Wrong Answer Screen - Blocks until "Next"
+                const card = document.getElementById('study-card');
+                const controls = document.getElementById('session-controls');
+                
+                card.innerHTML = `
+                    <div class="text-5xl mb-4 animate-shake">❌</div>
+                    <div class="text-3xl font-bold text-red-500 mb-2">${word.term}</div>
+                    <div class="text-xl mb-4">${word.def}</div>
+                    <div class="bg-black/5 dark:bg-white/5 p-4 rounded-xl text-sm text-left w-full">
+                        <div class="font-bold mb-1">例句:</div>
+                        <div class="italic">${word.ex}</div>
+                        <div class="opacity-70">${word.cn}</div>
+                    </div>
+                `;
+                controls.innerHTML = `
+                    <button id="btn-next" onclick="Session.next()" class="btn-action w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white">
+                        知道了 (空格进入下一词)
+                    </button>
+                `;
+            },
+
+            checkSpelling(target) {
+                const val = document.getElementById('spell-input').value.trim().toLowerCase();
+                if(val === target.toLowerCase()) {
+                    Session.handleResult(true);
+                } else {
+                    document.getElementById('spell-input').classList.add('animate-shake');
+                    setTimeout(()=>document.getElementById('spell-input').classList.remove('animate-shake'), 300);
+                    // Standard: Fail immediately on wrong spell? Or strict? 
+                    // Prompt says "Correct->Next, Wrong->Reset".
+                    Session.handleResult(false);
+                }
+            },
+
+            hint(term) {
+                const inp = document.getElementById('spell-input');
+                inp.value = term.substring(0, 1) + "...";
+                inp.focus();
+            },
+
+            // --- HELPERS ---
+            speak(text) {
+                const u = new SpeechSynthesisUtterance(text);
+                u.rate = DB.state.settings.rate;
+                u.lang = 'en-US';
+                speechSynthesis.speak(u);
+            },
+
+            showImport() { document.getElementById('modal-import').classList.remove('hidden'); },
+            
+            doImport() {
+                const txt = document.getElementById('import-input').value;
+                if(!txt) return;
+                let count = 0;
+                txt.split('\n').forEach(line => {
+                    const [t, d, e, c] = line.split('|').map(s=>s.trim());
+                    if(t && d) { DB.addWord(t, d, e, c); count++; }
+                });
+                alert(`成功导入 ${count} 个单词`);
+                document.getElementById('modal-import').classList.add('hidden');
+                DB.save();
+                this.renderDashboard();
+            },
+
+            deleteWord(id) {
+                if(confirm("确定删除？")) {
+                    DB.state.words = DB.state.words.filter(w => w.id !== id);
+                    DB.save();
+                    this.renderLibrary('all');
+                }
+            },
+
+            saveSettings() {
+                DB.state.settings.autoSpeak = document.getElementById('set-auto-speak').checked;
+                DB.state.settings.batchSize = parseInt(document.getElementById('set-batch').value);
+                DB.state.settings.rate = parseFloat(document.getElementById('set-rate').value);
+                document.getElementById('set-batch-disp').innerText = DB.state.settings.batchSize;
+                document.getElementById('set-rate-disp').innerText = DB.state.settings.rate;
+                DB.save();
+            },
+
+            toggleTheme() {
+                const isDark = document.body.classList.toggle('dark');
+                document.getElementById('icon-theme').innerText = isDark ? 'light_mode' : 'dark_mode';
+            },
+
+            exportData() {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(DB.state));
+                const node = document.createElement('a');
+                node.setAttribute("href", dataStr);
+                node.setAttribute("download", "lexiflow_backup.json");
+                document.body.appendChild(node);
+                node.click();
+                node.remove();
+            }
+        };
+
+        // Init
+        App.init();
+
+    </script>
+</body>
+</html>
