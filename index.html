@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jack's Ecosystem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            /* Google 品牌色 */
+            --g-blue: #4285F4;
+            --g-red: #EA4335;
+            --g-yellow: #FBBC05;
+            --g-green: #34A853;
+            
+            /* 界面颜色 (浅色模式) */
+            --bg-color: #ffffff;
+            --header-bg: #ffffff;
+            --text-main: #202124;
+            --text-sub: #5f6368;
+            --card-bg: #ffffff;
+            --card-border: #dadce0;
+            --card-hover-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+            --btn-bg: #1a73e8;
+            --btn-text: #ffffff;
+            --modal-bg: rgba(255, 255, 255, 0.95);
+            --modal-overlay: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 深色模式适配 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #202124;
+                --header-bg: #202124;
+                --text-main: #e8eaed;
+                --text-sub: #9aa0a6;
+                --card-bg: #303134;
+                --card-border: #5f6368;
+                --card-hover-shadow: 0 4px 8px 3px rgba(0,0,0,0.3);
+                --modal-bg: rgba(32, 33, 36, 0.95);
+                --modal-overlay: rgba(0, 0, 0, 0.8);
+            }
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            /* 防止弹窗存在时页面滚动 */
+            overflow-x: hidden; 
+        }
+
+        /* 顶部导航 */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 500;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-sub);
+        }
+
+        .logo span.brand { color: var(--text-main); font-weight: bold; }
+        
+        /* 简单的四色 Logo 模拟 */
+        .g-text span:nth-child(1) { color: var(--g-blue); }
+        .g-text span:nth-child(2) { color: var(--g-red); }
+        .g-text span:nth-child(3) { color: var(--g-yellow); }
+        .g-text span:nth-child(4) { color: var(--g-blue); }
+        .g-text span:nth-child(5) { color: var(--g-green); }
+        .g-text span:nth-child(6) { color: var(--g-red); }
+
+        /* 主要内容区域 */
+        .main-content {
+            flex: 1;
+            padding: 60px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .hero-text {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero-text h1 {
+            font-size: 48px;
+            font-weight: 400;
+            margin: 0 0 15px 0;
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            color: var(--text-sub);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* 网格布局 */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        /* 产品卡片 */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            height: 220px;
+        }
+
+        /* 悬停时的顶部彩条 */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, 
+                var(--g-blue) 0%, var(--g-blue) 25%, 
+                var(--g-red) 25%, var(--g-red) 50%, 
+                var(--g-yellow) 50%, var(--g-yellow) 75%, 
+                var(--g-green) 75%, var(--g-green) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover {
+            border-color: transparent;
+            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-4px);
+        }
+
+        .card:hover::before { opacity: 1; }
+
+        /* 图标区域 */
+        .icon-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background-color: rgba(66, 133, 244, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: var(--g-blue);
+        }
+
+        .material-icons-round { font-size: 32px; }
+
+        .card h3 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .launch-link {
+            margin-top: 20px;
+            font-weight: 500;
+            color: var(--btn-bg);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .launch-link span { opacity: 0; transform: translateX(-5px); transition: all 0.2s; }
+        .card:hover .launch-link span { opacity: 1; transform: translateX(5px); }
+
+        /* 搜索框 */
+        .mini-search {
+            max-width: 600px;
+            margin: 0 auto 50px;
+            position: relative;
+        }
+        .mini-search input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            border-radius: 30px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-size: 16px;
+            outline: none;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        .mini-search span {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-sub);
+        }
+
+        /* 脚注 */
+        footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-sub);
+            font-size: 13px;
+            background: var(--card-bg);
+        }
+
+        /* =========================================
+           全屏弹窗样式 (新增)
+           ========================================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-overlay);
+            backdrop-filter: blur(10px); /* 毛玻璃效果 */
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .modal-container {
+            background-color: var(--modal-bg);
+            width: 90%;
+            max-width: 800px;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 1px solid var(--card-border);
+            text-align: center;
+            position: relative;
+            animation: floatUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        @keyframes floatUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 32px;
+            margin: 0;
+            color: var(--g-red); /* 警示红 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-desc {
+            font-size: 16px;
+            color: var(--text-main);
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .modal-desc strong {
+            color: var(--g-blue);
+        }
+
+        /* Bing 结果展示区 */
+        .bing-results {
+            text-align: left;
+            background: rgba(128, 128, 128, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--card-border);
+        }
+
+        .bing-title {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--card-border);
+            transition: background 0.2s;
+        }
+
+        .result-item:last-child { border-bottom: none; }
+        .result-item:hover { background: rgba(128, 128, 128, 0.1); }
+
+        .result-info h4 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            color: var(--text-main);
+        }
+
+        .result-info p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-sub);
+            max-width: 450px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .result-btn {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--g-blue);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .result-btn:hover {
+            background: var(--g-blue);
+            color: white;
+            border-color: var(--g-blue);
+        }
+
+        /* 底部提示 */
+        .modal-footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: var(--text-sub);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .key-hint {
+            background: var(--text-main);
+            color: var(--bg-color);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 16px;
+            box-shadow: 0 2px 0 var(--text-sub);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay" id="disclaimer-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2><span class="material-icons-round">warning</span> 私人网站声明</h2>
+            </div>
+            
+            <div class="modal-desc">
+                <strong>致访客：</strong><br>
+                近期我们注意到 <strong>Jackyun.top</strong> 的访问量超出了个人测试预期。为了避免品牌混淆，特此郑重声明：<br><br>
+                 1. 本站是一个<strong>私人网站</strong>，仅用于个人工具开发与实验。<br>
+                 商业软件 <strong>吉客云 (Jackyun.com)</strong>、电商 ERP/OMS/WMS 系统以及任何物流合作项目<strong>无任何关联</strong>。<br><br>
+                 若您正在寻找吉客云企业服务，请通过下方列表跳转至正确位置：
+            </div>
+
+            <div class="bing-results">
+                <div class="bing-title">商业与公共服务</div>
+                
+                <div class="result-item">
+                    <div class="result-info">
+                        <h4>吉客云官网 (Jackyun.com)</h4>
+                        <p>领先的 SaaS ERP 软件服务商，提供电商 ERP、云仓 WMS 及生产管理解决方案。</p>
+                    </div>
+                    <a href="https://www.jackyun.com" target="_blank" class="result-btn">访问官网</a>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-info">
+                        <h4>吉客云 Web 版登录</h4>
+                        <p>web.jackyun.com - 吉客云用户登录入口，处理销售单数据与系统业务。</p>
+                    </div>
+                    <a href="https://web.jackyun.com" target="_blank" class="result-btn">前往登录</a>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-info">
+                        <h4>FedEx 兼容解决方案</h4>
+                        <p>Jackyun | FedEx China - 吉客云与联邦快递集成的数字化物流解决方案。</p>
+                    </div>
+                    <a href="https://www.fedex.com" target="_blank" class="result-btn">查看合作</a>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-info">
+                        <h4>App Store 下载</h4>
+                        <p>吉客云 ERP 进销存 - iOS 移动端应用下载。</p>
+                    </div>
+                    <a href="https://apps.apple.com" target="_blank" class="result-btn">查看应用</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">
+            <span class="g-text">
+                <span>J</span><span>a</span><span>c</span><span>k</span>
+            </span>
+            <span class="brand">Products</span>
+        </div>
+        <div style="font-size: 14px; color: var(--text-sub);">
+            V 2.0
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="hero-text">
+            <h1>打造实用的工具</h1>
+            <p>探索 Jack 的个人开发生态系统。从学习辅助到娱乐放松，这里汇集了所有高效能工具。</p>
+        </div>
+
+        <form class="mini-search" action="https://www.google.com/search" method="GET" target="_blank">
+            <span class="material-icons-round">search</span>
+            <input type="text" name="q" placeholder="搜索 Google 或输入网址...">
+        </form>
+
+        <div class="product-grid" id="grid">
+            </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Jack's Ecosystem. Built for efficiency.</p>
+    </footer>
+
+    <script>
+        // 定义你的所有产品 (文件名必须和你的实际文件名一致)
+        const myProducts = [
+            {
+                name: "Study",
+                file: "Jump.html",
+                desc: "StudyPlan and Control Center",
+                icon: "admin_panel_settings", 
+                color: "#c20c0c"
+            },
+            {
+                name: "Auxiliary Data",
+                file: "ADN.html",
+                desc: "辅助数据网络 (ADN)。快速处理文本、剪贴板与数据传输。",
+                icon: "hub", 
+                color: "#1a73e8"
+            },
+            {
+                name: "Lexicon Lab",
+                file: "LexiconLab.html",
+                desc: "智能词汇分拣实验室。英语单词分析与归类工具。",
+                icon: "school", 
+                color: "#34a853"
+            },
+            {
+                name: "Exam Countdown",
+                file: "Countdown.html",
+                desc: "重要考试倒计时。精确到秒的时间追踪。",
+                icon: "timer", 
+                color: "#fbbc04"
+            },
+            {
+                name: "Jack's Sync",
+                file: "MusicPlayer.html",
+                desc: "个人音乐播放器与同步终端。沉浸式音频体验。",
+                icon: "headphones", 
+                color: "#6366f1"
+            },
+            {
+                name: "Immersion Recite",
+                file: "Poem.html",
+                desc: "沉浸背诵工具。专注于诗词记忆与文本复习。",
+                icon: "menu_book", 
+                color: "#8e24aa"
+            },
+            {
+                name: "Sanctuary",
+                file: "Relax.html",
+                desc: "数字避难所。色彩生成、白噪音与放松工具。",
+                icon: "spa", 
+                color: "#009688"
+            },
+            {
+                name: "Battlefield 6",
+                file: "bf6.html",
+                desc: "游戏发布页概念设计。战地风云 6 模拟官网。",
+                icon: "sports_esports", 
+                color: "#ff5722"
+            }
+        ];
+
+        const grid = document.getElementById('grid');
+
+        // 渲染函数
+        function render() {
+            grid.innerHTML = '';
+            
+            myProducts.forEach(product => {
+                const card = document.createElement('a');
+                card.href = product.file;
+                card.className = 'card';
+                card.target = "_blank"; 
+
+                // 动态设置图标颜色，让每个产品更有辨识度
+                const iconStyle = `color: ${product.color}; background: ${product.color}15;`; 
+
+                card.innerHTML = `
+                    <div class="icon-box" style="${iconStyle}">
+                        <span class="material-icons-round">${product.icon}</span>
+                    </div>
+                    <h3>${product.name}</h3>
+                    <p>${product.desc}</p>
+                    <div class="launch-link">
+                        启动应用 <span class="material-icons-round" style="font-size:16px;">arrow_forward</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 初始化
+        render();
+
+        // =========================================
+        // 弹窗控制逻辑 (严格的 Space 键关闭)
+        // =========================================
+        const modal = document.getElementById('disclaimer-modal');
+        
+        // 禁止页面初始滚动 (可选，增强强制性)
+        document.body.style.overflow = 'hidden';
+
+        document.addEventListener('keydown', function(event) {
+            // 检测是否按下空格键 (Code: Space 或 Key: " ")
+            if (event.code === 'Space' || event.key === ' ') {
+                // 防止空格键触发页面向下滚动
+                event.preventDefault(); 
+                
+                // 隐藏弹窗
+                modal.style.opacity = '0';
+                
+                // 动画结束后移除元素并恢复滚动
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // 恢复滚动
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
