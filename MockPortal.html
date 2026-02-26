@@ -287,12 +287,7 @@
       <p class="text-lg mt-4" style="color:#9AA0A6">没有找到符合条件的卷子</p>
       <button onclick="clearFilters()" class="btn btn-o mt-4">清除筛选条件</button>
     </div>
-    <!-- Lock prompt -->
-    <div id="lockPrompt" class="hidden mt-6 lock-box">
-      <span class="mi" style="font-size:48px;color:#DADCE0">lock</span>
-      <p class="font-semibold mt-3" style="color:#5F6368">🔒 完成 2023-2025 的全部卷子后解锁更早年份</p>
-      <p class="text-sm mt-1" style="color:#9AA0A6">每完成一个科目的所有近年卷子，即可解锁该科目的历年真题</p>
-    </div>
+    <!-- Lock prompt - 已移除，因为所有内容都已解锁 -->
   </div>
 </main>
 
@@ -478,13 +473,14 @@ function generatePaperDB() {
               paperFull: `${pt.full} (Variant ${v})`,
               session, duration: pt.duration,
               totalMarks: pt.marks, tier: pt.tier,
-              locked: false,
+              locked: false, // ✅ 全部解锁
             });
           }
         }
       }
     }
-    // 历年卷子 (2020-2022): 仅 May/June，仅 P2/P4，两个变体（默认锁定）
+    // 历年卷子 (2020-2022): 仅 May/June，仅 P2/P4，两个变体
+    // ✅ 修改：设置为 locked: false，全部解锁
     for (const year of [2022, 2021, 2020]) {
       for (const pt of subj.papers.filter(p => ['P2', 'P4'].includes(p.code))) {
         for (const v of [1, 2]) {
@@ -499,7 +495,7 @@ function generatePaperDB() {
             session: 'May/June',
             duration: pt.duration,
             totalMarks: pt.marks, tier: pt.tier,
-            locked: true,
+            locked: false, // ✅ 改为 false，全部解锁
           });
         }
       }
@@ -572,9 +568,9 @@ const FILTER_DEFS = [
       { value: 2025, label: '2025' },
       { value: 2024, label: '2024' },
       { value: 2023, label: '2023' },
-      { value: 2022, label: '2022 🔒', locked: true },
-      { value: 2021, label: '2021 🔒', locked: true },
-      { value: 2020, label: '2020 🔒', locked: true },
+      { value: 2022, label: '2022' }, // ✅ 移除 🔒 标记
+      { value: 2021, label: '2021' }, // ✅ 移除 🔒 标记
+      { value: 2020, label: '2020' }, // ✅ 移除 🔒 标记
     ]
   },
   {
@@ -684,8 +680,8 @@ function updateFilterCounts() {
     def.options.forEach(opt => {
       const el = document.getElementById(`fcb-${def.key}-${opt.value}`);
       if (!el) return;
+      // ✅ 移除解锁检查，所有试卷都计入
       const count = paperDB.filter(p => {
-        if (p.locked && !isSubjectUnlocked(p.subject)) return false;
         if (def.key === 'subjects')  return p.subject === opt.value;
         if (def.key === 'years')     return p.year === opt.value;
         if (def.key === 'papers')    return p.paper.startsWith(opt.value);
@@ -707,10 +703,9 @@ function updateFilterCounts() {
 // ║                  FILTER & SORT LOGIC                    ║
 // ╚══════════════════════════════════════════════════════════╝
 
-/** 判断一个科目的历年卷是否已解锁 */
+/** ✅ 判断一个科目的历年卷是否已解锁 - 现在永远返回 true */
 function isSubjectUnlocked(subject) {
-  const recent = paperDB.filter(p => !p.locked && p.subject === subject);
-  return recent.length > 0 && recent.every(p => state.paperStatus[p.id] === 'done');
+  return true; // ✅ 所有科目都已解锁
 }
 
 /** 应用筛选+排序，并重新渲染卡片 */
@@ -718,9 +713,9 @@ function applyFilters() {
   const { subjects, years, papers, durations, statuses, sessions } = state.filters;
   const sort = document.getElementById('sortSel')?.value || 'year-desc';
 
-  // 筛选
+  // ✅ 筛选 - 移除解锁检查
   let result = paperDB.filter(p => {
-    if (p.locked && !isSubjectUnlocked(p.subject)) return false;
+    // ✅ 移除这一行：if (p.locked && !isSubjectUnlocked(p.subject)) return false;
     if (subjects.length  && !subjects.includes(p.subject))                         return false;
     if (years.length     && !years.includes(p.year))                               return false;
     if (papers.length    && !papers.some(pt => p.paper.startsWith(pt)))            return false;
@@ -770,23 +765,19 @@ const STATUS_MAP = {
 function renderCards() {
   const grid      = document.getElementById('cardGrid');
   const empty     = document.getElementById('emptyState');
-  const lockEl    = document.getElementById('lockPrompt');
   const countEl   = document.getElementById('filterCount');
 
   grid.innerHTML = '';
   countEl.textContent = `筛选到 ${filteredPapers.length} 张卷子`;
 
   if (filteredPapers.length === 0) {
-    empty.style.display    = 'flex';
-    lockEl.classList.add('hidden');
+    empty.style.display = 'flex';
   } else {
     empty.style.display = 'none';
     filteredPapers.forEach(p => grid.appendChild(makeCard(p)));
   }
 
-  // 显示锁定提示（有未解锁科目的历年卷时）
-  const hasLocked = paperDB.some(p => p.locked && !isSubjectUnlocked(p.subject));
-  lockEl.classList.toggle('hidden', !hasLocked);
+  // ✅ 移除锁定提示，因为所有内容都已解锁
 }
 
 /** 创建单张卡片 DOM */
@@ -1071,9 +1062,9 @@ function markDone(id) {
 // ║                   PROGRESS CIRCLE                       ║
 // ╚══════════════════════════════════════════════════════════╝
 
-/** 更新顶部圆形进度条 */
+/** ✅ 更新顶部圆形进度条 - 移除解锁检查 */
 function updateProgress() {
-  const total = paperDB.filter(p => !p.locked || isSubjectUnlocked(p.subject)).length;
+  const total = paperDB.length; // ✅ 计算所有试卷
   const done  = Object.values(state.paperStatus).filter(v => v === 'done').length;
   const pct   = total ? Math.round((done / total) * 100) : 0;
   document.getElementById('progArc').setAttribute('stroke-dasharray', `${pct} 100`);
@@ -1134,7 +1125,7 @@ function renderGachaConfig() {
     <div class="mb-4">
       <p class="text-sm font-semibold mb-2" style="color:#202124">年份范围</p>
       <div class="flex flex-wrap gap-2" id="gYear">
-        ${[2025,2024,2023].map(y =>
+        ${[2025,2024,2023,2022,2021,2020].map(y =>
           `<div class="fchip on" data-v="${y}" onclick="this.classList.toggle('on')">${y}</div>`
         ).join('')}
       </div>
@@ -1171,7 +1162,7 @@ function setGachaCount(n) {
   }
 }
 
-/** 执行抽取（先动画，再显示结果）*/
+/** ✅ 执行抽取 - 移除解锁检查 */
 function runGacha() {
   const box = document.getElementById('gachaBox');
 
@@ -1181,9 +1172,9 @@ function runGacha() {
   const papers    = [...document.querySelectorAll('#gPaper .fchip.on')].map(e => e.dataset.v);
   const onlyTodo  = document.getElementById('gOnlyTodo')?.classList.contains('on');
 
-  // 构建候选池
+  // ✅ 构建候选池 - 移除解锁检查
   let pool = paperDB.filter(p => {
-    if (p.locked && !isSubjectUnlocked(p.subject)) return false;
+    // ✅ 移除这一行：if (p.locked && !isSubjectUnlocked(p.subject)) return false;
     if (!subjects.includes(p.subject))             return false;
     if (!years.includes(p.year))                   return false;
     if (!papers.some(pt => p.paper.startsWith(pt))) return false;
