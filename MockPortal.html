@@ -261,7 +261,7 @@
 </header>
 
 <!-- ══════════════════════ FILTER PANEL ══════════════════════ -->
-<aside id="filterPanel" class="fixed left-0 top-14 bottom-0 bg-white z-40 overflow-y-auto" style="width:260px">
+<aside id="filterPanel" class="fixed left-0 top-14 bg-white z-40 overflow-y-auto" style="width:260px;bottom:64px">
   <div class="sticky top-0 bg-white z-10 p-3" style="border-bottom:1px solid var(--border)">
     <button onclick="clearFilters()" class="btn btn-o w-full text-xs" style="padding:7px 10px">
       <span class="mi" style="font-size:16px">clear_all</span> 清除所有筛选
@@ -271,15 +271,17 @@
 </aside>
 
 <!-- ══════════════════════ MAIN CONTENT ══════════════════════ -->
-<main id="mainContent" class="pt-14" style="margin-left:260px;padding-bottom:100px">
+<main id="mainContent" class="pt-14" style="margin-left:260px;padding-bottom:160px">
   <div class="p-4">
     <!-- Syllabus notice -->
     <div class="syllabus-note">
       <span class="mi" style="font-size:14px;vertical-align:middle">info</span>
-      <strong>📋 考纲更新提醒：</strong>
+      <strong>📋 考纲 & 题库说明：</strong>
       <ul style="margin-top:6px;margin-left:20px">
-        <li>✅ 2020-2024：0580 可使用计算器（旧考纲）</li>
-        <li>⏱️ 2025+：0580 Paper 1/2 禁用计算器（新考纲）</li>
+        <li>📐 <strong>0580 数学</strong>：P1/P2各1h30m(70分)，P3共2h(104分)，P4共2h30m(130分)</li>
+        <li>🔬 <strong>理科(0610/0620/0625)</strong>：P1/P2各45m(40分)，P3/P4/P5各1h15m，P6共1h(40分)</li>
+        <li>⏱️ <strong>2025+新考纲</strong>：0580 P1/P2禁用计算器，时长改为2h(100分)</li>
+        <li>📅 <strong>考季</strong>：March考季仅时区2；May/June和Oct/Nov有时区1-3</li>
       </ul>
     </div>
 
@@ -429,116 +431,300 @@
 // ║                   PAPER DATABASE                        ║
 // ╚══════════════════════════════════════════════════════════╝
 
-/** 生成所有试卷的数据库 - 包含所有变体及国家/地区注释 */
+/** 生成所有试卷的数据库 - 按实际考季/年份/变体精确生成 */
 function generatePaperDB() {
   const db = [];
 
-  // 科目配置
-  const SUBJECTS = [
-    {
-      subject: '0580', subjectName: 'Mathematics',
-      subjectIcon: 'calculate', subjectColor: '#1A73E8',
-      papers: [
-        { code: 'P1', full: 'Paper 1', duration: 45,  marks: 40, tier: 'Core' },
-        { code: 'P2', full: 'Paper 2', duration: 90,  marks: 70, tier: 'Extended' },
-        { code: 'P3', full: 'Paper 3', duration: 120, marks: 80, tier: 'Core' },
-        { code: 'P4', full: 'Paper 4', duration: 120, marks: 80, tier: 'Extended' },
-      ],
-      syllabusChange: true, // 标记数学有考纲变更
-    },
-    {
-      subject: '0610', subjectName: 'Biology',
-      subjectIcon: 'biotech', subjectColor: '#34A853',
-      papers: [
-        { code: 'P1', full: 'Paper 1', duration: 45,  marks: 40, tier: 'Core/Extended' },
-        { code: 'P2', full: 'Paper 2', duration: 90,  marks: 70, tier: 'Extended' },
-        { code: 'P4', full: 'Paper 4', duration: 120, marks: 80, tier: 'Extended' },
-        { code: 'P6', full: 'Paper 6', duration: 60,  marks: 40, tier: 'Practical' },
-      ]
-    },
-    {
-      subject: '0620', subjectName: 'Chemistry',
-      subjectIcon: 'science', subjectColor: '#FF6D00',
-      papers: [
-        { code: 'P1', full: 'Paper 1', duration: 45,  marks: 40, tier: 'Core/Extended' },
-        { code: 'P2', full: 'Paper 2', duration: 90,  marks: 70, tier: 'Extended' },
-        { code: 'P4', full: 'Paper 4', duration: 120, marks: 80, tier: 'Extended' },
-        { code: 'P6', full: 'Paper 6', duration: 60,  marks: 40, tier: 'Practical' },
-      ]
-    },
-    {
-      subject: '0625', subjectName: 'Physics',
-      subjectIcon: 'bolt', subjectColor: '#9334E8',
-      papers: [
-        { code: 'P1', full: 'Paper 1', duration: 45,  marks: 40, tier: 'Core/Extended' },
-        { code: 'P2', full: 'Paper 2', duration: 90,  marks: 70, tier: 'Extended' },
-        { code: 'P4', full: 'Paper 4', duration: 120, marks: 80, tier: 'Extended' },
-        { code: 'P6', full: 'Paper 6', duration: 60,  marks: 40, tier: 'Practical' },
-      ]
-    },
-  ];
-
-  // 变体注释
   const VARIANT_REGIONS = {
-    1: { name: 'Variant 1', region: '🇬🇧 英国/欧洲/非洲/美洲' },
-    2: { name: 'Variant 2', region: '🇨🇳 中国/东亚/巴基斯坦' },
-    3: { name: 'Variant 3', region: '🇦🇺 澳洲/新西兰/东南亚' },
+    1: { name: 'Variant 1', region: '🇬🇧 时区1 英/欧/非/美' },
+    2: { name: 'Variant 2', region: '🇨🇳 时区2 中/东亚/巴' },
+    3: { name: 'Variant 3', region: '🇦🇺 时区3 澳/新/东南亚' },
   };
 
-  for (const subj of SUBJECTS) {
-    // 近年卷子 (2023-2025): 两个考季，三个变体（新版本）
-    for (const year of [2025, 2024, 2023]) {
-      for (const [session, sc] of [['May/June', 'MJ'], ['Oct/Nov', 'ON']]) {
-        for (const pt of subj.papers) {
-          for (const v of [1, 2, 3]) {
-            const isOldSyllabus = year < 2025;
-            const syllabusInfo = subj.syllabusChange 
-              ? (isOldSyllabus ? ' [旧考纲✓计算器]' : ' [新考纲 P1/P2✗计算器]')
-              : '';
-            
-            db.push({
-              id: `${subj.subject}-${year}-${sc}-${pt.code}${v}`,
-              subject: subj.subject,
-              subjectName: subj.subjectName,
-              subjectIcon: subj.subjectIcon,
-              subjectColor: subj.subjectColor,
-              year, paper: `${pt.code}${v}`,
-              paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-              variantRegion: VARIANT_REGIONS[v].region,
-              session, duration: pt.duration,
-              totalMarks: pt.marks, tier: pt.tier,
-              locked: false,
-              syllabusInfo,
-            });
-          }
-        }
+  // ══════════════════════════════════════════
+  // 0580 Mathematics — 按实际试卷精确配置
+  // P1 Core: 1h30m / 70分
+  // P2 Extended: 1h30m / 70分  
+  // P3 Core: 2h / 104分
+  // P4 Extended: 2h30m / 130分
+  // ══════════════════════════════════════════
+  const MATH_PAPERS = [
+    { code: 'P1', full: 'Paper 1', duration: 90,  marks: 70,  tier: 'Core',     pNum: '1' },
+    { code: 'P2', full: 'Paper 2', duration: 90,  marks: 70,  tier: 'Extended', pNum: '2' },
+    { code: 'P3', full: 'Paper 3', duration: 120, marks: 104, tier: 'Core',     pNum: '3' },
+    { code: 'P4', full: 'Paper 4', duration: 150, marks: 130, tier: 'Extended', pNum: '4' },
+  ];
+
+  // 0580 实际试卷列表（根据提供数据）
+  // 格式: [year, session, paperCode, variant]
+  // session: 'MJ'=May/June, 'MA'=March, 'ON'=Oct/Nov
+  const MATH_ENTRIES = [
+    // 2024 May/June: P1,P2,P3,P4 各仅时区1
+    [2024,'MJ','P1',1],[2024,'MJ','P2',1],[2024,'MJ','P3',1],[2024,'MJ','P4',1],
+    // 2023 March: 时区2
+    [2023,'MA','P1',2],[2023,'MA','P2',2],[2023,'MA','P3',2],[2023,'MA','P4',2],
+    // 2023 May/June: 时区1,2,3
+    [2023,'MJ','P1',1],[2023,'MJ','P1',2],[2023,'MJ','P1',3],
+    [2023,'MJ','P2',1],[2023,'MJ','P2',2],[2023,'MJ','P2',3],
+    [2023,'MJ','P3',1],[2023,'MJ','P3',2],[2023,'MJ','P3',3],
+    [2023,'MJ','P4',1],[2023,'MJ','P4',2],[2023,'MJ','P4',3],
+    // 2023 Oct/Nov: 时区1
+    [2023,'ON','P1',1],
+    // 2022 March: 时区2
+    [2022,'MA','P1',2],[2022,'MA','P2',2],[2022,'MA','P3',2],[2022,'MA','P4',2],
+    // 2022 May/June: 时区1,2,3
+    [2022,'MJ','P1',1],[2022,'MJ','P1',2],[2022,'MJ','P1',3],
+    [2022,'MJ','P2',1],[2022,'MJ','P2',2],[2022,'MJ','P2',3],
+    [2022,'MJ','P3',1],[2022,'MJ','P3',2],[2022,'MJ','P3',3],
+    [2022,'MJ','P4',1],[2022,'MJ','P4',2],[2022,'MJ','P4',3],
+    // 2021 March: 时区2
+    [2021,'MA','P1',2],[2021,'MA','P2',2],[2021,'MA','P3',2],[2021,'MA','P4',2],
+    // 2021 May/June: 时区1,2,3
+    [2021,'MJ','P1',1],[2021,'MJ','P1',2],[2021,'MJ','P1',3],
+    [2021,'MJ','P2',1],[2021,'MJ','P2',2],[2021,'MJ','P2',3],
+    [2021,'MJ','P3',1],[2021,'MJ','P3',2],[2021,'MJ','P3',3],
+    [2021,'MJ','P4',1],[2021,'MJ','P4',2],[2021,'MJ','P4',3],
+    // 2021 Oct/Nov: 时区1,2,3
+    [2021,'ON','P1',1],[2021,'ON','P1',2],[2021,'ON','P1',3],
+    [2021,'ON','P2',1],[2021,'ON','P2',2],[2021,'ON','P2',3],
+    [2021,'ON','P3',1],[2021,'ON','P3',2],[2021,'ON','P3',3],
+    [2021,'ON','P4',1],[2021,'ON','P4',2],[2021,'ON','P4',3],
+    // 2020 March: 时区2 (P1,P3 only)
+    [2020,'MA','P1',2],[2020,'MA','P3',2],
+    // 2020 May/June: 时区1,2,3
+    [2020,'MJ','P1',1],[2020,'MJ','P1',2],[2020,'MJ','P1',3],
+    [2020,'MJ','P2',1],[2020,'MJ','P2',2],[2020,'MJ','P2',3],
+    [2020,'MJ','P3',1],[2020,'MJ','P3',2],[2020,'MJ','P3',3],
+    [2020,'MJ','P4',1],[2020,'MJ','P4',2],[2020,'MJ','P4',3],
+    // 2020 Oct/Nov: 时区1,2,3
+    [2020,'ON','P1',1],[2020,'ON','P1',2],[2020,'ON','P1',3],
+    [2020,'ON','P2',1],[2020,'ON','P2',2],[2020,'ON','P2',3],
+    [2020,'ON','P3',1],[2020,'ON','P3',2],[2020,'ON','P3',3],
+    [2020,'ON','P4',1],[2020,'ON','P4',2],[2020,'ON','P4',3],
+  ];
+
+  const SESSION_MAP = { MJ: 'May/June', MA: 'March', ON: 'Oct/Nov' };
+
+  for (const [year, sc, pCode, v] of MATH_ENTRIES) {
+    const pt = MATH_PAPERS.find(p => p.code === pCode);
+    const session = SESSION_MAP[sc];
+    const syllabusInfo = year >= 2025 ? ' [新考纲 P1/P2✗计算器]' : ' [旧考纲✓计算器]';
+    db.push({
+      id: `0580-${year}-${sc}-${pCode}${v}`,
+      subject: '0580', subjectName: 'Mathematics',
+      subjectIcon: 'calculate', subjectColor: '#1A73E8',
+      year, paper: `${pCode}${v}`,
+      paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+      variantRegion: VARIANT_REGIONS[v].region,
+      session, duration: pt.duration,
+      totalMarks: pt.marks, tier: pt.tier,
+      locked: false, syllabusInfo,
+    });
+  }
+
+  // ══════════════════════════════════════════
+  // 理科 0610/0620/0625 — 共同结构
+  // P1 Core MCQ: 45min / 40分
+  // P2 Extended MCQ: 45min / 40分
+  // P3 Core Theory: 1h15m / 80分
+  // P4 Extended Theory: 1h15m / 80分
+  // P5 Practical: 1h15m / 40分
+  // P6 Alt. to Practical: 1h / 40分
+  // ══════════════════════════════════════════
+  const SCI_PAPERS = [
+    { code: 'P1', full: 'Paper 1', duration: 45, marks: 40, tier: 'Core MCQ' },
+    { code: 'P2', full: 'Paper 2', duration: 45, marks: 40, tier: 'Extended MCQ' },
+    { code: 'P3', full: 'Paper 3', duration: 75, marks: 80, tier: 'Core Theory' },
+    { code: 'P4', full: 'Paper 4', duration: 75, marks: 80, tier: 'Extended Theory' },
+    { code: 'P5', full: 'Paper 5', duration: 75, marks: 40, tier: 'Practical' },
+    { code: 'P6', full: 'Paper 6', duration: 60, marks: 40, tier: 'Alt. to Practical' },
+  ];
+
+  const SCI_SUBJECTS = [
+    { subject: '0610', subjectName: 'Biology',   subjectIcon: 'biotech',   subjectColor: '#34A853' },
+    { subject: '0620', subjectName: 'Chemistry', subjectIcon: 'science',   subjectColor: '#FF6D00' },
+    { subject: '0625', subjectName: 'Physics',   subjectIcon: 'bolt',      subjectColor: '#9334E8' },
+  ];
+
+  // 理科实际考季/变体配置（按文档整理，2020-2024）
+  // March: 只有时区2; May/June: 时区1,2,3; Oct/Nov: 时区1,2,3
+  // 2024 只有 May/June（文档中只列了MJ2024）
+  // 理科不区分0620 March 2023有否P2 -- 文档显示齐全
+
+  for (const subj of SCI_SUBJECTS) {
+    // 2024 May/June: 时区1 only (文档只列了时区1)
+    for (const pt of SCI_PAPERS) {
+      db.push({
+        id: `${subj.subject}-2024-MJ-${pt.code}1`,
+        ...subj, year: 2024, paper: `${pt.code}1`,
+        paperFull: `${pt.full} (${VARIANT_REGIONS[1].name})`,
+        variantRegion: VARIANT_REGIONS[1].region,
+        session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+        locked: false, syllabusInfo: '',
+      });
+    }
+
+    // 2023 March: 时区2
+    for (const pt of SCI_PAPERS) {
+      db.push({
+        id: `${subj.subject}-2023-MA-${pt.code}2`,
+        ...subj, year: 2023, paper: `${pt.code}2`,
+        paperFull: `${pt.full} (${VARIANT_REGIONS[2].name})`,
+        variantRegion: VARIANT_REGIONS[2].region,
+        session: 'March', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+        locked: false, syllabusInfo: '',
+      });
+    }
+
+    // 2023 May/June: 时区1,2,3
+    for (const pt of SCI_PAPERS) {
+      for (const v of [1,2,3]) {
+        db.push({
+          id: `${subj.subject}-2023-MJ-${pt.code}${v}`,
+          ...subj, year: 2023, paper: `${pt.code}${v}`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+          variantRegion: VARIANT_REGIONS[v].region,
+          session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+          locked: false, syllabusInfo: '',
+        });
       }
     }
-    // 历年卷子 (2020-2022): May/June，全种类纸张，三个变体
-    for (const year of [2022, 2021, 2020]) {
-      for (const pt of subj.papers) {
-        for (const v of [1, 2, 3]) {
-          const syllabusInfo = subj.syllabusChange ? ' [旧考纲✓计算器]' : '';
-          
-          db.push({
-            id: `${subj.subject}-${year}-MJ-${pt.code}${v}`,
-            subject: subj.subject,
-            subjectName: subj.subjectName,
-            subjectIcon: subj.subjectIcon,
-            subjectColor: subj.subjectColor,
-            year, paper: `${pt.code}${v}`,
-            paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-            variantRegion: VARIANT_REGIONS[v].region,
-            session: 'May/June',
-            duration: pt.duration,
-            totalMarks: pt.marks, tier: pt.tier,
-            locked: false,
-            syllabusInfo,
-          });
-        }
+
+    // 2023 Oct/Nov: 时区1,2,3
+    for (const pt of SCI_PAPERS) {
+      for (const v of [1,2,3]) {
+        db.push({
+          id: `${subj.subject}-2023-ON-${pt.code}${v}`,
+          ...subj, year: 2023, paper: `${pt.code}${v}`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+          variantRegion: VARIANT_REGIONS[v].region,
+          session: 'Oct/Nov', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+          locked: false, syllabusInfo: '',
+        });
+      }
+    }
+
+    // 2022 March: 时区2
+    for (const pt of SCI_PAPERS) {
+      db.push({
+        id: `${subj.subject}-2022-MA-${pt.code}2`,
+        ...subj, year: 2022, paper: `${pt.code}2`,
+        paperFull: `${pt.full} (${VARIANT_REGIONS[2].name})`,
+        variantRegion: VARIANT_REGIONS[2].region,
+        session: 'March', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+        locked: false, syllabusInfo: '',
+      });
+    }
+
+    // 2022 May/June: 时区1,2,3
+    for (const pt of SCI_PAPERS) {
+      for (const v of [1,2,3]) {
+        db.push({
+          id: `${subj.subject}-2022-MJ-${pt.code}${v}`,
+          ...subj, year: 2022, paper: `${pt.code}${v}`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+          variantRegion: VARIANT_REGIONS[v].region,
+          session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+          locked: false, syllabusInfo: '',
+        });
+      }
+    }
+
+    // 2022 Oct/Nov: 时区1,2,3
+    for (const pt of SCI_PAPERS) {
+      for (const v of [1,2,3]) {
+        db.push({
+          id: `${subj.subject}-2022-ON-${pt.code}${v}`,
+          ...subj, year: 2022, paper: `${pt.code}${v}`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+          variantRegion: VARIANT_REGIONS[v].region,
+          session: 'Oct/Nov', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+          locked: false, syllabusInfo: '',
+        });
+      }
+    }
+
+    // 2021 March: 时区2
+    for (const pt of SCI_PAPERS) {
+      db.push({
+        id: `${subj.subject}-2021-MA-${pt.code}2`,
+        ...subj, year: 2021, paper: `${pt.code}2`,
+        paperFull: `${pt.full} (${VARIANT_REGIONS[2].name})`,
+        variantRegion: VARIANT_REGIONS[2].region,
+        session: 'March', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+        locked: false, syllabusInfo: '',
+      });
+    }
+
+    // 2021 May/June: 时区1,2,3
+    for (const pt of SCI_PAPERS) {
+      for (const v of [1,2,3]) {
+        db.push({
+          id: `${subj.subject}-2021-MJ-${pt.code}${v}`,
+          ...subj, year: 2021, paper: `${pt.code}${v}`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+          variantRegion: VARIANT_REGIONS[v].region,
+          session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+          locked: false, syllabusInfo: '',
+        });
+      }
+    }
+
+    // 2021 Oct/Nov: 时区1,2,3
+    for (const pt of SCI_PAPERS) {
+      for (const v of [1,2,3]) {
+        db.push({
+          id: `${subj.subject}-2021-ON-${pt.code}${v}`,
+          ...subj, year: 2021, paper: `${pt.code}${v}`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+          variantRegion: VARIANT_REGIONS[v].region,
+          session: 'Oct/Nov', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+          locked: false, syllabusInfo: '',
+        });
+      }
+    }
+
+    // 2020 March: 时区2
+    for (const pt of SCI_PAPERS) {
+      db.push({
+        id: `${subj.subject}-2020-MA-${pt.code}2`,
+        ...subj, year: 2020, paper: `${pt.code}2`,
+        paperFull: `${pt.full} (${VARIANT_REGIONS[2].name})`,
+        variantRegion: VARIANT_REGIONS[2].region,
+        session: 'March', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+        locked: false, syllabusInfo: '',
+      });
+    }
+
+    // 2020 May/June: 时区1,2,3
+    for (const pt of SCI_PAPERS) {
+      for (const v of [1,2,3]) {
+        db.push({
+          id: `${subj.subject}-2020-MJ-${pt.code}${v}`,
+          ...subj, year: 2020, paper: `${pt.code}${v}`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+          variantRegion: VARIANT_REGIONS[v].region,
+          session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+          locked: false, syllabusInfo: '',
+        });
+      }
+    }
+
+    // 2020 Oct/Nov: 时区1,2,3
+    for (const pt of SCI_PAPERS) {
+      for (const v of [1,2,3]) {
+        db.push({
+          id: `${subj.subject}-2020-ON-${pt.code}${v}`,
+          ...subj, year: 2020, paper: `${pt.code}${v}`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+          variantRegion: VARIANT_REGIONS[v].region,
+          session: 'Oct/Nov', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+          locked: false, syllabusInfo: '',
+        });
       }
     }
   }
+
   return db;
 }
 
@@ -612,19 +798,21 @@ const FILTER_DEFS = [
   {
     key: 'papers', label: '📄 卷型',
     options: [
-      { value: 'P1', label: 'P1 (MCQ)' },
-      { value: 'P2', label: 'P2 (结构)' },
-      { value: 'P3', label: 'P3 (Core)' },
-      { value: 'P4', label: 'P4 (Extended)' },
-      { value: 'P6', label: 'P6 (实验)' },
+      { value: 'P1', label: 'P1 (Core MCQ)' },
+      { value: 'P2', label: 'P2 (Ext. MCQ)' },
+      { value: 'P3', label: 'P3 (Core Theory)' },
+      { value: 'P4', label: 'P4 (Ext. Theory)' },
+      { value: 'P5', label: 'P5 (Practical)' },
+      { value: 'P6', label: 'P6 (Alt. Prac.)' },
     ]
   },
   {
     key: 'durations', label: '⏱ 时长',
     options: [
-      { value: '45',  label: '≤ 45 min' },
-      { value: '90',  label: '46–90 min' },
-      { value: '120', label: '91–120 min' },
+      { value: '45',  label: '45 min (P1/P2 理科)' },
+      { value: '90',  label: '90 min (P1/P2 数学)' },
+      { value: '120', label: '91–120 min (P3/P4/P5 理科)' },
+      { value: '150', label: '150 min (P4 数学)' },
     ]
   },
   {
@@ -646,8 +834,9 @@ const FILTER_DEFS = [
   {
     key: 'sessions', label: '🗓 考季',
     options: [
-      { value: 'May/June', label: 'May/June' },
-      { value: 'Oct/Nov',  label: 'Oct/Nov'  },
+      { value: 'March',    label: 'March (二月考季)' },
+      { value: 'May/June', label: 'May/June (六月考季)' },
+      { value: 'Oct/Nov',  label: 'Oct/Nov (十一月考季)' },
     ]
   },
 ];
@@ -722,8 +911,9 @@ function updateFilterCounts() {
         if (def.key === 'papers')    return p.paper.startsWith(opt.value);
         if (def.key === 'durations') {
           if (opt.value === '45')  return p.duration <= 45;
-          if (opt.value === '90')  return p.duration > 45 && p.duration <= 90;
-          if (opt.value === '120') return p.duration > 90;
+          if (opt.value === '90')  return p.duration === 90;
+          if (opt.value === '120') return p.duration > 90 && p.duration < 150;
+          if (opt.value === '150') return p.duration >= 150;
         }
         if (def.key === 'variants')  return String(p.paper).endsWith(String(opt.value));
         if (def.key === 'statuses')  return (state.paperStatus[p.id] || 'todo') === opt.value;
@@ -754,8 +944,9 @@ function applyFilters() {
     if (durations.length) {
       const inRange = durations.some(d => {
         if (d === '45')  return p.duration <= 45;
-        if (d === '90')  return p.duration > 45 && p.duration <= 90;
-        if (d === '120') return p.duration > 90;
+        if (d === '90')  return p.duration === 90;
+        if (d === '120') return p.duration > 90 && p.duration < 150;
+        if (d === '150') return p.duration >= 150;
         return false;
       });
       if (!inRange) return false;
@@ -814,7 +1005,7 @@ function makeCard(p) {
   const sc     = STATUS_MAP[status];
   const inCart = state.cart.includes(p.id);
   const isSel  = selectedSet.has(p.id);
-  const sCode  = p.session === 'May/June' ? 'M/J' : 'O/N';
+  const sCode  = p.session === 'May/June' ? 'M/J' : p.session === 'March' ? 'Mar' : 'O/N';
   const tSec   = state.paperTimes[p.id];
   const tStr   = tSec ? fmtTime(tSec) : null;
   const barPct = status === 'done' ? 100 : status === 'inprog' ? 50 : 0;
@@ -860,7 +1051,7 @@ function makeCard(p) {
     <!-- 时长 / 分数 -->
     <div class="flex gap-3 mb-2" style="font-size:11px;color:var(--text-sub)">
       <div class="flex items-center gap-1">
-        <span class="mi" style="font-size:14px;color:#9AA0A6">timer</span>${p.duration} min
+        <span class="mi" style="font-size:14px;color:#9AA0A6">timer</span>${fmtDurationMin(p.duration)}
       </div>
       <div class="flex items-center gap-1">
         <span class="mi" style="font-size:14px;color:#9AA0A6">grading</span>${p.totalMarks} 分
@@ -1027,7 +1218,7 @@ function renderCartList() {
       </div>
       <div style="flex:1;min-width:0">
         <div class="font-semibold text-sm" style="color:#202124">${p.subject} ${p.paper}</div>
-        <div style="font-size:11px;color:var(--text-sub)">${p.year} ${sCode} · ${p.duration}min · ${p.totalMarks}分</div>
+        <div style="font-size:11px;color:var(--text-sub)">${p.year} ${sCode} · ${fmtDurationMin(p.duration)} · ${p.totalMarks}分</div>
       </div>
       <button onclick="removeFromCart('${id}')" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:50%" title="移除">
         <span class="mi" style="font-size:18px;color:#9AA0A6">close</span>
@@ -1338,7 +1529,7 @@ function loadExamPaper() {
 function renderExamUI(p) {
   const isStrict = state.settings.mode === 'strict';
   const content  = document.getElementById('examContent');
-  const sCode    = p.session === 'May/June' ? 'May/June' : 'Oct/Nov';
+  const sCode    = p.session === 'May/June' ? 'May/June' : p.session === 'March' ? 'March' : 'Oct/Nov';
 
   content.innerHTML = `
     <!-- 科目信息 -->
@@ -1653,6 +1844,14 @@ function closeMobileFilter() {
 // ╔══════════════════════════════════════════════════════════╗
 // ║                    UTILITIES                            ║
 // ╚══════════════════════════════════════════════════════════╝
+
+function fmtDurationMin(min) {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
 
 function fmtTime(sec) {
   if (sec < 0) sec = 0;
