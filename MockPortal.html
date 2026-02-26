@@ -85,17 +85,18 @@
     .btn-g { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
     .btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
 
-    /* Cart bar */
+    /* Cart bar - 改进的固定位置和 z-index */
     #cartBar {
       backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
       background: rgba(255,255,255,0.93);
       border-top: 1px solid rgba(0,0,0,0.07);
       box-shadow: 0 -2px 14px rgba(0,0,0,0.09);
     }
-    /* Cart panel */
+    /* Cart panel - 增加底部间距以不被 cartBar 挡住 */
     #cartPanel {
       position: fixed; bottom: 64px; left: 0; right: 0;
-      max-height: 440px; background: white;
+      max-height: 55vh;
+      background: white;
       border-radius: 20px 20px 0 0;
       box-shadow: 0 -4px 28px rgba(0,0,0,0.15);
       transform: translateY(100%);
@@ -223,6 +224,16 @@
     /* Status bar */
     .sbar { height:4px;border-radius:2px;background:#E8EAED;overflow:hidden; }
     .sbar-fill { height:100%;border-radius:2px;transition:width .3s ease; }
+
+    /* 考纲变更提示 */
+    .syllabus-note {
+      background: #FEF7E0; border-left: 4px solid #FBBC04; padding: 12px; 
+      border-radius: 8px; margin: 16px 0; font-size: 12px; color: #5F6368;
+    }
+    .variant-badge {
+      display: inline-block; font-size: 10px; padding: 2px 8px; 
+      border-radius: 12px; margin-left: 4px; font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -262,6 +273,16 @@
 <!-- ══════════════════════ MAIN CONTENT ══════════════════════ -->
 <main id="mainContent" class="pt-14" style="margin-left:260px;padding-bottom:100px">
   <div class="p-4">
+    <!-- Syllabus notice -->
+    <div class="syllabus-note">
+      <span class="mi" style="font-size:14px;vertical-align:middle">info</span>
+      <strong>📋 考纲更新提醒：</strong>
+      <ul style="margin-top:6px;margin-left:20px">
+        <li>✅ 2020-2024：0580 可使用计算器（旧考纲）</li>
+        <li>⏱️ 2025+：0580 Paper 1/2 禁用计算器（新考纲）</li>
+      </ul>
+    </div>
+
     <!-- Action bar -->
     <div class="flex items-center flex-wrap gap-2 mb-4 px-4 py-3 bg-white rounded-2xl" style="box-shadow:0 1px 3px rgba(0,0,0,0.12)">
       <span id="filterCount" class="text-sm font-medium" style="color:#202124">筛选到 0 张卷子</span>
@@ -287,7 +308,6 @@
       <p class="text-lg mt-4" style="color:#9AA0A6">没有找到符合条件的卷子</p>
       <button onclick="clearFilters()" class="btn btn-o mt-4">清除筛选条件</button>
     </div>
-    <!-- Lock prompt - 已移除，因为所有内容都已解锁 -->
   </div>
 </main>
 
@@ -302,7 +322,7 @@
       </button>
     </div>
   </div>
-  <div id="cartList" class="overflow-y-auto" style="max-height:360px;padding:8px"></div>
+  <div id="cartList" class="overflow-y-auto" style="max-height:calc(55vh - 60px);padding:8px"></div>
 </div>
 
 <!-- ══════════════════════ CART BAR ══════════════════════ -->
@@ -340,7 +360,7 @@
     <!-- Mode -->
     <div>
       <p class="font-semibold text-sm mb-1" style="color:#202124">考试模式</p>
-      <p class="text-xs mb-3" style="color:var(--text-sub)">严格模式下不允许暂停，退出全屏将显示警告</p>
+      <p class="text-xs mb-3" style="color:var(--text-sub)">严格模式下不允许暂停，退出全屏自动恢复；练习模式可随时暂停</p>
       <div class="flex rounded-xl overflow-hidden" style="border:1.5px solid var(--border)">
         <button id="modeStrict" onclick="setMode('strict')" class="flex-1 py-2 text-sm font-medium transition-colors" style="background:var(--primary);color:white;border:none;cursor:pointer">⚡ 严格模式</button>
         <button id="modePrac" onclick="setMode('practice')" class="flex-1 py-2 text-sm font-medium transition-colors" style="background:white;color:var(--text-sub);border:none;cursor:pointer">🎓 练习模式</button>
@@ -384,7 +404,7 @@
 
 <!-- ══════════════════════ EXAM OVERLAY ══════════════════════ -->
 <div id="examOv" class="fixed inset-0 z-[100] hidden" style="display:none">
-  <div id="warnBanner">⚠️ 警告！退出全屏视为作弊行为！请立刻返回全屏！</div>
+  <div id="warnBanner">⚠️ 警告！已退出全屏。正在自动恢复…</div>
   <div id="examContent" class="flex flex-col items-center justify-center h-full px-8 text-center relative" style="z-index:1"></div>
   <div class="wm" id="examWm"></div>
 </div>
@@ -409,7 +429,7 @@
 // ║                   PAPER DATABASE                        ║
 // ╚══════════════════════════════════════════════════════════╝
 
-/** 生成所有试卷的数据库 */
+/** 生成所有试卷的数据库 - 包含所有变体及国家/地区注释 */
 function generatePaperDB() {
   const db = [];
 
@@ -423,7 +443,8 @@ function generatePaperDB() {
         { code: 'P2', full: 'Paper 2', duration: 90,  marks: 70, tier: 'Extended' },
         { code: 'P3', full: 'Paper 3', duration: 120, marks: 80, tier: 'Core' },
         { code: 'P4', full: 'Paper 4', duration: 120, marks: 80, tier: 'Extended' },
-      ]
+      ],
+      syllabusChange: true, // 标记数学有考纲变更
     },
     {
       subject: '0610', subjectName: 'Biology',
@@ -457,12 +478,24 @@ function generatePaperDB() {
     },
   ];
 
+  // 变体注释
+  const VARIANT_REGIONS = {
+    1: { name: 'Variant 1', region: '🇬🇧 英国/欧洲/非洲/美洲' },
+    2: { name: 'Variant 2', region: '🇨🇳 中国/东亚/巴基斯坦' },
+    3: { name: 'Variant 3', region: '🇦🇺 澳洲/新西兰/东南亚' },
+  };
+
   for (const subj of SUBJECTS) {
-    // 近年卷子 (2023-2025): 两个考季，两个变体
+    // 近年卷子 (2023-2025): 两个考季，三个变体（新版本）
     for (const year of [2025, 2024, 2023]) {
       for (const [session, sc] of [['May/June', 'MJ'], ['Oct/Nov', 'ON']]) {
         for (const pt of subj.papers) {
-          for (const v of [1, 2]) {
+          for (const v of [1, 2, 3]) {
+            const isOldSyllabus = year < 2025;
+            const syllabusInfo = subj.syllabusChange 
+              ? (isOldSyllabus ? ' [旧考纲✓计算器]' : ' [新考纲 P1/P2✗计算器]')
+              : '';
+            
             db.push({
               id: `${subj.subject}-${year}-${sc}-${pt.code}${v}`,
               subject: subj.subject,
@@ -470,20 +503,23 @@ function generatePaperDB() {
               subjectIcon: subj.subjectIcon,
               subjectColor: subj.subjectColor,
               year, paper: `${pt.code}${v}`,
-              paperFull: `${pt.full} (Variant ${v})`,
+              paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+              variantRegion: VARIANT_REGIONS[v].region,
               session, duration: pt.duration,
               totalMarks: pt.marks, tier: pt.tier,
-              locked: false, // ✅ 全部解锁
+              locked: false,
+              syllabusInfo,
             });
           }
         }
       }
     }
-    // 历年卷子 (2020-2022): 仅 May/June，仅 P2/P4，两个变体
-    // ✅ 修改：设置为 locked: false，全部解锁
+    // 历年卷子 (2020-2022): May/June，全种类纸张，三个变体
     for (const year of [2022, 2021, 2020]) {
-      for (const pt of subj.papers.filter(p => ['P2', 'P4'].includes(p.code))) {
-        for (const v of [1, 2]) {
+      for (const pt of subj.papers) {
+        for (const v of [1, 2, 3]) {
+          const syllabusInfo = subj.syllabusChange ? ' [旧考纲✓计算器]' : '';
+          
           db.push({
             id: `${subj.subject}-${year}-MJ-${pt.code}${v}`,
             subject: subj.subject,
@@ -491,11 +527,13 @@ function generatePaperDB() {
             subjectIcon: subj.subjectIcon,
             subjectColor: subj.subjectColor,
             year, paper: `${pt.code}${v}`,
-            paperFull: `${pt.full} (Variant ${v})`,
+            paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+            variantRegion: VARIANT_REGIONS[v].region,
             session: 'May/June',
             duration: pt.duration,
             totalMarks: pt.marks, tier: pt.tier,
-            locked: false, // ✅ 改为 false，全部解锁
+            locked: false,
+            syllabusInfo,
           });
         }
       }
@@ -508,21 +546,20 @@ function generatePaperDB() {
 // ║                    STATE & STORAGE                      ║
 // ╚══════════════════════════════════════════════════════════╝
 
-const STORAGE_KEY = 'warden_mock_portal_v2';
+const STORAGE_KEY = 'warden_mock_portal_v3';
 
 let paperDB = [];
 let filteredPapers = [];
-let selectedSet = new Set(); // 卡片选中状态（用于批量操作）
+let selectedSet = new Set();
 
 let state = {
-  filters: { subjects: [], years: [], papers: [], durations: [], statuses: [], sessions: [] },
-  cart: [],           // 今日清单（paper id 数组）
-  paperStatus: {},    // id -> 'done' | 'inprog'
-  paperTimes: {},     // id -> seconds
+  filters: { subjects: [], years: [], papers: [], durations: [], statuses: [], sessions: [], variants: [] },
+  cart: [],
+  paperStatus: {},
+  paperTimes: {},
   settings: { mode: 'strict', theme: 'light' },
 };
 
-/** 从 LocalStorage 加载状态 */
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -536,7 +573,6 @@ function loadState() {
   } catch (e) { console.warn('加载状态失败', e); }
 }
 
-/** 保存状态到 LocalStorage */
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -568,9 +604,9 @@ const FILTER_DEFS = [
       { value: 2025, label: '2025' },
       { value: 2024, label: '2024' },
       { value: 2023, label: '2023' },
-      { value: 2022, label: '2022' }, // ✅ 移除 🔒 标记
-      { value: 2021, label: '2021' }, // ✅ 移除 🔒 标记
-      { value: 2020, label: '2020' }, // ✅ 移除 🔒 标记
+      { value: 2022, label: '2022' },
+      { value: 2021, label: '2021' },
+      { value: 2020, label: '2020' },
     ]
   },
   {
@@ -592,6 +628,14 @@ const FILTER_DEFS = [
     ]
   },
   {
+    key: 'variants', label: '🌍 变体',
+    options: [
+      { value: 1, label: '🇬🇧 Variant 1 (英/欧/非/美)' },
+      { value: 2, label: '🇨🇳 Variant 2 (中/东亚/巴)' },
+      { value: 3, label: '🇦🇺 Variant 3 (澳/新/东南亚)' },
+    ]
+  },
+  {
     key: 'statuses', label: '✅ 状态',
     options: [
       { value: 'todo',   label: '未做' },
@@ -604,12 +648,10 @@ const FILTER_DEFS = [
     options: [
       { value: 'May/June', label: 'May/June' },
       { value: 'Oct/Nov',  label: 'Oct/Nov'  },
-      { value: 'Feb/Mar',  label: 'Feb/Mar'  },
     ]
   },
 ];
 
-/** 渲染左侧筛选面板 */
 function renderFilterPanel() {
   const container = document.getElementById('filterSections');
   container.innerHTML = '';
@@ -637,12 +679,10 @@ function renderFilterPanel() {
     container.appendChild(sec);
   });
   updateFilterCounts();
-  // 同步渲染移动端筛选
   const mob = document.getElementById('mobileFilterSections');
   if (mob) mob.innerHTML = container.innerHTML;
 }
 
-/** 展开/折叠筛选分区 */
 function toggleFilterSec(i) {
   const body  = document.getElementById(`fsec-body-${i}`);
   const arrow = document.getElementById(`fsec-arrow-${i}`);
@@ -651,13 +691,11 @@ function toggleFilterSec(i) {
   arrow.style.transform = open ? 'rotate(-90deg)' : '';
 }
 
-/** 切换单个筛选项 */
 function toggleFilter(key, value) {
   const arr = state.filters[key];
   const idx = arr.indexOf(value);
   if (idx === -1) arr.push(value);
   else arr.splice(idx, 1);
-  // 同步所有相关 chip 样式
   document.querySelectorAll(`[id^="fc-${key}-"]`).forEach(el => {
     const v = el.id.replace(`fc-${key}-`, '');
     const parsed = isNaN(v) ? v : Number(v);
@@ -666,7 +704,6 @@ function toggleFilter(key, value) {
   applyFilters();
 }
 
-/** 清除所有筛选条件 */
 function clearFilters() {
   FILTER_DEFS.forEach(d => { state.filters[d.key] = []; });
   renderFilterPanel();
@@ -674,13 +711,11 @@ function clearFilters() {
   showToast('筛选已清除');
 }
 
-/** 更新每个筛选项的计数角标 */
 function updateFilterCounts() {
   FILTER_DEFS.forEach(def => {
     def.options.forEach(opt => {
       const el = document.getElementById(`fcb-${def.key}-${opt.value}`);
       if (!el) return;
-      // ✅ 移除解锁检查，所有试卷都计入
       const count = paperDB.filter(p => {
         if (def.key === 'subjects')  return p.subject === opt.value;
         if (def.key === 'years')     return p.year === opt.value;
@@ -690,8 +725,9 @@ function updateFilterCounts() {
           if (opt.value === '90')  return p.duration > 45 && p.duration <= 90;
           if (opt.value === '120') return p.duration > 90;
         }
-        if (def.key === 'statuses') return (state.paperStatus[p.id] || 'todo') === opt.value;
-        if (def.key === 'sessions') return p.session === opt.value;
+        if (def.key === 'variants')  return String(p.paper).endsWith(String(opt.value));
+        if (def.key === 'statuses')  return (state.paperStatus[p.id] || 'todo') === opt.value;
+        if (def.key === 'sessions')  return p.session === opt.value;
         return false;
       }).length;
       el.textContent = count;
@@ -703,19 +739,15 @@ function updateFilterCounts() {
 // ║                  FILTER & SORT LOGIC                    ║
 // ╚══════════════════════════════════════════════════════════╝
 
-/** ✅ 判断一个科目的历年卷是否已解锁 - 现在永远返回 true */
 function isSubjectUnlocked(subject) {
-  return true; // ✅ 所有科目都已解锁
+  return true;
 }
 
-/** 应用筛选+排序，并重新渲染卡片 */
 function applyFilters() {
-  const { subjects, years, papers, durations, statuses, sessions } = state.filters;
+  const { subjects, years, papers, durations, statuses, sessions, variants } = state.filters;
   const sort = document.getElementById('sortSel')?.value || 'year-desc';
 
-  // ✅ 筛选 - 移除解锁检查
   let result = paperDB.filter(p => {
-    // ✅ 移除这一行：if (p.locked && !isSubjectUnlocked(p.subject)) return false;
     if (subjects.length  && !subjects.includes(p.subject))                         return false;
     if (years.length     && !years.includes(p.year))                               return false;
     if (papers.length    && !papers.some(pt => p.paper.startsWith(pt)))            return false;
@@ -728,12 +760,12 @@ function applyFilters() {
       });
       if (!inRange) return false;
     }
+    if (variants.length && !variants.some(v => String(p.paper).endsWith(String(v)))) return false;
     if (statuses.length && !(statuses.includes(state.paperStatus[p.id] || 'todo'))) return false;
     if (sessions.length && !sessions.includes(p.session))                           return false;
     return true;
   });
 
-  // 排序
   result.sort((a, b) => {
     switch (sort) {
       case 'year-asc':  return a.year - b.year  || a.subject.localeCompare(b.subject);
@@ -761,7 +793,6 @@ const STATUS_MAP = {
   done:   { color: '#34A853', label: '已完成', bg: '#E6F4EA' },
 };
 
-/** 渲染全部卡片 */
 function renderCards() {
   const grid      = document.getElementById('cardGrid');
   const empty     = document.getElementById('emptyState');
@@ -776,17 +807,14 @@ function renderCards() {
     empty.style.display = 'none';
     filteredPapers.forEach(p => grid.appendChild(makeCard(p)));
   }
-
-  // ✅ 移除锁定提示，因为所有内容都已解锁
 }
 
-/** 创建单张卡片 DOM */
 function makeCard(p) {
   const status = state.paperStatus[p.id] || 'todo';
   const sc     = STATUS_MAP[status];
   const inCart = state.cart.includes(p.id);
   const isSel  = selectedSet.has(p.id);
-  const sCode  = p.session === 'May/June' ? 'M/J' : p.session === 'Oct/Nov' ? 'O/N' : 'F/M';
+  const sCode  = p.session === 'May/June' ? 'M/J' : 'O/N';
   const tSec   = state.paperTimes[p.id];
   const tStr   = tSec ? fmtTime(tSec) : null;
   const barPct = status === 'done' ? 100 : status === 'inprog' ? 50 : 0;
@@ -824,7 +852,9 @@ function makeCard(p) {
     <div class="mb-2">
       <div class="font-bold" style="font-size:22px;color:#202124;letter-spacing:-.5px">${p.paper}</div>
       <div style="font-size:11px;color:var(--text-sub)">${p.paperFull}</div>
+      <div style="font-size:10px;color:#9AA0A6;margin-top:4px">${p.variantRegion}</div>
       <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;margin-top:4px;background:${p.subjectColor}15;color:${p.subjectColor}">${p.tier}</span>
+      ${p.syllabusInfo ? `<span class="variant-badge" style="background:#FEF7E0;color:#D97706">${p.syllabusInfo}</span>` : ''}
     </div>
 
     <!-- 时长 / 分数 -->
@@ -863,7 +893,6 @@ function makeCard(p) {
     </div>
   `;
 
-  // 点击卡片（非按钮区域）切换选中
   div.addEventListener('click', e => {
     if (!e.target.closest('button') && !e.target.closest('[onclick]')) {
       toggleSel(p.id);
@@ -877,11 +906,9 @@ function makeCard(p) {
 // ║                   SELECTION LOGIC                       ║
 // ╚══════════════════════════════════════════════════════════╝
 
-/** 切换卡片选中状态 */
 function toggleSel(id) {
   if (selectedSet.has(id)) selectedSet.delete(id);
   else selectedSet.add(id);
-  // 只刷新该卡片
   const el = document.querySelector(`[data-id="${id}"]`);
   if (el) {
     const p = paperDB.find(x => x.id === id);
@@ -892,14 +919,12 @@ function toggleSel(id) {
   }
 }
 
-/** 全选当前筛选到的卡片 */
 function selectAll() {
   filteredPapers.forEach(p => selectedSet.add(p.id));
   renderCards();
   showToast(`已选中 ${selectedSet.size} 张卷子`);
 }
 
-/** 反选当前筛选到的卡片 */
 function invertSel() {
   filteredPapers.forEach(p => {
     if (selectedSet.has(p.id)) selectedSet.delete(p.id);
@@ -914,30 +939,25 @@ function invertSel() {
 
 let cartPanelOpen = false;
 
-/** 切换今日清单中的某张卷子 */
 function toggleCart(id) {
   const idx = state.cart.indexOf(id);
   if (idx === -1) { state.cart.push(id); showToast('已加入今日清单'); }
   else { state.cart.splice(idx, 1); showToast('已从清单移除'); }
   saveState();
   updateCartBar();
-  // 刷新该卡片按钮
   const el = document.querySelector(`[data-id="${id}"]`);
   if (el) { const p = paperDB.find(x => x.id === id); if (p) el.replaceWith(makeCard(p)); }
 }
 
-/** 从清单中删除 */
 function removeFromCart(id) {
   state.cart = state.cart.filter(x => x !== id);
   saveState();
   updateCartBar();
   renderCartList();
-  // 刷新卡片按钮
   const el = document.querySelector(`[data-id="${id}"]`);
   if (el) { const p = paperDB.find(x => x.id === id); if (p) el.replaceWith(makeCard(p)); }
 }
 
-/** 清空清单 */
 function clearCart() {
   const ids = [...state.cart];
   state.cart = [];
@@ -951,12 +971,10 @@ function clearCart() {
   showToast('清单已清空');
 }
 
-/** 更新底部 cart bar */
 function updateCartBar() {
   const n = state.cart.length;
   document.getElementById('cartCount').textContent = n;
 
-  // 预计时长
   const total = state.cart.reduce((s, id) => {
     const p = paperDB.find(x => x.id === id);
     return s + (p ? p.duration : 0);
@@ -964,7 +982,6 @@ function updateCartBar() {
   document.getElementById('cartTime').textContent =
     n ? `预计总时长: ${fmtDuration(total * 60)}` : '预计总时长: --';
 
-  // 科目色点
   const dotsEl = document.getElementById('cartDots');
   const subjColors = [...new Set(state.cart.map(id => {
     const p = paperDB.find(x => x.id === id);
@@ -976,12 +993,10 @@ function updateCartBar() {
   ).join('') + (subjColors.length > max ?
     `<span style="font-size:10px;color:var(--text-sub)">+${subjColors.length - max}</span>` : '');
 
-  // 开始模考按钮
   const btn = document.getElementById('startExamBtn');
   btn.disabled = n === 0;
 }
 
-/** 展开/收起清单面板 */
 function toggleCartPanel() {
   cartPanelOpen = !cartPanelOpen;
   document.getElementById('cartPanel').classList.toggle('open', cartPanelOpen);
@@ -989,7 +1004,6 @@ function toggleCartPanel() {
   if (cartPanelOpen) renderCartList();
 }
 
-/** 渲染清单列表（支持拖拽排序） */
 function renderCartList() {
   const list = document.getElementById('cartList');
   list.innerHTML = '';
@@ -1013,13 +1027,12 @@ function renderCartList() {
       </div>
       <div style="flex:1;min-width:0">
         <div class="font-semibold text-sm" style="color:#202124">${p.subject} ${p.paper}</div>
-        <div style="font-size:11px;color:var(--text-sub)">${p.year} ${p.session === 'May/June' ? 'M/J' : 'O/N'} · ${p.duration}min · ${p.totalMarks}分</div>
+        <div style="font-size:11px;color:var(--text-sub)">${p.year} ${sCode} · ${p.duration}min · ${p.totalMarks}分</div>
       </div>
       <button onclick="removeFromCart('${id}')" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:50%" title="移除">
         <span class="mi" style="font-size:18px;color:#9AA0A6">close</span>
       </button>
     `;
-    // 拖拽事件
     row.addEventListener('dragstart', e => {
       e.dataTransfer.setData('text/plain', id);
       row.classList.add('dragging');
@@ -1045,12 +1058,10 @@ function renderCartList() {
   });
 }
 
-/** 标记一张卷子为完成 */
 function markDone(id) {
   const cur = state.paperStatus[id] || 'todo';
   state.paperStatus[id] = cur === 'done' ? 'todo' : 'done';
   saveState();
-  // 刷新卡片
   const el = document.querySelector(`[data-id="${id}"]`);
   if (el) { const p = paperDB.find(x => x.id === id); if (p) el.replaceWith(makeCard(p)); }
   updateProgress();
@@ -1062,9 +1073,8 @@ function markDone(id) {
 // ║                   PROGRESS CIRCLE                       ║
 // ╚══════════════════════════════════════════════════════════╝
 
-/** ✅ 更新顶部圆形进度条 - 移除解锁检查 */
 function updateProgress() {
-  const total = paperDB.length; // ✅ 计算所有试卷
+  const total = paperDB.length;
   const done  = Object.values(state.paperStatus).filter(v => v === 'done').length;
   const pct   = total ? Math.round((done / total) * 100) : 0;
   document.getElementById('progArc').setAttribute('stroke-dasharray', `${pct} 100`);
@@ -1078,19 +1088,16 @@ function updateProgress() {
 let gachaCount = 3;
 let lastGachaResults = [];
 
-/** 打开随机抽取弹窗 */
 function openGacha() {
   const modal = document.getElementById('gachaModal');
   modal.style.display = 'flex';
   renderGachaConfig();
 }
 
-/** 关闭随机抽取弹窗 */
 function closeGacha() {
   document.getElementById('gachaModal').style.display = 'none';
 }
 
-/** 渲染抽取配置界面 */
 function renderGachaConfig() {
   const box = document.getElementById('gachaBox');
   box.innerHTML = `
@@ -1153,7 +1160,6 @@ function renderGachaConfig() {
   `;
 }
 
-/** 设置抽取数量 */
 function setGachaCount(n) {
   gachaCount = n;
   for (let i = 1; i <= 5; i++) {
@@ -1162,19 +1168,15 @@ function setGachaCount(n) {
   }
 }
 
-/** ✅ 执行抽取 - 移除解锁检查 */
 function runGacha() {
   const box = document.getElementById('gachaBox');
 
-  // 读取配置
   const subjects  = [...document.querySelectorAll('#gSubj .fchip.on')].map(e => e.dataset.v);
   const years     = [...document.querySelectorAll('#gYear .fchip.on')].map(e => Number(e.dataset.v));
   const papers    = [...document.querySelectorAll('#gPaper .fchip.on')].map(e => e.dataset.v);
   const onlyTodo  = document.getElementById('gOnlyTodo')?.classList.contains('on');
 
-  // ✅ 构建候选池 - 移除解锁检查
   let pool = paperDB.filter(p => {
-    // ✅ 移除这一行：if (p.locked && !isSubjectUnlocked(p.subject)) return false;
     if (!subjects.includes(p.subject))             return false;
     if (!years.includes(p.year))                   return false;
     if (!papers.some(pt => p.paper.startsWith(pt))) return false;
@@ -1184,11 +1186,9 @@ function runGacha() {
 
   if (pool.length === 0) { showToast('😢 没有符合条件的卷子！'); return; }
 
-  // 随机打乱
   pool = pool.sort(() => Math.random() - 0.5);
   lastGachaResults = pool.slice(0, Math.min(gachaCount, pool.length));
 
-  // 显示滚动动画
   const allShuffled = [...paperDB].sort(() => Math.random() - 0.5);
   const scrollItems = [...allShuffled.slice(0, 24), ...lastGachaResults];
   const itemH = 68;
@@ -1215,7 +1215,6 @@ function runGacha() {
     <p class="text-center text-sm mt-4" style="color:var(--text-sub)">正在为你随机抽取…</p>
   `;
 
-  // 动画：快速滚动到接近末尾
   const track = document.getElementById('gachaTrack');
   const endY   = -(scrollItems.length - lastGachaResults.length) * itemH;
 
@@ -1227,7 +1226,6 @@ function runGacha() {
   setTimeout(() => showGachaResults(), 2300);
 }
 
-/** 显示抽取结果 */
 function showGachaResults() {
   const box = document.getElementById('gachaBox');
   box.innerHTML = `
@@ -1263,11 +1261,9 @@ function showGachaResults() {
       </button>
     </div>
   `;
-  // 用 id 精确绑定重新抽取按钮，避免歧义选择器
   document.getElementById('gachaRedrawBtn').addEventListener('click', renderGachaConfig);
 }
 
-/** 将抽取结果加入清单 */
 function addGachaToCart() {
   let added = 0;
   lastGachaResults.forEach(p => {
@@ -1290,7 +1286,6 @@ let examState = {
   paused: false, results: [],
 };
 
-/** 开始模考（从清单启动） */
 function startExam() {
   if (state.cart.length === 0) { showToast('清单为空！'); return; }
   examState.queue      = [...state.cart];
@@ -1298,10 +1293,9 @@ function startExam() {
   examState.results    = [];
   examState.paused     = false;
 
-  // 关闭清单面板
   if (cartPanelOpen) toggleCartPanel();
 
-  // 进入全屏，失败时提示用户
+  // 自动进入全屏，若失败则弹出警告
   document.documentElement.requestFullscreen?.().catch(err => {
     console.warn('全屏请求失败:', err);
     showToast('⚠️ 全屏失败，建议手动按 F11');
@@ -1311,7 +1305,6 @@ function startExam() {
   loadExamPaper();
 }
 
-/** 显示考试遮罩 */
 function showExamOverlay() {
   const ov = document.getElementById('examOv');
   ov.style.display = 'flex';
@@ -1319,11 +1312,9 @@ function showExamOverlay() {
   ov.style.alignItems = 'center';
   ov.style.justifyContent = 'center';
 
-  // 全屏退出监听
   document.addEventListener('fullscreenchange', onFSChange);
 }
 
-/** 加载当前试卷 */
 function loadExamPaper() {
   const id = examState.queue[examState.currentIdx];
   const p  = paperDB.find(x => x.id === id);
@@ -1333,25 +1324,21 @@ function loadExamPaper() {
   examState.totalTime = p.duration * 60;
   examState.paused    = false;
 
-  // 标记为进行中
   state.paperStatus[id] = 'inprog';
   saveState();
 
-  // 水印
   document.getElementById('examWm').textContent = id;
 
   renderExamUI(p);
 
-  // 启动计时器
   clearInterval(examState.timer);
   examState.timer = setInterval(examTick, 1000);
 }
 
-/** 渲染考试界面 */
 function renderExamUI(p) {
   const isStrict = state.settings.mode === 'strict';
   const content  = document.getElementById('examContent');
-  const sCode    = p.session === 'May/June' ? 'May/June' : p.session === 'Oct/Nov' ? 'Oct/Nov' : p.session;
+  const sCode    = p.session === 'May/June' ? 'May/June' : 'Oct/Nov';
 
   content.innerHTML = `
     <!-- 科目信息 -->
@@ -1383,7 +1370,7 @@ function renderExamUI(p) {
       第 ${examState.currentIdx + 1} / ${examState.queue.length} 张 &nbsp;·&nbsp; ${p.duration} min
     </div>
 
-    <!-- 操作按钮（严格模式隐藏暂停）-->
+    <!-- 操作按钮 -->
     <div class="flex gap-3">
       ${!isStrict ? `
         <button id="pauseBtn" onclick="togglePause()" class="btn" style="background:rgba(255,255,255,.12);color:white;padding:10px 24px">
@@ -1404,7 +1391,6 @@ function renderExamUI(p) {
   updateTimerDisplay();
 }
 
-/** 计时器 tick（每秒执行）*/
 function examTick() {
   if (examState.paused) return;
   examState.timeLeft--;
@@ -1416,7 +1402,6 @@ function examTick() {
   }
 }
 
-/** 更新计时器显示 */
 function updateTimerDisplay() {
   const el = document.getElementById('timerDisp');
   const pb = document.getElementById('examProgFill');
@@ -1432,7 +1417,6 @@ function updateTimerDisplay() {
   }
 }
 
-/** 暂停/恢复（练习模式） */
 function togglePause() {
   examState.paused = !examState.paused;
   const btn = document.getElementById('pauseBtn');
@@ -1441,7 +1425,6 @@ function togglePause() {
     : '<span class="mi" style="font-size:18px">pause</span>&nbsp;暂停';
 }
 
-/** 重置当前试卷计时器 */
 function resetTimer() {
   const id = examState.queue[examState.currentIdx];
   const p  = paperDB.find(x => x.id === id);
@@ -1451,7 +1434,6 @@ function resetTimer() {
   updateTimerDisplay();
 }
 
-/** 时间到 */
 function onTimeUp() {
   playBeep();
   const id = examState.queue[examState.currentIdx];
@@ -1459,7 +1441,6 @@ function onTimeUp() {
   const spent = p ? p.duration * 60 : 0;
   recordResult(id, spent);
 
-  // 显示绿色庆祝
   const content = document.getElementById('examContent');
   content.innerHTML = `
     <div style="font-size:72px;animation:twarn 0s">✅</div>
@@ -1470,7 +1451,6 @@ function onTimeUp() {
   setTimeout(() => nextPaper(), 2200);
 }
 
-/** 记录结果 */
 function recordResult(id, timeSpent) {
   state.paperStatus[id] = 'done';
   state.paperTimes[id]  = timeSpent;
@@ -1478,7 +1458,6 @@ function recordResult(id, timeSpent) {
   saveState();
 }
 
-/** 跳过当前试卷 */
 function skipPaper() {
   const id = examState.queue[examState.currentIdx];
   const spent = examState.totalTime - examState.timeLeft;
@@ -1487,7 +1466,6 @@ function skipPaper() {
   nextPaper();
 }
 
-/** 下一张试卷 */
 function nextPaper() {
   examState.currentIdx++;
   if (examState.currentIdx >= examState.queue.length) {
@@ -1497,14 +1475,12 @@ function nextPaper() {
   }
 }
 
-/** 全部完成，显示汇总 */
 function endAllExams() {
   clearInterval(examState.timer);
   document.removeEventListener('fullscreenchange', onFSChange);
   showSummary();
 }
 
-/** 显示汇总页 */
 function showSummary() {
   const ov = document.getElementById('examOv');
   const content = document.getElementById('examContent');
@@ -1540,13 +1516,11 @@ function showSummary() {
   `;
 }
 
-/** 结束模考，退出全屏 */
 function closeExam() {
   clearInterval(examState.timer);
   document.removeEventListener('fullscreenchange', onFSChange);
   document.getElementById('examOv').style.display = 'none';
   document.exitFullscreen?.().catch(err => { console.warn('退出全屏失败:', err); });
-  // 清空清单
   state.cart = [];
   saveState();
   updateCartBar();
@@ -1554,11 +1528,9 @@ function closeExam() {
   updateProgress();
 }
 
-/** 确认退出 */
 function confirmExitExam() {
   if (confirm('确定要提前结束模考吗？当前进度将被保存。')) {
     clearInterval(examState.timer);
-    // 保存当前未完成的
     const id = examState.queue[examState.currentIdx];
     if (id) {
       const spent = examState.totalTime - examState.timeLeft;
@@ -1568,16 +1540,23 @@ function confirmExitExam() {
   }
 }
 
-/** 监听全屏变化（严格模式警告） */
+/** 监听全屏变化 - 自动恢复全屏（严格模式） */
 function onFSChange() {
-  if (!document.fullscreenElement && state.settings.mode === 'strict') {
+  if (!document.fullscreenElement) {
     const banner = document.getElementById('warnBanner');
     banner.classList.add('show');
-    setTimeout(() => banner.classList.remove('show'), 5000);
+    setTimeout(() => {
+      banner.classList.remove('show');
+      // 严格模式下自动恢复全屏
+      if (state.settings.mode === 'strict') {
+        document.documentElement.requestFullscreen?.().catch(err => {
+          console.warn('自动全屏恢复失败:', err);
+        });
+      }
+    }, 2000);
   }
 }
 
-/** Web Audio API 生成提示音 */
 function playBeep() {
   try {
     const ctx  = new (window.AudioContext || window.webkitAudioContext)();
@@ -1598,20 +1577,17 @@ function playBeep() {
 // ║                     SETTINGS                            ║
 // ╚══════════════════════════════════════════════════════════╝
 
-/** 打开设置抽屉 */
 function openSettings() {
   document.getElementById('settingsDr').classList.add('open');
   document.getElementById('settingsOv').classList.remove('hidden');
   updateSettingsUI();
 }
 
-/** 关闭设置抽屉 */
 function closeSettings() {
   document.getElementById('settingsDr').classList.remove('open');
   document.getElementById('settingsOv').classList.add('hidden');
 }
 
-/** 同步设置界面状态 */
 function updateSettingsUI() {
   const mode = state.settings.mode;
   const ms   = document.getElementById('modeStrict');
@@ -1622,7 +1598,6 @@ function updateSettingsUI() {
     mp.style.background = mode === 'practice' ? 'var(--primary)' : 'white';
     mp.style.color      = mode === 'practice' ? 'white'          : 'var(--text-sub)';
   }
-  // 统计数字
   const done = Object.values(state.paperStatus).filter(v => v === 'done').length;
   const ttl  = paperDB.length;
   const secs = Object.values(state.paperTimes).reduce((a, b) => a + b, 0);
@@ -1634,7 +1609,6 @@ function updateSettingsUI() {
   if (el3) el3.textContent = fmtDuration(secs);
 }
 
-/** 切换考试模式 */
 function setMode(m) {
   state.settings.mode = m;
   saveState();
@@ -1642,10 +1616,8 @@ function setMode(m) {
   showToast(m === 'strict' ? '⚡ 严格模式已启用' : '🎓 练习模式已启用');
 }
 
-/** 切换主题（占位） */
 function toggleTheme() {}
 
-/** 确认重置进度 */
 function confirmReset() {
   if (confirm('⚠️ 确定要重置所有进度吗？此操作不可撤销！')) {
     state.paperStatus = {};
@@ -1669,10 +1641,8 @@ function openMobileFilter() {
   document.getElementById('mobileFilterOv').classList.remove('hidden');
   const sheet = document.getElementById('mobileFilterSheet');
   sheet.style.transform = 'translateY(0)';
-  // 渲染筛选选项到移动端面板
   const mob = document.getElementById('mobileFilterSections');
   mob.innerHTML = document.getElementById('filterSections').innerHTML;
-  // 重新绑定事件（通过 onclick 属性已内联，无需额外绑定）
 }
 
 function closeMobileFilter() {
@@ -1684,7 +1654,6 @@ function closeMobileFilter() {
 // ║                    UTILITIES                            ║
 // ╚══════════════════════════════════════════════════════════╝
 
-/** 格式化秒数为 MM:SS */
 function fmtTime(sec) {
   if (sec < 0) sec = 0;
   const m = Math.floor(sec / 60);
@@ -1692,21 +1661,18 @@ function fmtTime(sec) {
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-/** 格式化秒数为 Xh Ymin */
 function fmtDuration(sec) {
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
   return h > 0 ? `${h}h ${m}min` : `${m}min`;
 }
 
-/** 动态获取并显示当前日期 */
 function updateDate() {
   const now = new Date();
   const opts = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
   document.getElementById('dateDisp').textContent = now.toLocaleDateString('zh-CN', opts);
 }
 
-/** Toast 提示 */
 let toastTimer = null;
 function showToast(msg) {
   const el = document.getElementById('toast');
@@ -1716,7 +1682,6 @@ function showToast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
 }
 
-/** AppBar 滚动阴影 */
 function initScrollShadow() {
   window.addEventListener('scroll', () => {
     document.getElementById('appbar').classList.toggle('scrolled', window.scrollY > 4);
@@ -1728,27 +1693,24 @@ function initScrollShadow() {
 // ╚══════════════════════════════════════════════════════════╝
 
 function init() {
-  paperDB = generatePaperDB();    // 生成试卷数据库
-  loadState();                    // 从 LocalStorage 加载状态
-  updateDate();                   // 更新日期
-  renderFilterPanel();            // 渲染筛选面板
-  applyFilters();                 // 首次渲染卡片
-  updateCartBar();                // 初始化 cart bar
-  updateProgress();               // 更新进度圆环
-  initScrollShadow();             // 绑定滚动事件
+  paperDB = generatePaperDB();
+  loadState();
+  updateDate();
+  renderFilterPanel();
+  applyFilters();
+  updateCartBar();
+  updateProgress();
+  initScrollShadow();
 
-  // 恢复清单（若页面刷新后 cart 非空）
   if (state.cart.length > 0) {
     showToast(`📋 清单中还有 ${state.cart.length} 张卷子`);
   }
 
-  // Gacha 关闭点击外部
   document.getElementById('gachaModal').addEventListener('click', e => {
     if (e.target === document.getElementById('gachaModal')) closeGacha();
   });
 }
 
-// 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
