@@ -247,9 +247,9 @@
       <span class="mi" style="font-size:14px;vertical-align:middle">info</span>
       <strong>📋 考纲 & 题库说明（2020–2025）：</strong>
       <ul style="margin-top:6px;margin-left:20px">
-        <li>📐 <strong>0580 数学</strong>：P1/P2各1h30m(70分)，P3共2h(104分)，P4共2h30m(130分)</li>
-        <li>🔬 <strong>理科(0610/0620/0625)</strong>：P1/P2各45m(40分)，P3/P4各1h15m(80分)，P5共1h15m(40分)，P6共1h(40分)</li>
-        <li>⚠️ <strong>2025新考纲(0580)</strong>：P2改为2h(100分)非计算器；P4改为2h(100分)计算器；P1/P3不变</li>
+        <li>📐 <strong>0580 数学</strong>：P1/P2各1 hour 30 minutes(70分)，P3共2 hours(104分)，P4共2 hours 30 minutes(130分)</li>
+        <li>🔬 <strong>理科(0610/0620/0625)</strong>：P1/P2各45 minutes(40分)，P3/P4各1 hour 15 minutes(80分)，P5共1 hour 15 minutes(40分)，P6共1 hour(40分)</li>
+        <li>⚠️ <strong>2025新考纲(0580)</strong>：P2改为2 hours(100分)非计算器；P4改为2 hours(100分)计算器；P1/P3不变</li>
         <li>📅 <strong>考季规律</strong>：March仅时区2；May/June和Oct/Nov各有时区1、2、3</li>
         <li>🟢 <strong>2025年卷子</strong>：按规律推算（March已考，MJ/ON预测）</li>
       </ul>
@@ -269,6 +269,9 @@
       <button onclick="invertSel()" class="btn btn-o text-xs" style="padding:6px 12px">反选</button>
       <button onclick="openGacha()" class="btn btn-g text-xs" style="padding:6px 16px">
         <span class="mi" style="font-size:16px">casino</span> 随机抽取
+      </button>
+      <button onclick="openSearch()" class="btn text-xs" style="padding:6px 16px;background:linear-gradient(135deg,#0F9D58,#34A853);color:white">
+        <span class="mi" style="font-size:16px">search</span> 输入代码
       </button>
     </div>
     <div id="cardGrid" class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))"></div>
@@ -399,6 +402,49 @@
   <div id="warnBanner" style="position:fixed;top:0;left:0;right:0;z-index:200;background:#EA4335;color:white;text-align:center;padding:10px;font-weight:600;font-size:14px;transform:translateY(-100%);transition:transform .3s ease">⚠️ 警告！已退出全屏。正在自动恢复…</div>
   <div id="examContent" class="flex flex-col items-center justify-center h-full px-8 text-center relative" style="z-index:1"></div>
   <div class="wm" id="examWm"></div>
+</div>
+
+<!-- ══════════════════════ SEARCH / CUSTOM PAPER MODAL ══════════════════════ -->
+<div id="searchModal" class="fixed inset-0 z-50 hidden items-center justify-center mbg" style="display:none" onclick="handleSearchModalBg(event)">
+  <div id="searchBox" class="bg-white rounded-2xl mx-4 relative flex flex-col" style="width:480px;max-width:100%;max-height:90vh;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <!-- Header -->
+    <div class="flex items-center gap-3 px-5 py-4 flex-shrink-0" style="border-bottom:1.5px solid var(--border)">
+      <div style="width:36px;height:36px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <span class="mi" style="color:#34A853;font-size:20px">search</span>
+      </div>
+      <div>
+        <h2 class="font-bold text-base" style="color:#202124">输入卷子代码</h2>
+        <p class="text-xs" style="color:var(--text-sub)">如 0580/41、0625/62、0610/32</p>
+      </div>
+      <div style="flex:1"></div>
+      <button onclick="closeSearch()" style="background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .15s" onmouseover="this.style.background='#F1F3F4'" onmouseout="this.style.background='none'">
+        <span class="mi" style="color:#5F6368">close</span>
+      </button>
+    </div>
+
+    <!-- Search input -->
+    <div class="px-5 pt-4 pb-3 flex-shrink-0">
+      <div class="flex gap-2">
+        <div class="relative flex-1">
+          <span class="mi" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9AA0A6;font-size:18px;pointer-events:none">tag</span>
+          <input id="searchInput" type="text" placeholder="例：0580/41 或 0625/62"
+            class="w-full rounded-xl text-sm focus:outline-none"
+            style="border:2px solid var(--border);padding:10px 12px 10px 38px;font-family:inherit;color:#202124;transition:border .15s"
+            oninput="onSearchInput(this.value)"
+            onkeydown="if(event.key==='Enter')doSearch()"
+            onfocus="this.style.borderColor='var(--primary)'"
+            onblur="this.style.borderColor='var(--border)'" />
+        </div>
+        <button onclick="doSearch()" class="btn btn-p" style="padding:10px 18px;flex-shrink:0">
+          <span class="mi" style="font-size:18px">search</span>
+        </button>
+      </div>
+      <p class="text-xs mt-2" style="color:#9AA0A6">格式：科目代码/卷号变体，如 <code style="background:#F1F3F4;padding:1px 5px;border-radius:4px">0580/41</code> = 数学 Paper 4 Variant 1</p>
+    </div>
+
+    <!-- Results / Add form area -->
+    <div id="searchResults" class="flex-1 overflow-y-auto px-5 pb-5"></div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -687,12 +733,12 @@ const FILTER_DEFS = [
   {
     key: 'durations', label: '⏱ 时长',
     options: [
-      { value: '45',  label: '45 min' },
-      { value: '60',  label: '60 min' },
-      { value: '75',  label: '75 min' },
-      { value: '90',  label: '90 min' },
-      { value: '120', label: '120 min' },
-      { value: '150', label: '150 min' },
+      { value: '45',  label: '45 minutes' },
+      { value: '60',  label: '1 hour' },
+      { value: '75',  label: '1 hour 15 minutes' },
+      { value: '90',  label: '1 hour 30 minutes' },
+      { value: '120', label: '2 hours' },
+      { value: '150', label: '2 hours 30 minutes' },
     ]
   },
   {
@@ -868,6 +914,7 @@ function makeCard(p) {
     </div>
 
     ${p.isPredicted ? `<div style="position:absolute;top:10px;right:10px;font-size:9px;padding:2px 6px;border-radius:8px;background:#E8F5E9;color:#2E7D32;font-weight:700">🟢 25预测</div>` : ''}
+    ${p.isCustom ? `<div style="position:absolute;top:10px;right:10px;font-size:9px;padding:2px 6px;border-radius:8px;background:#E8F0FE;color:var(--primary);font-weight:700">✏️ 自添加</div>` : ''}
 
     <div class="flex items-start justify-between pt-5 mb-2">
       <div class="flex items-center gap-2">
@@ -1311,7 +1358,7 @@ function runGacha() {
             </div>
             <div>
               <div class="font-bold text-sm" style="color:#202124">${p.subject} · ${p.paper}</div>
-              <div style="font-size:11px;color:var(--text-sub)">${p.year} ${p.session==='May/June'?'M/J':p.session==='March'?'Mar':'O/N'} · ${p.duration}min</div>
+              <div style="font-size:11px;color:var(--text-sub)">${p.year} ${p.session==='May/June'?'M/J':p.session==='March'?'Mar':'O/N'} · ${fmtDurationShort(p.duration)}</div>
             </div>
           </div>
         `).join('')}
@@ -1352,7 +1399,7 @@ function showGachaResults() {
           </div>
           <div style="flex:1">
             <div class="font-bold text-sm" style="color:#202124">${p.subject} · ${p.paper} ${p.isPredicted ? '<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:#E8F5E9;color:#2E7D32">预测</span>' : ''}</div>
-            <div style="font-size:11px;color:var(--text-sub)">${p.paperFull} · ${p.year} ${p.session==='May/June'?'M/J':p.session==='March'?'Mar':'O/N'} · ${p.duration}min</div>
+            <div style="font-size:11px;color:var(--text-sub)">${p.paperFull} · ${p.year} ${p.session==='May/June'?'M/J':p.session==='March'?'Mar':'O/N'} · ${fmtDurationShort(p.duration)}</div>
           </div>
         </div>
       `).join('')}
@@ -1461,7 +1508,7 @@ function renderExamUI(p) {
       <div class="exam-prog-fill" id="examProgFill" style="width:100%"></div>
     </div>
     <div style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:28px">
-      第 ${examState.currentIdx + 1} / ${examState.queue.length} 张 &nbsp;·&nbsp; ${p.duration} min
+      第 ${examState.currentIdx + 1} / ${examState.queue.length} 张 &nbsp;·&nbsp; ${fmtDurationMin(p.duration)}
     </div>
     <div class="flex gap-3">
       ${!isStrict ? `
@@ -1710,10 +1757,21 @@ function closeMobileFilter() {
 // ║                    UTILITIES                            ║
 // ╚══════════════════════════════════════════════════════════╝
 
+/** IGCSE格式: 45 minutes / 1 hour 30 minutes / 2 hours 30 minutes */
 function fmtDurationMin(min) {
   const h = Math.floor(min / 60);
   const m = min % 60;
-  if (h === 0) return `${m} min`;
+  if (h === 0) return `${m} minute${m !== 1 ? 's' : ''}`;
+  const hStr = `${h} hour${h !== 1 ? 's' : ''}`;
+  if (m === 0) return hStr;
+  return `${hStr} ${m} minute${m !== 1 ? 's' : ''}`;
+}
+
+/** Short IGCSE format for tight spaces: 45m / 1h 30m / 2h 30m */
+function fmtDurationShort(min) {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h === 0) return `${m}m`;
   if (m === 0) return `${h}h`;
   return `${h}h ${m}m`;
 }
@@ -1728,7 +1786,9 @@ function fmtTime(sec) {
 function fmtDuration(sec) {
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
-  return h > 0 ? `${h}h ${m}min` : `${m}min`;
+  if (h === 0) return `${m} minutes`;
+  if (m === 0) return `${h} hour${h !== 1 ? 's' : ''}`;
+  return `${h}h ${m}min`;
 }
 
 function updateDate() {
@@ -1755,6 +1815,348 @@ function initScrollShadow() {
 // ╔══════════════════════════════════════════════════════════╗
 // ║                   INITIALIZATION                        ║
 // ╚══════════════════════════════════════════════════════════╝
+
+// ╔══════════════════════════════════════════════════════════╗
+// ║              SEARCH / CUSTOM PAPER SYSTEM               ║
+// ╚══════════════════════════════════════════════════════════╝
+
+// Parse a code like "0580/41" or "0625/62" → { subject, paperCode, variant }
+function parseCode(raw) {
+  const s = raw.trim().toUpperCase().replace(/\s/g, '');
+  // Match patterns: 0580/41, 0580/4/1, 058041 etc.
+  const m = s.match(/^(0580|0610|0620|0625)\/?([1-6])([1-3])$/);
+  if (!m) return null;
+  return {
+    subject: m[1],
+    paperNum: m[2],   // 1-6
+    variant: Number(m[3]),  // 1-3
+    paperCode: `P${m[2]}${m[3]}`,  // e.g. P41
+    displayCode: `${m[1]}/${m[2]}${m[3]}`,
+  };
+}
+
+const SUBJECT_META = {
+  '0580': { name: 'Mathematics',   icon: 'calculate', color: '#1A73E8' },
+  '0610': { name: 'Biology',       icon: 'biotech',   color: '#34A853' },
+  '0620': { name: 'Chemistry',     icon: 'science',   color: '#FF6D00' },
+  '0625': { name: 'Physics',       icon: 'bolt',      color: '#9334E8' },
+};
+
+const VARIANT_REGIONS = {
+  1: { name: 'Variant 1', region: '🇬🇧 时区1 英/欧/非/美' },
+  2: { name: 'Variant 2', region: '🇨🇳 时区2 中/东亚/巴' },
+  3: { name: 'Variant 3', region: '🇦🇺 时区3 澳/新/东南亚' },
+};
+
+let searchState = {
+  parsed: null,
+  addMode: false,
+  addYear: null,
+  addSession: null,
+  addDuration: null,
+};
+
+function openSearch() {
+  document.getElementById('searchModal').style.display = 'flex';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').innerHTML = `
+    <div style="text-align:center;padding:32px 0;color:#BDC1C6">
+      <span class="mi" style="font-size:48px">search</span>
+      <p class="text-sm mt-2">输入卷子代码开始搜索</p>
+    </div>
+  `;
+  setTimeout(() => document.getElementById('searchInput').focus(), 100);
+}
+
+function closeSearch() {
+  document.getElementById('searchModal').style.display = 'none';
+}
+
+function handleSearchModalBg(e) {
+  if (e.target === document.getElementById('searchModal')) closeSearch();
+}
+
+function onSearchInput(val) {
+  if (val.length >= 6) doSearch();
+}
+
+function doSearch() {
+  const raw = document.getElementById('searchInput').value;
+  const parsed = parseCode(raw);
+  const results = document.getElementById('searchResults');
+
+  if (!parsed) {
+    results.innerHTML = `
+      <div style="background:#FEF3F2;border:1.5px solid #FEE2E2;border-radius:12px;padding:16px;text-align:center;margin-top:8px">
+        <span class="mi" style="color:#EA4335;font-size:24px">error_outline</span>
+        <p class="text-sm font-semibold mt-2" style="color:#DC2626">格式不正确</p>
+        <p class="text-xs mt-1" style="color:#9AA0A6">请输入如 <code style="background:#F1F3F4;padding:1px 5px;border-radius:4px">0580/41</code> 格式的代码</p>
+        <div class="flex flex-wrap gap-2 justify-center mt-3">
+          ${['0580/41','0580/22','0625/61','0610/32','0620/42'].map(ex =>
+            `<span class="fchip" onclick="document.getElementById('searchInput').value='${ex}';doSearch()" style="cursor:pointer">${ex}</span>`
+          ).join('')}
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  searchState.parsed = parsed;
+  const { subject, paperNum, variant, paperCode, displayCode } = parsed;
+  const meta = SUBJECT_META[subject];
+
+  // Find matching papers in DB (same subject + paper code)
+  const matches = paperDB.filter(p =>
+    p.subject === subject && p.paper === paperCode
+  );
+
+  if (matches.length > 0) {
+    // Show found papers
+    const status = matches.map(p => state.paperStatus[p.id] || 'todo');
+    results.innerHTML = `
+      <div style="margin-bottom:12px">
+        <div class="flex items-center gap-2 mb-3">
+          <div style="width:32px;height:32px;border-radius:9px;background:${meta.color}18;display:flex;align-items:center;justify-content:center">
+            <span class="mi" style="color:${meta.color};font-size:16px">${meta.icon}</span>
+          </div>
+          <div>
+            <span class="font-bold text-sm" style="color:${meta.color}">${displayCode}</span>
+            <span class="text-xs ml-2" style="color:var(--text-sub)">${meta.name} · Paper ${paperNum} · ${VARIANT_REGIONS[variant].name}</span>
+          </div>
+          <span class="text-xs ml-auto font-semibold" style="color:var(--success)">找到 ${matches.length} 张</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${matches.map(p => {
+            const sc = STATUS_MAP[state.paperStatus[p.id] || 'todo'];
+            const inCart = state.cart.includes(p.id);
+            const sCode = p.session === 'May/June' ? 'M/J' : p.session === 'March' ? 'Mar' : 'O/N';
+            return `
+              <div class="flex items-center gap-3 p-3 rounded-xl" style="border:1.5px solid var(--border);background:white;transition:all .15s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="flex:1;min-width:0">
+                  <div class="font-semibold text-sm" style="color:#202124">${p.year} ${p.session}</div>
+                  <div class="flex items-center gap-2 mt-1 flex-wrap">
+                    <span style="font-size:10px;padding:2px 7px;border-radius:8px;background:#F1F3F4;color:#5F6368">${fmtDurationMin(p.duration)}</span>
+                    <span style="font-size:10px;padding:2px 7px;border-radius:8px;background:#F1F3F4;color:#5F6368">${p.totalMarks} 分</span>
+                    <span style="font-size:10px;padding:2px 7px;border-radius:8px;background:${sc.bg};color:${sc.color};font-weight:600">${sc.label}</span>
+                    ${p.isPredicted ? '<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:#E8F5E9;color:#2E7D32;font-weight:600">🟢 预测</span>' : ''}
+                  </div>
+                </div>
+                <button onclick="searchAddToCart('${p.id}')"
+                  class="btn ${inCart ? 'btn-p' : 'btn-o'}" id="scart-${p.id}"
+                  style="font-size:11px;padding:6px 12px;flex-shrink:0">
+                  <span class="mi" style="font-size:14px">${inCart ? 'playlist_add_check' : 'playlist_add'}</span>
+                  ${inCart ? '已在清单' : '加入清单'}
+                </button>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  } else {
+    // Not found — show add form
+    results.innerHTML = `
+      <div style="background:#FEF7E0;border:1.5px solid #FBBC04;border-radius:12px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+        <span class="mi" style="color:#F59E0B;font-size:22px;flex-shrink:0">info</span>
+        <div>
+          <p class="font-semibold text-sm" style="color:#92400E">题库中没有 <code style="background:#FDE68A;padding:1px 6px;border-radius:4px">${displayCode}</code></p>
+          <p class="text-xs mt-1" style="color:#B45309">可以手动添加此卷子，填写考试信息后直接加入清单开始模考</p>
+        </div>
+      </div>
+
+      <div style="background:white;border:1.5px solid var(--border);border-radius:16px;padding:16px">
+        <!-- Paper info header -->
+        <div class="flex items-center gap-2 mb-4">
+          <div style="width:36px;height:36px;border-radius:10px;background:${meta.color}18;display:flex;align-items:center;justify-content:center">
+            <span class="mi" style="color:${meta.color}">${meta.icon}</span>
+          </div>
+          <div>
+            <p class="font-bold text-sm" style="color:${meta.color}">${subject} · Paper ${paperNum} · ${VARIANT_REGIONS[variant].name}</p>
+            <p class="text-xs" style="color:var(--text-sub)">${meta.name} · ${VARIANT_REGIONS[variant].region}</p>
+          </div>
+        </div>
+
+        <!-- Year -->
+        <div class="mb-4">
+          <p class="text-sm font-semibold mb-2" style="color:#202124">📅 考试年份</p>
+          <div class="flex flex-wrap gap-2" id="addYear">
+            ${[2025,2024,2023,2022,2021,2020].map(y =>
+              `<div class="fchip" data-v="${y}" onclick="selectAddYear(${y})">${y}${y===2025?' 🟢':''}</div>`
+            ).join('')}
+          </div>
+        </div>
+
+        <!-- Session -->
+        <div class="mb-4">
+          <p class="text-sm font-semibold mb-2" style="color:#202124">🗓 考季</p>
+          <div class="flex flex-wrap gap-2" id="addSession">
+            ${['March','May/June','Oct/Nov'].map(s =>
+              `<div class="fchip" data-v="${s}" onclick="selectAddSession('${s}')">${s}</div>`
+            ).join('')}
+          </div>
+          <p class="text-xs mt-1" style="color:#9AA0A6">March 仅 Variant 2；May/June 和 Oct/Nov 有 Variant 1/2/3</p>
+        </div>
+
+        <!-- Duration -->
+        <div class="mb-5">
+          <p class="text-sm font-semibold mb-2" style="color:#202124">⏱ 考试时长</p>
+          <div class="flex flex-wrap gap-2" id="addDuration">
+            ${[
+              {v:45,  l:'45 minutes'},
+              {v:60,  l:'1 hour'},
+              {v:75,  l:'1 hour 15 minutes'},
+              {v:90,  l:'1 hour 30 minutes'},
+              {v:120, l:'2 hours'},
+              {v:150, l:'2 hours 30 minutes'},
+            ].map(d =>
+              `<div class="fchip" data-v="${d.v}" onclick="selectAddDuration(${d.v})">${d.l}</div>`
+            ).join('')}
+          </div>
+        </div>
+
+        <!-- Marks (optional) -->
+        <div class="mb-5">
+          <p class="text-sm font-semibold mb-1" style="color:#202124">📊 总分 <span style="font-weight:400;color:#9AA0A6">(可选)</span></p>
+          <input id="addMarks" type="number" min="1" max="200" placeholder="如 130"
+            class="rounded-xl text-sm focus:outline-none"
+            style="border:2px solid var(--border);padding:8px 12px;font-family:inherit;color:#202124;transition:border .15s;width:120px"
+            onfocus="this.style.borderColor='var(--primary)'"
+            onblur="this.style.borderColor='var(--border)'" />
+        </div>
+
+        <button onclick="addCustomPaper()" id="addCustomBtn" class="btn btn-s w-full" style="justify-content:center;padding:12px;font-size:14px" disabled>
+          <span class="mi" style="font-size:18px">add_circle</span>&nbsp;添加并加入清单 → 立即开始
+        </button>
+        <p class="text-xs text-center mt-2" style="color:#9AA0A6">添加后会自动加入今日清单，可立即开始模考</p>
+      </div>
+    `;
+
+    // Reset add state
+    searchState.addYear = null;
+    searchState.addSession = null;
+    searchState.addDuration = null;
+  }
+}
+
+function searchAddToCart(id) {
+  const inCart = state.cart.includes(id);
+  if (!inCart) {
+    state.cart.push(id);
+    saveState();
+    updateCartBar();
+    const el = document.getElementById(`scart-${id}`);
+    if (el) {
+      el.className = 'btn btn-p';
+      el.style.cssText += 'font-size:11px;padding:6px 12px;flex-shrink:0';
+      el.innerHTML = '<span class="mi" style="font-size:14px">playlist_add_check</span> 已在清单';
+    }
+    const card = document.querySelector(`[data-id="${id}"]`);
+    if (card) { const p = paperDB.find(x => x.id === id); if (p) card.replaceWith(makeCard(p)); }
+    showToast('✅ 已加入清单');
+  } else {
+    showToast('已在清单中');
+  }
+}
+
+function selectAddYear(y) {
+  searchState.addYear = y;
+  document.querySelectorAll('#addYear .fchip').forEach(el => {
+    el.classList.toggle('on', Number(el.dataset.v) === y);
+  });
+  checkAddReady();
+}
+
+function selectAddSession(s) {
+  searchState.addSession = s;
+  document.querySelectorAll('#addSession .fchip').forEach(el => {
+    el.classList.toggle('on', el.dataset.v === s);
+  });
+  checkAddReady();
+}
+
+function selectAddDuration(d) {
+  searchState.addDuration = d;
+  document.querySelectorAll('#addDuration .fchip').forEach(el => {
+    el.classList.toggle('on', Number(el.dataset.v) === d);
+  });
+  checkAddReady();
+}
+
+function checkAddReady() {
+  const btn = document.getElementById('addCustomBtn');
+  if (btn) btn.disabled = !(searchState.addYear && searchState.addSession && searchState.addDuration);
+}
+
+function addCustomPaper() {
+  const parsed = searchState.parsed;
+  if (!parsed || !searchState.addYear || !searchState.addSession || !searchState.addDuration) return;
+
+  const { subject, paperNum, variant, paperCode, displayCode } = parsed;
+  const meta = SUBJECT_META[subject];
+  const sc = { MA: 'MA', 'May/June': 'MJ', 'Oct/Nov': 'ON', March: 'MA' };
+  const scCode = sc[searchState.addSession] || 'MJ';
+  const marksInput = document.getElementById('addMarks');
+  const marks = marksInput && marksInput.value ? Number(marksInput.value) : null;
+
+  // Guess tier
+  const tierMap = {
+    '1': 'Core', '2': 'Extended', '3': 'Core Theory', '4': 'Extended Theory',
+    '5': 'Practical', '6': 'Alt. to Practical',
+  };
+  const tier = tierMap[paperNum] || 'Unknown';
+
+  const id = `${subject}-${searchState.addYear}-${scCode}-${paperCode}-custom`;
+
+  // Check if already exists
+  if (paperDB.find(p => p.id === id)) {
+    showToast('⚠️ 这张卷子已存在！');
+    searchAddToCart(id);
+    closeSearch();
+    return;
+  }
+
+  const newPaper = {
+    id,
+    subject, subjectName: meta.name, subjectIcon: meta.icon, subjectColor: meta.color,
+    year: searchState.addYear,
+    paper: paperCode,
+    paperFull: `Paper ${paperNum} (${VARIANT_REGIONS[variant].name})`,
+    variantRegion: VARIANT_REGIONS[variant].region,
+    session: searchState.addSession,
+    duration: searchState.addDuration,
+    totalMarks: marks || defaultMarks(subject, paperNum),
+    tier,
+    locked: false,
+    syllabusInfo: searchState.addYear >= 2025 ? '新考纲' : '',
+    isPredicted: false,
+    isCustom: true,
+  };
+
+  // Add to DB
+  paperDB.push(newPaper);
+
+  // Add to cart
+  state.cart.push(id);
+  saveState();
+  updateCartBar();
+
+  // Refresh if visible
+  applyFilters();
+  updateProgress();
+
+  closeSearch();
+  showToast(`✅ 已添加 ${displayCode} 并加入清单！`);
+
+  // Auto open cart
+  setTimeout(() => openCartDrawer(), 400);
+}
+
+function defaultMarks(subject, paperNum) {
+  if (subject === '0580') {
+    return { '1': 70, '2': 70, '3': 104, '4': 130 }[paperNum] || 70;
+  }
+  return { '1': 40, '2': 40, '3': 80, '4': 80, '5': 40, '6': 40 }[paperNum] || 40;
+}
 
 function init() {
   paperDB = generatePaperDB();
