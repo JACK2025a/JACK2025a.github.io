@@ -85,25 +85,30 @@
     .btn-g { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
     .btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
 
-    /* Cart bar - 改进的固定位置和 z-index */
-    #cartBar {
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      background: rgba(255,255,255,0.93);
-      border-top: 1px solid rgba(0,0,0,0.07);
-      box-shadow: 0 -2px 14px rgba(0,0,0,0.09);
+    /* Cart FAB pulse animation when items added */
+    @keyframes fabPop { 0%{transform:scale(1)} 40%{transform:scale(1.12)} 100%{transform:scale(1)} }
+    .fab-pop { animation: fabPop .3s ease; }
+
+    /* Cart item card */
+    .cart-item {
+      background: white; border-radius: 16px; border: 1.5px solid var(--border);
+      margin-bottom: 10px; overflow: hidden; transition: all .2s ease;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
     }
-    /* Cart panel - 增加底部间距以不被 cartBar 挡住 */
-    #cartPanel {
-      position: fixed; bottom: 64px; left: 0; right: 0;
-      max-height: 55vh;
-      background: white;
-      border-radius: 20px 20px 0 0;
-      box-shadow: 0 -4px 28px rgba(0,0,0,0.15);
-      transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-      z-index: 45; overflow: hidden;
+    .cart-item:hover { border-color: #DADCE0; box-shadow: 0 2px 12px rgba(0,0,0,.1); }
+    .cart-item.dragging { opacity: .45; transform: scale(.97); }
+    .cart-item.dragover-top { border-top: 3px solid var(--primary); }
+
+    /* Drag handle */
+    .drag-handle { cursor: grab; color: #DADCE0; transition: color .15s; }
+    .drag-handle:hover { color: #9AA0A6; }
+    .drag-handle:active { cursor: grabbing; }
+
+    /* Subject tag chip */
+    .subj-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
     }
-    #cartPanel.open { transform: translateY(0); }
 
     /* Modal */
     .mbg { background: rgba(0,0,0,0.52); backdrop-filter: blur(5px); }
@@ -144,12 +149,6 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #DADCE0; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #BDC1C6; }
-
-    /* Drag items */
-    .cart-row { transition: all 0.15s ease; cursor: grab; }
-    .cart-row:active { cursor: grabbing; }
-    .cart-row.dragging { opacity: .4; transform: scale(.97); }
-    .cart-row.dragover { border-top: 2px solid var(--primary); }
 
     /* Toast */
     #toast {
@@ -261,7 +260,7 @@
 </header>
 
 <!-- ══════════════════════ FILTER PANEL ══════════════════════ -->
-<aside id="filterPanel" class="fixed left-0 top-14 bg-white z-40 overflow-y-auto" style="width:260px;bottom:64px">
+<aside id="filterPanel" class="fixed left-0 top-14 bottom-0 bg-white z-40 overflow-y-auto" style="width:260px">
   <div class="sticky top-0 bg-white z-10 p-3" style="border-bottom:1px solid var(--border)">
     <button onclick="clearFilters()" class="btn btn-o w-full text-xs" style="padding:7px 10px">
       <span class="mi" style="font-size:16px">clear_all</span> 清除所有筛选
@@ -271,7 +270,7 @@
 </aside>
 
 <!-- ══════════════════════ MAIN CONTENT ══════════════════════ -->
-<main id="mainContent" class="pt-14" style="margin-left:260px;padding-bottom:160px">
+<main id="mainContent" class="pt-14" style="margin-left:260px;padding-bottom:100px">
   <div class="p-4">
     <!-- Syllabus notice -->
     <div class="syllabus-note">
@@ -313,36 +312,76 @@
   </div>
 </main>
 
-<!-- ══════════════════════ CART PANEL (slide-up) ══════════════════════ -->
-<div id="cartPanel">
-  <div class="flex items-center justify-between px-4 py-3" style="border-bottom:1px solid var(--border)">
-    <h3 class="font-semibold text-sm" style="color:#202124">今日清单</h3>
-    <div class="flex gap-2">
-      <button onclick="clearCart()" class="btn" style="font-size:12px;padding:5px 12px;border:1.5px solid var(--danger);color:var(--danger);border-radius:24px;background:transparent">清空</button>
-      <button onclick="startExam()" class="btn btn-p" style="font-size:12px;padding:5px 12px">
-        <span class="mi" style="font-size:15px">play_arrow</span> 开始模考
+<!-- ══════════════════════ CART OVERLAY ══════════════════════ -->
+<div id="cartOverlay" class="fixed inset-0 z-[60] hidden" style="background:rgba(0,0,0,0.45);backdrop-filter:blur(3px)" onclick="closeCartDrawer()"></div>
+
+<!-- ══════════════════════ CART DRAWER (购物车抽屉) ══════════════════════ -->
+<div id="cartDrawer" class="fixed top-0 right-0 bottom-0 z-[70] flex flex-col bg-white" style="width:420px;max-width:100vw;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);box-shadow:-8px 0 40px rgba(0,0,0,0.18)">
+
+  <!-- 抽屉头部 -->
+  <div class="flex items-center justify-between px-5 py-4 flex-shrink-0" style="border-bottom:2px solid var(--border);background:white">
+    <div class="flex items-center gap-3">
+      <div style="width:36px;height:36px;border-radius:10px;background:#E8F0FE;display:flex;align-items:center;justify-content:center">
+        <span class="mi" style="color:var(--primary);font-size:20px">shopping_cart</span>
+      </div>
+      <div>
+        <h2 class="font-bold text-base" style="color:#202124;letter-spacing:-.3px">今日清单</h2>
+        <p id="cartDrawerSubtitle" class="text-xs" style="color:var(--text-sub)">暂无卷子</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="clearCart()" id="cartClearBtn" class="btn btn-o" style="font-size:12px;padding:5px 12px;color:var(--danger);border-color:var(--danger)" disabled>
+        <span class="mi" style="font-size:15px">delete_sweep</span> 清空
+      </button>
+      <button onclick="closeCartDrawer()" style="background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .15s" onmouseover="this.style.background='#F1F3F4'" onmouseout="this.style.background='none'">
+        <span class="mi" style="color:#5F6368">close</span>
       </button>
     </div>
   </div>
-  <div id="cartList" class="overflow-y-auto" style="max-height:calc(55vh - 60px);padding:8px"></div>
+
+  <!-- 科目汇总标签 -->
+  <div id="cartSubjectSummary" class="flex-shrink-0 px-5 py-3" style="border-bottom:1px solid var(--border);background:#FAFAFA;display:none">
+    <div id="cartSubjectTags" class="flex flex-wrap gap-2"></div>
+  </div>
+
+  <!-- 卷子列表 -->
+  <div id="cartList" class="flex-1 overflow-y-auto" style="padding:16px 16px 0"></div>
+
+  <!-- 底部汇总结账区 -->
+  <div class="flex-shrink-0" style="border-top:2px solid var(--border);background:white">
+    <!-- 统计行 -->
+    <div class="px-5 py-3" style="background:#F8F9FA;border-bottom:1px solid var(--border)">
+      <div class="grid grid-cols-3 gap-3">
+        <div class="text-center p-2 bg-white rounded-xl" style="box-shadow:0 1px 3px rgba(0,0,0,.07)">
+          <div id="cartStatCount" class="font-bold text-lg" style="color:var(--primary)">0</div>
+          <div class="text-xs" style="color:var(--text-sub)">张卷子</div>
+        </div>
+        <div class="text-center p-2 bg-white rounded-xl" style="box-shadow:0 1px 3px rgba(0,0,0,.07)">
+          <div id="cartStatTime" class="font-bold text-lg" style="color:#9334E8">--</div>
+          <div class="text-xs" style="color:var(--text-sub)">总时长</div>
+        </div>
+        <div class="text-center p-2 bg-white rounded-xl" style="box-shadow:0 1px 3px rgba(0,0,0,.07)">
+          <div id="cartStatMarks" class="font-bold text-lg" style="color:var(--success)">0</div>
+          <div class="text-xs" style="color:var(--text-sub)">总分值</div>
+        </div>
+      </div>
+    </div>
+    <!-- 开始按钮 -->
+    <div class="px-5 py-4">
+      <button onclick="startExam()" id="startExamBtn" class="btn btn-p w-full" disabled style="font-size:15px;padding:14px;justify-content:center;border-radius:14px;letter-spacing:.3px">
+        <span class="mi" style="font-size:20px">play_circle</span>&nbsp;开始模考
+      </button>
+      <p class="text-center text-xs mt-2" style="color:#9AA0A6">试卷将按清单顺序依次进行，可拖拽调整顺序</p>
+    </div>
+  </div>
 </div>
 
-<!-- ══════════════════════ CART BAR ══════════════════════ -->
-<div id="cartBar" class="fixed bottom-0 left-0 right-0 z-50 flex items-center px-4 gap-3" style="height:64px">
-  <button onclick="toggleCartPanel()" class="flex items-center gap-2 transition-colors hover:opacity-80" style="background:none;border:none;cursor:pointer;color:#202124">
-    <span class="mi" style="color:var(--primary)">playlist_add_check</span>
-    <span class="font-medium text-sm">今日清单</span>
-    <span id="cartCount" class="font-bold text-xs text-white rounded-full px-2 py-0.5" style="background:var(--primary);min-width:20px;text-align:center">0</span>
-  </button>
-  <div id="cartDots" class="flex gap-1.5 items-center" style="flex:1"></div>
-  <span id="cartTime" class="text-xs" style="color:var(--text-sub);white-space:nowrap">预计总时长: --</span>
-  <button onclick="toggleCartPanel()" id="cartExpBtn" style="background:none;border:none;cursor:pointer;padding:6px;border-radius:50%;transition:background .15s" onmouseover="this.style.background='#F1F3F4'" onmouseout="this.style.background='none'">
-    <span class="mi" id="cartExpIco" style="color:#5F6368">expand_less</span>
-  </button>
-  <button onclick="startExam()" id="startExamBtn" class="btn btn-p" disabled style="font-size:13px;padding:8px 20px">
-    <span class="mi" style="font-size:16px">play_arrow</span> 开始模考
-  </button>
-</div>
+<!-- ══════════════════════ CART FAB (悬浮购物车按钮) ══════════════════════ -->
+<button onclick="openCartDrawer()" id="cartFab" class="fixed z-50 flex items-center gap-2 shadow-lg" style="bottom:28px;right:28px;background:var(--primary);color:white;border:none;cursor:pointer;border-radius:28px;padding:14px 20px;font-family:inherit;font-size:14px;font-weight:600;transition:all .2s ease;box-shadow:0 4px 20px rgba(26,115,232,.45)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(26,115,232,.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(26,115,232,.45)'">
+  <span class="mi" style="font-size:22px">shopping_cart</span>
+  <span>今日清单</span>
+  <span id="cartCount" style="background:white;color:var(--primary);border-radius:20px;padding:2px 9px;font-size:12px;font-weight:700;min-width:24px;text-align:center">0</span>
+</button>
 
 <!-- ══════════════════════ GACHA MODAL ══════════════════════ -->
 <div id="gachaModal" class="fixed inset-0 z-50 hidden items-center justify-center mbg" style="display:none">
@@ -1128,14 +1167,41 @@ function invertSel() {
 // ║                     CART LOGIC                          ║
 // ╚══════════════════════════════════════════════════════════╝
 
-let cartPanelOpen = false;
+let cartDrawerOpen = false;
+
+function openCartDrawer() {
+  cartDrawerOpen = true;
+  document.getElementById('cartDrawer').style.transform = 'translateX(0)';
+  document.getElementById('cartOverlay').classList.remove('hidden');
+  renderCartList();
+}
+
+function closeCartDrawer() {
+  cartDrawerOpen = false;
+  document.getElementById('cartDrawer').style.transform = 'translateX(100%)';
+  document.getElementById('cartOverlay').classList.add('hidden');
+}
+
+// Keep for backward compat (exam calls this)
+function toggleCartPanel() { openCartDrawer(); }
 
 function toggleCart(id) {
   const idx = state.cart.indexOf(id);
-  if (idx === -1) { state.cart.push(id); showToast('已加入今日清单'); }
-  else { state.cart.splice(idx, 1); showToast('已从清单移除'); }
+  if (idx === -1) {
+    state.cart.push(id);
+    showToast('✅ 已加入今日清单');
+    // Pop animation on FAB
+    const fab = document.getElementById('cartFab');
+    fab.classList.remove('fab-pop');
+    void fab.offsetWidth;
+    fab.classList.add('fab-pop');
+  } else {
+    state.cart.splice(idx, 1);
+    showToast('移出清单');
+  }
   saveState();
   updateCartBar();
+  if (cartDrawerOpen) renderCartList();
   const el = document.querySelector(`[data-id="${id}"]`);
   if (el) { const p = paperDB.find(x => x.id === id); if (p) el.replaceWith(makeCard(p)); }
 }
@@ -1150,6 +1216,8 @@ function removeFromCart(id) {
 }
 
 function clearCart() {
+  if (state.cart.length === 0) return;
+  if (!confirm(`确定清空清单中的 ${state.cart.length} 张卷子吗？`)) return;
   const ids = [...state.cart];
   state.cart = [];
   saveState();
@@ -1159,7 +1227,7 @@ function clearCart() {
     const el = document.querySelector(`[data-id="${id}"]`);
     if (el) { const p = paperDB.find(x => x.id === id); if (p) el.replaceWith(makeCard(p)); }
   });
-  showToast('清单已清空');
+  showToast('🗑️ 清单已清空');
 }
 
 function updateCartBar() {
@@ -1170,73 +1238,151 @@ function updateCartBar() {
     const p = paperDB.find(x => x.id === id);
     return s + (p ? p.duration : 0);
   }, 0);
-  document.getElementById('cartTime').textContent =
-    n ? `预计总时长: ${fmtDuration(total * 60)}` : '预计总时长: --';
-
-  const dotsEl = document.getElementById('cartDots');
-  const subjColors = [...new Set(state.cart.map(id => {
+  const totalMarks = state.cart.reduce((s, id) => {
     const p = paperDB.find(x => x.id === id);
-    return p ? p.subjectColor : null;
-  }).filter(Boolean))];
-  const max = 8;
-  dotsEl.innerHTML = subjColors.slice(0, max).map(c =>
-    `<div style="width:10px;height:10px;border-radius:50%;background:${c};flex-shrink:0"></div>`
-  ).join('') + (subjColors.length > max ?
-    `<span style="font-size:10px;color:var(--text-sub)">+${subjColors.length - max}</span>` : '');
+    return s + (p ? p.totalMarks : 0);
+  }, 0);
+
+  // Update drawer stats
+  document.getElementById('cartStatCount').textContent = n;
+  document.getElementById('cartStatTime').textContent = n ? fmtDurationMin(total) : '--';
+  document.getElementById('cartStatMarks').textContent = n ? totalMarks : '0';
+  document.getElementById('cartDrawerSubtitle').textContent = n
+    ? `${n} 张卷子 · 共 ${fmtDurationMin(total)}`
+    : '暂无卷子，从卡片加入';
+
+  // Clear button state
+  const clearBtn = document.getElementById('cartClearBtn');
+  if (clearBtn) clearBtn.disabled = n === 0;
+
+  // Subject summary tags
+  const summaryDiv = document.getElementById('cartSubjectSummary');
+  const tagsDiv = document.getElementById('cartSubjectTags');
+  if (n > 0) {
+    summaryDiv.style.display = '';
+    const subjMap = {};
+    state.cart.forEach(id => {
+      const p = paperDB.find(x => x.id === id);
+      if (!p) return;
+      if (!subjMap[p.subject]) subjMap[p.subject] = { count: 0, color: p.subjectColor, name: p.subjectName, icon: p.subjectIcon };
+      subjMap[p.subject].count++;
+    });
+    tagsDiv.innerHTML = Object.entries(subjMap).map(([subj, info]) => `
+      <span class="subj-chip" style="background:${info.color}18;color:${info.color}">
+        <span class="mi" style="font-size:13px">${info.icon}</span>
+        ${subj} ${info.name} <strong>×${info.count}</strong>
+      </span>
+    `).join('');
+  } else {
+    summaryDiv.style.display = 'none';
+  }
 
   const btn = document.getElementById('startExamBtn');
-  btn.disabled = n === 0;
-}
-
-function toggleCartPanel() {
-  cartPanelOpen = !cartPanelOpen;
-  document.getElementById('cartPanel').classList.toggle('open', cartPanelOpen);
-  document.getElementById('cartExpIco').textContent = cartPanelOpen ? 'expand_more' : 'expand_less';
-  if (cartPanelOpen) renderCartList();
+  if (btn) btn.disabled = n === 0;
 }
 
 function renderCartList() {
   const list = document.getElementById('cartList');
   list.innerHTML = '';
+
   if (state.cart.length === 0) {
-    list.innerHTML = '<p class="text-center py-8 text-sm" style="color:#9AA0A6">清单为空，请从上方卡片加入卷子</p>';
+    list.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center">
+        <span class="mi" style="font-size:64px;color:#E8EAED">shopping_cart</span>
+        <p style="font-size:15px;color:#9AA0A6;margin-top:12px;font-weight:500">清单还是空的</p>
+        <p style="font-size:12px;color:#BDC1C6;margin-top:4px">点击卷子卡片上的「加入清单」按钮</p>
+      </div>
+    `;
     return;
   }
+
   state.cart.forEach((id, i) => {
     const p = paperDB.find(x => x.id === id);
     if (!p) return;
-    const row = document.createElement('div');
-    row.className = 'cart-row flex items-center gap-3 p-3 rounded-xl mb-1';
-    row.draggable = true;
-    row.dataset.id = id;
-    row.style.background = '#F8F9FA';
-    row.style.border = '1.5px solid var(--border)';
-    row.innerHTML = `
-      <span class="mi" style="color:#9AA0A6;font-size:18px;cursor:grab">drag_indicator</span>
-      <div style="width:30px;height:30px;border-radius:8px;background:${p.subjectColor}1A;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <span class="mi" style="color:${p.subjectColor};font-size:16px">${p.subjectIcon}</span>
+    const status = state.paperStatus[p.id] || 'todo';
+    const sc = STATUS_MAP[status];
+    const sCode = p.session === 'May/June' ? 'M/J' : p.session === 'March' ? 'Mar' : 'O/N';
+    const tierColor = p.tier.includes('Extended') ? '#9334E8' : p.tier.includes('Practical') ? '#EA4335' : '#34A853';
+
+    const item = document.createElement('div');
+    item.className = 'cart-item';
+    item.draggable = true;
+    item.dataset.id = id;
+
+    item.innerHTML = `
+      <!-- 彩色左边条 -->
+      <div style="display:flex">
+        <div style="width:5px;background:${p.subjectColor};border-radius:16px 0 0 16px;flex-shrink:0"></div>
+        <div style="flex:1;padding:12px 14px 12px 12px">
+          <!-- 行1: 顺序号 + 科目标识 + 操作 -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <!-- 拖拽 + 序号 -->
+            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+              <span class="mi drag-handle" style="font-size:20px">drag_indicator</span>
+              <span style="font-size:12px;font-weight:700;color:#9AA0A6;min-width:16px;text-align:center">${i+1}</span>
+            </div>
+            <!-- 科目图标 -->
+            <div style="width:36px;height:36px;border-radius:10px;background:${p.subjectColor}18;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <span class="mi" style="color:${p.subjectColor};font-size:18px">${p.subjectIcon}</span>
+            </div>
+            <!-- 标题 -->
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:14px;color:#202124">${p.subject} · ${p.paper}</div>
+              <div style="font-size:11px;color:var(--text-sub);margin-top:1px">${p.subjectName}</div>
+            </div>
+            <!-- 删除 -->
+            <button onclick="removeFromCart('${id}')" title="移出清单"
+              style="background:none;border:none;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;color:#9AA0A6"
+              onmouseover="this.style.background='#FEE2E2';this.style.color='var(--danger)'"
+              onmouseout="this.style.background='none';this.style.color='#9AA0A6'">
+              <span class="mi" style="font-size:18px">delete</span>
+            </button>
+          </div>
+
+          <!-- 行2: 详细信息标签 -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;padding-left:56px">
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:#F1F3F4;color:#5F6368;font-weight:500">
+              <span class="mi" style="font-size:12px">calendar_today</span>
+              ${p.year} ${sCode}
+            </span>
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:#F1F3F4;color:#5F6368;font-weight:500">
+              <span class="mi" style="font-size:12px">timer</span>
+              ${fmtDurationMin(p.duration)}
+            </span>
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:#F1F3F4;color:#5F6368;font-weight:500">
+              <span class="mi" style="font-size:12px">grading</span>
+              ${p.totalMarks} 分
+            </span>
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:${tierColor}15;color:${tierColor};font-weight:600">
+              ${p.tier}
+            </span>
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:${sc.bg};color:${sc.color};font-weight:600">
+              ${sc.label}
+            </span>
+          </div>
+
+          ${p.syllabusInfo ? `
+          <div style="margin-top:6px;padding-left:56px">
+            <span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#FEF7E0;color:#D97706;font-weight:600">${p.syllabusInfo}</span>
+          </div>` : ''}
+        </div>
       </div>
-      <div style="flex:1;min-width:0">
-        <div class="font-semibold text-sm" style="color:#202124">${p.subject} ${p.paper}</div>
-        <div style="font-size:11px;color:var(--text-sub)">${p.year} ${sCode} · ${fmtDurationMin(p.duration)} · ${p.totalMarks}分</div>
-      </div>
-      <button onclick="removeFromCart('${id}')" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:50%" title="移除">
-        <span class="mi" style="font-size:18px;color:#9AA0A6">close</span>
-      </button>
     `;
-    row.addEventListener('dragstart', e => {
+
+    // Drag events
+    item.addEventListener('dragstart', e => {
       e.dataTransfer.setData('text/plain', id);
-      row.classList.add('dragging');
+      setTimeout(() => item.classList.add('dragging'), 0);
     });
-    row.addEventListener('dragend',  () => row.classList.remove('dragging'));
-    row.addEventListener('dragover', e => { e.preventDefault(); row.classList.add('dragover'); });
-    row.addEventListener('dragleave',() => row.classList.remove('dragover'));
-    row.addEventListener('drop', e => {
+    item.addEventListener('dragend', () => item.classList.remove('dragging'));
+    item.addEventListener('dragover', e => { e.preventDefault(); item.classList.add('dragover-top'); });
+    item.addEventListener('dragleave', () => item.classList.remove('dragover-top'));
+    item.addEventListener('drop', e => {
       e.preventDefault();
-      row.classList.remove('dragover');
+      item.classList.remove('dragover-top');
       const fromId = e.dataTransfer.getData('text/plain');
       const fromIdx = state.cart.indexOf(fromId);
-      const toIdx   = state.cart.indexOf(id);
+      const toIdx = state.cart.indexOf(id);
       if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
         state.cart.splice(fromIdx, 1);
         state.cart.splice(toIdx, 0, fromId);
@@ -1245,7 +1391,8 @@ function renderCartList() {
         updateCartBar();
       }
     });
-    list.appendChild(row);
+
+    list.appendChild(item);
   });
 }
 
@@ -1484,7 +1631,7 @@ function startExam() {
   examState.results    = [];
   examState.paused     = false;
 
-  if (cartPanelOpen) toggleCartPanel();
+  if (cartDrawerOpen) closeCartDrawer();
 
   // 自动进入全屏，若失败则弹出警告
   document.documentElement.requestFullscreen?.().catch(err => {
