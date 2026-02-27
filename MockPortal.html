@@ -45,7 +45,6 @@
     .mi { font-family: 'Material Icons Round'; font-style: normal; font-size: 20px;
       line-height: 1; vertical-align: middle; display: inline-block; }
 
-    /* Filter chips */
     .fchip {
       display: inline-flex; align-items: center; gap: 3px;
       padding: 3px 10px; border-radius: 20px; font-size: 12px;
@@ -56,7 +55,6 @@
     .fchip:hover { border-color: var(--primary); color: var(--primary); }
     .fchip.on { border-color: var(--primary); background: #E8F0FE; color: var(--primary); font-weight: 600; }
 
-    /* Paper card */
     .pcard {
       background: white; border-radius: 16px;
       border: 2px solid transparent;
@@ -68,7 +66,6 @@
     .pcard.done { border-left: 4px solid var(--success) !important; opacity: 0.88; }
     .pcard.inprog { border-left: 4px solid var(--warning) !important; }
 
-    /* Buttons */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 4px;
       padding: 7px 18px; border-radius: 24px; font-size: 13px; font-weight: 500;
@@ -85,11 +82,9 @@
     .btn-g { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
     .btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
 
-    /* Cart FAB pulse animation when items added */
     @keyframes fabPop { 0%{transform:scale(1)} 40%{transform:scale(1.12)} 100%{transform:scale(1)} }
     .fab-pop { animation: fabPop .3s ease; }
 
-    /* Cart item card */
     .cart-item {
       background: white; border-radius: 16px; border: 1.5px solid var(--border);
       margin-bottom: 10px; overflow: hidden; transition: all .2s ease;
@@ -99,21 +94,17 @@
     .cart-item.dragging { opacity: .45; transform: scale(.97); }
     .cart-item.dragover-top { border-top: 3px solid var(--primary); }
 
-    /* Drag handle */
     .drag-handle { cursor: grab; color: #DADCE0; transition: color .15s; }
     .drag-handle:hover { color: #9AA0A6; }
     .drag-handle:active { cursor: grabbing; }
 
-    /* Subject tag chip */
     .subj-chip {
       display: inline-flex; align-items: center; gap: 4px;
       padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
     }
 
-    /* Modal */
     .mbg { background: rgba(0,0,0,0.52); backdrop-filter: blur(5px); }
 
-    /* Settings drawer */
     #settingsDr {
       box-shadow: -6px 0 28px rgba(0,0,0,0.16);
       transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
@@ -121,10 +112,8 @@
     }
     #settingsDr.open { transform: translateX(0); }
 
-    /* Exam overlay */
     #examOv { background: #0A0A1E; }
 
-    /* Timer */
     .timer-num {
       font-family: 'Roboto Mono', monospace;
       font-size: clamp(80px, 15vw, 160px);
@@ -144,13 +133,11 @@
       pointer-events: none; color: white;
     }
 
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #DADCE0; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #BDC1C6; }
 
-    /* Toast */
     #toast {
       position: fixed; bottom: 88px; left: 50%;
       transform: translateX(-50%) translateY(24px);
@@ -162,27 +149,17 @@
     }
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-    /* Filter section */
     #filterPanel { border-right: 1px solid var(--border); }
     .fsec-hdr { cursor: pointer; user-select: none; transition: background .15s; }
     .fsec-hdr:hover { background: #F8F9FA; }
     .fsec-body { overflow: hidden; transition: max-height 0.3s ease; }
 
-    /* AppBar */
     #appbar { transition: box-shadow 0.3s ease; }
     #appbar.scrolled { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
 
-    /* Lock box */
-    .lock-box { background: white; border: 2px dashed var(--border); border-radius: 16px; padding: 32px; text-align: center; }
-
-    /* Gacha */
     #gachaScroller { height: 68px; overflow: hidden; position: relative; border-radius: 12px; }
     #gachaTrack { position: absolute; width: 100%; transition: transform 2s cubic-bezier(0.25,0.1,0.25,1); }
 
-    /* Summary bar */
-    .sum-bar { height: 28px; border-radius: 6px; transition: width .7s ease; min-width: 4px; }
-
-    /* Toggle switch */
     .tgl { width: 44px; height: 24px; border-radius: 12px; background: #DADCE0;
       position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
     .tgl.on { background: var(--primary); }
@@ -190,19 +167,16 @@
       border-radius:50%; background:white; box-shadow:0 1px 3px rgba(0,0,0,.2); transition:transform .2s; }
     .tgl.on::after { transform: translateX(20px); }
 
-    /* Mobile */
     @media(max-width:767px) {
       #filterPanel { display: none; }
       #mainContent { margin-left: 0 !important; }
       #mobileFilterBtn { display: flex !important; }
     }
 
-    /* Chip count badge */
     .cbadge { background:#E8EAED; color:var(--text-sub); font-size:10px;
       padding:0 5px; border-radius:10px; font-weight:600; }
     .fchip.on .cbadge { background:rgba(26,115,232,.18); color:var(--primary); }
 
-    /* Gacha count btn */
     .gcnt { width:40px;height:40px;border-radius:12px;border:2px solid var(--border);
       font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;
       font-size:15px;color:var(--text-sub);background:white;font-family:inherit;
@@ -211,7 +185,6 @@
     .gcnt:hover { border-color:var(--primary);color:var(--primary); }
     .gcnt.on:hover { color:white; }
 
-    /* Warning banner */
     #warnBanner {
       position:fixed;top:0;left:0;right:0;z-index:200;
       background:#EA4335;color:white;text-align:center;
@@ -220,30 +193,30 @@
     }
     #warnBanner.show { transform:translateY(0); }
 
-    /* Status bar */
     .sbar { height:4px;border-radius:2px;background:#E8EAED;overflow:hidden; }
     .sbar-fill { height:100%;border-radius:2px;transition:width .3s ease; }
 
-    /* 考纲变更提示 */
     .syllabus-note {
-      background: #FEF7E0; border-left: 4px solid #FBBC04; padding: 12px; 
+      background: #FEF7E0; border-left: 4px solid #FBBC04; padding: 12px;
       border-radius: 8px; margin: 16px 0; font-size: 12px; color: #5F6368;
     }
     .variant-badge {
-      display: inline-block; font-size: 10px; padding: 2px 8px; 
+      display: inline-block; font-size: 10px; padding: 2px 8px;
       border-radius: 12px; margin-left: 4px; font-weight: 600;
+    }
+    .new-badge {
+      display: inline-block; font-size: 10px; padding: 2px 8px;
+      border-radius: 12px; background: #E8F5E9; color: #2E7D32; font-weight: 700;
     }
   </style>
 </head>
 <body>
 
-<!-- ══════════════════════ APP BAR ══════════════════════ -->
 <header id="appbar" class="fixed top-0 left-0 right-0 z-50 bg-white h-14 flex items-center px-4 gap-3 select-none" style="box-shadow:0 1px 3px rgba(0,0,0,0.12)">
   <span class="mi" style="color:var(--primary);font-size:24px">bolt</span>
   <span class="font-bold text-base" style="color:#202124;letter-spacing:-.3px">Warden Mock</span>
   <div style="flex:1"></div>
   <span id="dateDisp" class="text-xs hidden sm:block" style="color:var(--text-sub)"></span>
-  <!-- Circular progress -->
   <div class="relative cursor-pointer" style="width:34px;height:34px" id="progWrap" title="完成进度">
     <svg viewBox="0 0 36 36" style="width:34px;height:34px;transform:rotate(-90deg)">
       <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E8EAED" stroke-width="3"/>
@@ -259,7 +232,6 @@
   </button>
 </header>
 
-<!-- ══════════════════════ FILTER PANEL ══════════════════════ -->
 <aside id="filterPanel" class="fixed left-0 top-14 bottom-0 bg-white z-40 overflow-y-auto" style="width:260px">
   <div class="sticky top-0 bg-white z-10 p-3" style="border-bottom:1px solid var(--border)">
     <button onclick="clearFilters()" class="btn btn-o w-full text-xs" style="padding:7px 10px">
@@ -269,22 +241,20 @@
   <div id="filterSections"></div>
 </aside>
 
-<!-- ══════════════════════ MAIN CONTENT ══════════════════════ -->
 <main id="mainContent" class="pt-14" style="margin-left:260px;padding-bottom:100px">
   <div class="p-4">
-    <!-- Syllabus notice -->
     <div class="syllabus-note">
       <span class="mi" style="font-size:14px;vertical-align:middle">info</span>
-      <strong>📋 考纲 & 题库说明：</strong>
+      <strong>📋 考纲 & 题库说明（2020–2025）：</strong>
       <ul style="margin-top:6px;margin-left:20px">
         <li>📐 <strong>0580 数学</strong>：P1/P2各1h30m(70分)，P3共2h(104分)，P4共2h30m(130分)</li>
-        <li>🔬 <strong>理科(0610/0620/0625)</strong>：P1/P2各45m(40分)，P3/P4/P5各1h15m，P6共1h(40分)</li>
-        <li>⏱️ <strong>2025+新考纲</strong>：0580 P1/P2禁用计算器，时长改为2h(100分)</li>
-        <li>📅 <strong>考季</strong>：March考季仅时区2；May/June和Oct/Nov有时区1-3</li>
+        <li>🔬 <strong>理科(0610/0620/0625)</strong>：P1/P2各45m(40分)，P3/P4各1h15m(80分)，P5共1h15m(40分)，P6共1h(40分)</li>
+        <li>⚠️ <strong>2025新考纲(0580)</strong>：P2改为2h(100分)非计算器；P4改为2h(100分)计算器；P1/P3不变</li>
+        <li>📅 <strong>考季规律</strong>：March仅时区2；May/June和Oct/Nov各有时区1、2、3</li>
+        <li>🟢 <strong>2025年卷子</strong>：按规律推算（March已考，MJ/ON预测）</li>
       </ul>
     </div>
 
-    <!-- Action bar -->
     <div class="flex items-center flex-wrap gap-2 mb-4 px-4 py-3 bg-white rounded-2xl" style="box-shadow:0 1px 3px rgba(0,0,0,0.12)">
       <span id="filterCount" class="text-sm font-medium" style="color:#202124">筛选到 0 张卷子</span>
       <div style="flex:1"></div>
@@ -301,9 +271,7 @@
         <span class="mi" style="font-size:16px">casino</span> 随机抽取
       </button>
     </div>
-    <!-- Card grid -->
     <div id="cardGrid" class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))"></div>
-    <!-- Empty state -->
     <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center" style="display:none">
       <span class="mi" style="font-size:64px;color:#DADCE0">search_off</span>
       <p class="text-lg mt-4" style="color:#9AA0A6">没有找到符合条件的卷子</p>
@@ -312,13 +280,9 @@
   </div>
 </main>
 
-<!-- ══════════════════════ CART OVERLAY ══════════════════════ -->
 <div id="cartOverlay" class="fixed inset-0 z-[60] hidden" style="background:rgba(0,0,0,0.45);backdrop-filter:blur(3px)" onclick="closeCartDrawer()"></div>
 
-<!-- ══════════════════════ CART DRAWER (购物车抽屉) ══════════════════════ -->
 <div id="cartDrawer" class="fixed top-0 right-0 bottom-0 z-[70] flex flex-col bg-white" style="width:420px;max-width:100vw;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);box-shadow:-8px 0 40px rgba(0,0,0,0.18)">
-
-  <!-- 抽屉头部 -->
   <div class="flex items-center justify-between px-5 py-4 flex-shrink-0" style="border-bottom:2px solid var(--border);background:white">
     <div class="flex items-center gap-3">
       <div style="width:36px;height:36px;border-radius:10px;background:#E8F0FE;display:flex;align-items:center;justify-content:center">
@@ -339,17 +303,13 @@
     </div>
   </div>
 
-  <!-- 科目汇总标签 -->
   <div id="cartSubjectSummary" class="flex-shrink-0 px-5 py-3" style="border-bottom:1px solid var(--border);background:#FAFAFA;display:none">
     <div id="cartSubjectTags" class="flex flex-wrap gap-2"></div>
   </div>
 
-  <!-- 卷子列表 -->
   <div id="cartList" class="flex-1 overflow-y-auto" style="padding:16px 16px 0"></div>
 
-  <!-- 底部汇总结账区 -->
   <div class="flex-shrink-0" style="border-top:2px solid var(--border);background:white">
-    <!-- 统计行 -->
     <div class="px-5 py-3" style="background:#F8F9FA;border-bottom:1px solid var(--border)">
       <div class="grid grid-cols-3 gap-3">
         <div class="text-center p-2 bg-white rounded-xl" style="box-shadow:0 1px 3px rgba(0,0,0,.07)">
@@ -366,7 +326,6 @@
         </div>
       </div>
     </div>
-    <!-- 开始按钮 -->
     <div class="px-5 py-4">
       <button onclick="startExam()" id="startExamBtn" class="btn btn-p w-full" disabled style="font-size:15px;padding:14px;justify-content:center;border-radius:14px;letter-spacing:.3px">
         <span class="mi" style="font-size:20px">play_circle</span>&nbsp;开始模考
@@ -376,19 +335,16 @@
   </div>
 </div>
 
-<!-- ══════════════════════ CART FAB (悬浮购物车按钮) ══════════════════════ -->
 <button onclick="openCartDrawer()" id="cartFab" class="fixed z-50 flex items-center gap-2 shadow-lg" style="bottom:28px;right:28px;background:var(--primary);color:white;border:none;cursor:pointer;border-radius:28px;padding:14px 20px;font-family:inherit;font-size:14px;font-weight:600;transition:all .2s ease;box-shadow:0 4px 20px rgba(26,115,232,.45)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(26,115,232,.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(26,115,232,.45)'">
   <span class="mi" style="font-size:22px">shopping_cart</span>
   <span>今日清单</span>
   <span id="cartCount" style="background:white;color:var(--primary);border-radius:20px;padding:2px 9px;font-size:12px;font-weight:700;min-width:24px;text-align:center">0</span>
 </button>
 
-<!-- ══════════════════════ GACHA MODAL ══════════════════════ -->
 <div id="gachaModal" class="fixed inset-0 z-50 hidden items-center justify-center mbg" style="display:none">
   <div id="gachaBox" class="bg-white rounded-2xl p-6 mx-4 relative" style="width:440px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)"></div>
 </div>
 
-<!-- ══════════════════════ SETTINGS OVERLAY + DRAWER ══════════════════════ -->
 <div id="settingsOv" class="fixed inset-0 z-50 hidden mbg" onclick="closeSettings()"></div>
 <div id="settingsDr" class="fixed top-0 right-0 bottom-0 z-50 bg-white overflow-y-auto" style="width:320px">
   <div class="flex items-center justify-between px-5 py-4" style="border-bottom:1px solid var(--border)">
@@ -398,7 +354,6 @@
     </button>
   </div>
   <div class="p-5 space-y-6">
-    <!-- Mode -->
     <div>
       <p class="font-semibold text-sm mb-1" style="color:#202124">考试模式</p>
       <p class="text-xs mb-3" style="color:var(--text-sub)">严格模式下不允许暂停，退出全屏自动恢复；练习模式可随时暂停</p>
@@ -407,7 +362,6 @@
         <button id="modePrac" onclick="setMode('practice')" class="flex-1 py-2 text-sm font-medium transition-colors" style="background:white;color:var(--text-sub);border:none;cursor:pointer">🎓 练习模式</button>
       </div>
     </div>
-    <!-- Theme -->
     <div class="flex items-center justify-between">
       <div>
         <p class="font-semibold text-sm" style="color:#202124">深色主题</p>
@@ -415,7 +369,6 @@
       </div>
       <div class="tgl" id="themeTgl" onclick="toggleTheme()" style="opacity:.45;pointer-events:none"></div>
     </div>
-    <!-- Stats -->
     <div style="background:#F8F9FA;border-radius:12px;padding:16px">
       <p class="font-semibold text-sm mb-3" style="color:#202124">学习统计</p>
       <div class="grid grid-cols-2 gap-3">
@@ -433,7 +386,6 @@
         </div>
       </div>
     </div>
-    <!-- Reset -->
     <div>
       <p class="font-semibold text-sm mb-2" style="color:#202124">危险操作</p>
       <button onclick="confirmReset()" class="btn btn-d w-full" style="justify-content:center">
@@ -443,17 +395,14 @@
   </div>
 </div>
 
-<!-- ══════════════════════ EXAM OVERLAY ══════════════════════ -->
 <div id="examOv" class="fixed inset-0 z-[100] hidden" style="display:none">
-  <div id="warnBanner">⚠️ 警告！已退出全屏。正在自动恢复…</div>
+  <div id="warnBanner" style="position:fixed;top:0;left:0;right:0;z-index:200;background:#EA4335;color:white;text-align:center;padding:10px;font-weight:600;font-size:14px;transform:translateY(-100%);transition:transform .3s ease">⚠️ 警告！已退出全屏。正在自动恢复…</div>
   <div id="examContent" class="flex flex-col items-center justify-center h-full px-8 text-center relative" style="z-index:1"></div>
   <div class="wm" id="examWm"></div>
 </div>
 
-<!-- ══════════════════════ TOAST ══════════════════════ -->
 <div id="toast"></div>
 
-<!-- ══════════════════════ MOBILE FILTER BOTTOM SHEET ══════════════════════ -->
 <div id="mobileFilterOv" class="fixed inset-0 z-50 hidden mbg" onclick="closeMobileFilter()"></div>
 <div id="mobileFilterSheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl overflow-y-auto transition-transform" style="max-height:80vh;transform:translateY(100%);box-shadow:0 -4px 24px rgba(0,0,0,.15)">
   <div class="flex items-center justify-between p-4" style="border-bottom:1px solid var(--border)">
@@ -467,12 +416,16 @@
 
 <script>
 // ╔══════════════════════════════════════════════════════════╗
-// ║                   PAPER DATABASE                        ║
+// ║              PAPER DATABASE — COMPLETE VERSION          ║
+// ║  规律：每年 March(V2) + MJ(V1/2/3) + ON(V1/2/3)       ║
+// ║  科目：0580数学 + 0610生物 + 0620化学 + 0625物理        ║
+// ║  年份：2020-2025（2025按规律推算）                       ║
 // ╚══════════════════════════════════════════════════════════╝
 
-/** 生成所有试卷的数据库 - 按实际考季/年份/变体精确生成 */
 function generatePaperDB() {
   const db = [];
+
+  const YEARS = [2025, 2024, 2023, 2022, 2021, 2020];
 
   const VARIANT_REGIONS = {
     1: { name: 'Variant 1', region: '🇬🇧 时区1 英/欧/非/美' },
@@ -481,94 +434,97 @@ function generatePaperDB() {
   };
 
   // ══════════════════════════════════════════
-  // 0580 Mathematics — 按实际试卷精确配置
-  // P1 Core: 1h30m / 70分
-  // P2 Extended: 1h30m / 70分  
-  // P3 Core: 2h / 104分
-  // P4 Extended: 2h30m / 130分
+  // 0580 Mathematics
+  // 2020-2024: P1 1h30m/70分, P2 1h30m/70分, P3 2h/104分, P4 2h30m/130分
+  // 2025新考纲: P1 1h30m/70分(不变), P2 2h/100分(非计算器), P3 2h/104分(不变), P4 2h/100分(计算器)
   // ══════════════════════════════════════════
-  const MATH_PAPERS = [
-    { code: 'P1', full: 'Paper 1', duration: 90,  marks: 70,  tier: 'Core',     pNum: '1' },
-    { code: 'P2', full: 'Paper 2', duration: 90,  marks: 70,  tier: 'Extended', pNum: '2' },
-    { code: 'P3', full: 'Paper 3', duration: 120, marks: 104, tier: 'Core',     pNum: '3' },
-    { code: 'P4', full: 'Paper 4', duration: 150, marks: 130, tier: 'Extended', pNum: '4' },
-  ];
+  function getMathPapers(year) {
+    if (year >= 2025) {
+      return [
+        { code: 'P1', full: 'Paper 1', duration: 90,  marks: 70,  tier: 'Core',     note: '非计算器' },
+        { code: 'P2', full: 'Paper 2', duration: 120, marks: 100, tier: 'Extended', note: '非计算器 [新考纲]' },
+        { code: 'P3', full: 'Paper 3', duration: 120, marks: 104, tier: 'Core',     note: '计算器' },
+        { code: 'P4', full: 'Paper 4', duration: 120, marks: 100, tier: 'Extended', note: '计算器 [新考纲]' },
+      ];
+    }
+    return [
+      { code: 'P1', full: 'Paper 1', duration: 90,  marks: 70,  tier: 'Core',     note: '' },
+      { code: 'P2', full: 'Paper 2', duration: 90,  marks: 70,  tier: 'Extended', note: '' },
+      { code: 'P3', full: 'Paper 3', duration: 120, marks: 104, tier: 'Core',     note: '' },
+      { code: 'P4', full: 'Paper 4', duration: 150, marks: 130, tier: 'Extended', note: '' },
+    ];
+  }
 
-  // 0580 实际试卷列表（根据提供数据）
-  // 格式: [year, session, paperCode, variant]
-  // session: 'MJ'=May/June, 'MA'=March, 'ON'=Oct/Nov
-  const MATH_ENTRIES = [
-    // 2024 May/June: P1,P2,P3,P4 各仅时区1
-    [2024,'MJ','P1',1],[2024,'MJ','P2',1],[2024,'MJ','P3',1],[2024,'MJ','P4',1],
-    // 2023 March: 时区2
-    [2023,'MA','P1',2],[2023,'MA','P2',2],[2023,'MA','P3',2],[2023,'MA','P4',2],
-    // 2023 May/June: 时区1,2,3
-    [2023,'MJ','P1',1],[2023,'MJ','P1',2],[2023,'MJ','P1',3],
-    [2023,'MJ','P2',1],[2023,'MJ','P2',2],[2023,'MJ','P2',3],
-    [2023,'MJ','P3',1],[2023,'MJ','P3',2],[2023,'MJ','P3',3],
-    [2023,'MJ','P4',1],[2023,'MJ','P4',2],[2023,'MJ','P4',3],
-    // 2023 Oct/Nov: 时区1
-    [2023,'ON','P1',1],
-    // 2022 March: 时区2
-    [2022,'MA','P1',2],[2022,'MA','P2',2],[2022,'MA','P3',2],[2022,'MA','P4',2],
-    // 2022 May/June: 时区1,2,3
-    [2022,'MJ','P1',1],[2022,'MJ','P1',2],[2022,'MJ','P1',3],
-    [2022,'MJ','P2',1],[2022,'MJ','P2',2],[2022,'MJ','P2',3],
-    [2022,'MJ','P3',1],[2022,'MJ','P3',2],[2022,'MJ','P3',3],
-    [2022,'MJ','P4',1],[2022,'MJ','P4',2],[2022,'MJ','P4',3],
-    // 2021 March: 时区2
-    [2021,'MA','P1',2],[2021,'MA','P2',2],[2021,'MA','P3',2],[2021,'MA','P4',2],
-    // 2021 May/June: 时区1,2,3
-    [2021,'MJ','P1',1],[2021,'MJ','P1',2],[2021,'MJ','P1',3],
-    [2021,'MJ','P2',1],[2021,'MJ','P2',2],[2021,'MJ','P2',3],
-    [2021,'MJ','P3',1],[2021,'MJ','P3',2],[2021,'MJ','P3',3],
-    [2021,'MJ','P4',1],[2021,'MJ','P4',2],[2021,'MJ','P4',3],
-    // 2021 Oct/Nov: 时区1,2,3
-    [2021,'ON','P1',1],[2021,'ON','P1',2],[2021,'ON','P1',3],
-    [2021,'ON','P2',1],[2021,'ON','P2',2],[2021,'ON','P2',3],
-    [2021,'ON','P3',1],[2021,'ON','P3',2],[2021,'ON','P3',3],
-    [2021,'ON','P4',1],[2021,'ON','P4',2],[2021,'ON','P4',3],
-    // 2020 March: 时区2 (P1,P3 only)
-    [2020,'MA','P1',2],[2020,'MA','P3',2],
-    // 2020 May/June: 时区1,2,3
-    [2020,'MJ','P1',1],[2020,'MJ','P1',2],[2020,'MJ','P1',3],
-    [2020,'MJ','P2',1],[2020,'MJ','P2',2],[2020,'MJ','P2',3],
-    [2020,'MJ','P3',1],[2020,'MJ','P3',2],[2020,'MJ','P3',3],
-    [2020,'MJ','P4',1],[2020,'MJ','P4',2],[2020,'MJ','P4',3],
-    // 2020 Oct/Nov: 时区1,2,3
-    [2020,'ON','P1',1],[2020,'ON','P1',2],[2020,'ON','P1',3],
-    [2020,'ON','P2',1],[2020,'ON','P2',2],[2020,'ON','P2',3],
-    [2020,'ON','P3',1],[2020,'ON','P3',2],[2020,'ON','P3',3],
-    [2020,'ON','P4',1],[2020,'ON','P4',2],[2020,'ON','P4',3],
-  ];
+  for (const year of YEARS) {
+    const mathPapers = getMathPapers(year);
+    const isNew = year >= 2025;
+    const isPredict = year >= 2025;
 
-  const SESSION_MAP = { MJ: 'May/June', MA: 'March', ON: 'Oct/Nov' };
+    // March — 仅 Variant 2
+    for (const pt of mathPapers) {
+      db.push({
+        id: `0580-${year}-MA-${pt.code}2`,
+        subject: '0580', subjectName: 'Mathematics',
+        subjectIcon: 'calculate', subjectColor: '#1A73E8',
+        year, paper: `${pt.code}2`,
+        paperFull: `${pt.full} (${VARIANT_REGIONS[2].name})`,
+        variantRegion: VARIANT_REGIONS[2].region,
+        session: 'March', duration: pt.duration,
+        totalMarks: pt.marks, tier: pt.tier,
+        locked: false,
+        syllabusInfo: isNew ? pt.note : '',
+        isPredicted: isPredict,
+      });
+    }
 
-  for (const [year, sc, pCode, v] of MATH_ENTRIES) {
-    const pt = MATH_PAPERS.find(p => p.code === pCode);
-    const session = SESSION_MAP[sc];
-    const syllabusInfo = year >= 2025 ? ' [新考纲 P1/P2✗计算器]' : ' [旧考纲✓计算器]';
-    db.push({
-      id: `0580-${year}-${sc}-${pCode}${v}`,
-      subject: '0580', subjectName: 'Mathematics',
-      subjectIcon: 'calculate', subjectColor: '#1A73E8',
-      year, paper: `${pCode}${v}`,
-      paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-      variantRegion: VARIANT_REGIONS[v].region,
-      session, duration: pt.duration,
-      totalMarks: pt.marks, tier: pt.tier,
-      locked: false, syllabusInfo,
-    });
+    // May/June — Variant 1, 2, 3
+    for (const pt of mathPapers) {
+      for (const v of [1, 2, 3]) {
+        db.push({
+          id: `0580-${year}-MJ-${pt.code}${v}`,
+          subject: '0580', subjectName: 'Mathematics',
+          subjectIcon: 'calculate', subjectColor: '#1A73E8',
+          year, paper: `${pt.code}${v}`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+          variantRegion: VARIANT_REGIONS[v].region,
+          session: 'May/June', duration: pt.duration,
+          totalMarks: pt.marks, tier: pt.tier,
+          locked: false,
+          syllabusInfo: isNew ? pt.note : '',
+          isPredicted: isPredict,
+        });
+      }
+    }
+
+    // Oct/Nov — Variant 1, 2, 3
+    for (const pt of mathPapers) {
+      for (const v of [1, 2, 3]) {
+        db.push({
+          id: `0580-${year}-ON-${pt.code}${v}`,
+          subject: '0580', subjectName: 'Mathematics',
+          subjectIcon: 'calculate', subjectColor: '#1A73E8',
+          year, paper: `${pt.code}${v}`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+          variantRegion: VARIANT_REGIONS[v].region,
+          session: 'Oct/Nov', duration: pt.duration,
+          totalMarks: pt.marks, tier: pt.tier,
+          locked: false,
+          syllabusInfo: isNew ? pt.note : '',
+          isPredicted: isPredict,
+        });
+      }
+    }
   }
 
   // ══════════════════════════════════════════
-  // 理科 0610/0620/0625 — 共同结构
-  // P1 Core MCQ: 45min / 40分
-  // P2 Extended MCQ: 45min / 40分
-  // P3 Core Theory: 1h15m / 80分
-  // P4 Extended Theory: 1h15m / 80分
-  // P5 Practical: 1h15m / 40分
-  // P6 Alt. to Practical: 1h / 40分
+  // 理科 0610 Biology / 0620 Chemistry / 0625 Physics
+  // 完全相同的结构：
+  //   P1: 45min / 40分 (Core MCQ)
+  //   P2: 45min / 40分 (Extended MCQ)
+  //   P3: 75min / 80分 (Core Theory)
+  //   P4: 75min / 80分 (Extended Theory)
+  //   P5: 75min / 40分 (Practical)
+  //   P6: 60min / 40分 (Alt. to Practical)
   // ══════════════════════════════════════════
   const SCI_PAPERS = [
     { code: 'P1', full: 'Paper 1', duration: 45, marks: 40, tier: 'Core MCQ' },
@@ -585,181 +541,48 @@ function generatePaperDB() {
     { subject: '0625', subjectName: 'Physics',   subjectIcon: 'bolt',      subjectColor: '#9334E8' },
   ];
 
-  // 理科实际考季/变体配置（按文档整理，2020-2024）
-  // March: 只有时区2; May/June: 时区1,2,3; Oct/Nov: 时区1,2,3
-  // 2024 只有 May/June（文档中只列了MJ2024）
-  // 理科不区分0620 March 2023有否P2 -- 文档显示齐全
-
   for (const subj of SCI_SUBJECTS) {
-    // 2024 May/June: 时区1 only (文档只列了时区1)
-    for (const pt of SCI_PAPERS) {
-      db.push({
-        id: `${subj.subject}-2024-MJ-${pt.code}1`,
-        ...subj, year: 2024, paper: `${pt.code}1`,
-        paperFull: `${pt.full} (${VARIANT_REGIONS[1].name})`,
-        variantRegion: VARIANT_REGIONS[1].region,
-        session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-        locked: false, syllabusInfo: '',
-      });
-    }
+    for (const year of YEARS) {
+      const isPredict = year >= 2025;
 
-    // 2023 March: 时区2
-    for (const pt of SCI_PAPERS) {
-      db.push({
-        id: `${subj.subject}-2023-MA-${pt.code}2`,
-        ...subj, year: 2023, paper: `${pt.code}2`,
-        paperFull: `${pt.full} (${VARIANT_REGIONS[2].name})`,
-        variantRegion: VARIANT_REGIONS[2].region,
-        session: 'March', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-        locked: false, syllabusInfo: '',
-      });
-    }
-
-    // 2023 May/June: 时区1,2,3
-    for (const pt of SCI_PAPERS) {
-      for (const v of [1,2,3]) {
+      // March — Variant 2 only
+      for (const pt of SCI_PAPERS) {
         db.push({
-          id: `${subj.subject}-2023-MJ-${pt.code}${v}`,
-          ...subj, year: 2023, paper: `${pt.code}${v}`,
-          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-          variantRegion: VARIANT_REGIONS[v].region,
-          session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-          locked: false, syllabusInfo: '',
+          id: `${subj.subject}-${year}-MA-${pt.code}2`,
+          ...subj, year, paper: `${pt.code}2`,
+          paperFull: `${pt.full} (${VARIANT_REGIONS[2].name})`,
+          variantRegion: VARIANT_REGIONS[2].region,
+          session: 'March', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+          locked: false, syllabusInfo: '', isPredicted: isPredict,
         });
       }
-    }
 
-    // 2023 Oct/Nov: 时区1,2,3
-    for (const pt of SCI_PAPERS) {
-      for (const v of [1,2,3]) {
-        db.push({
-          id: `${subj.subject}-2023-ON-${pt.code}${v}`,
-          ...subj, year: 2023, paper: `${pt.code}${v}`,
-          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-          variantRegion: VARIANT_REGIONS[v].region,
-          session: 'Oct/Nov', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-          locked: false, syllabusInfo: '',
-        });
+      // May/June — Variant 1, 2, 3
+      for (const pt of SCI_PAPERS) {
+        for (const v of [1, 2, 3]) {
+          db.push({
+            id: `${subj.subject}-${year}-MJ-${pt.code}${v}`,
+            ...subj, year, paper: `${pt.code}${v}`,
+            paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+            variantRegion: VARIANT_REGIONS[v].region,
+            session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+            locked: false, syllabusInfo: '', isPredicted: isPredict,
+          });
+        }
       }
-    }
 
-    // 2022 March: 时区2
-    for (const pt of SCI_PAPERS) {
-      db.push({
-        id: `${subj.subject}-2022-MA-${pt.code}2`,
-        ...subj, year: 2022, paper: `${pt.code}2`,
-        paperFull: `${pt.full} (${VARIANT_REGIONS[2].name})`,
-        variantRegion: VARIANT_REGIONS[2].region,
-        session: 'March', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-        locked: false, syllabusInfo: '',
-      });
-    }
-
-    // 2022 May/June: 时区1,2,3
-    for (const pt of SCI_PAPERS) {
-      for (const v of [1,2,3]) {
-        db.push({
-          id: `${subj.subject}-2022-MJ-${pt.code}${v}`,
-          ...subj, year: 2022, paper: `${pt.code}${v}`,
-          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-          variantRegion: VARIANT_REGIONS[v].region,
-          session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-          locked: false, syllabusInfo: '',
-        });
-      }
-    }
-
-    // 2022 Oct/Nov: 时区1,2,3
-    for (const pt of SCI_PAPERS) {
-      for (const v of [1,2,3]) {
-        db.push({
-          id: `${subj.subject}-2022-ON-${pt.code}${v}`,
-          ...subj, year: 2022, paper: `${pt.code}${v}`,
-          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-          variantRegion: VARIANT_REGIONS[v].region,
-          session: 'Oct/Nov', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-          locked: false, syllabusInfo: '',
-        });
-      }
-    }
-
-    // 2021 March: 时区2
-    for (const pt of SCI_PAPERS) {
-      db.push({
-        id: `${subj.subject}-2021-MA-${pt.code}2`,
-        ...subj, year: 2021, paper: `${pt.code}2`,
-        paperFull: `${pt.full} (${VARIANT_REGIONS[2].name})`,
-        variantRegion: VARIANT_REGIONS[2].region,
-        session: 'March', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-        locked: false, syllabusInfo: '',
-      });
-    }
-
-    // 2021 May/June: 时区1,2,3
-    for (const pt of SCI_PAPERS) {
-      for (const v of [1,2,3]) {
-        db.push({
-          id: `${subj.subject}-2021-MJ-${pt.code}${v}`,
-          ...subj, year: 2021, paper: `${pt.code}${v}`,
-          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-          variantRegion: VARIANT_REGIONS[v].region,
-          session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-          locked: false, syllabusInfo: '',
-        });
-      }
-    }
-
-    // 2021 Oct/Nov: 时区1,2,3
-    for (const pt of SCI_PAPERS) {
-      for (const v of [1,2,3]) {
-        db.push({
-          id: `${subj.subject}-2021-ON-${pt.code}${v}`,
-          ...subj, year: 2021, paper: `${pt.code}${v}`,
-          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-          variantRegion: VARIANT_REGIONS[v].region,
-          session: 'Oct/Nov', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-          locked: false, syllabusInfo: '',
-        });
-      }
-    }
-
-    // 2020 March: 时区2
-    for (const pt of SCI_PAPERS) {
-      db.push({
-        id: `${subj.subject}-2020-MA-${pt.code}2`,
-        ...subj, year: 2020, paper: `${pt.code}2`,
-        paperFull: `${pt.full} (${VARIANT_REGIONS[2].name})`,
-        variantRegion: VARIANT_REGIONS[2].region,
-        session: 'March', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-        locked: false, syllabusInfo: '',
-      });
-    }
-
-    // 2020 May/June: 时区1,2,3
-    for (const pt of SCI_PAPERS) {
-      for (const v of [1,2,3]) {
-        db.push({
-          id: `${subj.subject}-2020-MJ-${pt.code}${v}`,
-          ...subj, year: 2020, paper: `${pt.code}${v}`,
-          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-          variantRegion: VARIANT_REGIONS[v].region,
-          session: 'May/June', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-          locked: false, syllabusInfo: '',
-        });
-      }
-    }
-
-    // 2020 Oct/Nov: 时区1,2,3
-    for (const pt of SCI_PAPERS) {
-      for (const v of [1,2,3]) {
-        db.push({
-          id: `${subj.subject}-2020-ON-${pt.code}${v}`,
-          ...subj, year: 2020, paper: `${pt.code}${v}`,
-          paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
-          variantRegion: VARIANT_REGIONS[v].region,
-          session: 'Oct/Nov', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
-          locked: false, syllabusInfo: '',
-        });
+      // Oct/Nov — Variant 1, 2, 3
+      for (const pt of SCI_PAPERS) {
+        for (const v of [1, 2, 3]) {
+          db.push({
+            id: `${subj.subject}-${year}-ON-${pt.code}${v}`,
+            ...subj, year, paper: `${pt.code}${v}`,
+            paperFull: `${pt.full} (${VARIANT_REGIONS[v].name})`,
+            variantRegion: VARIANT_REGIONS[v].region,
+            session: 'Oct/Nov', duration: pt.duration, totalMarks: pt.marks, tier: pt.tier,
+            locked: false, syllabusInfo: '', isPredicted: isPredict,
+          });
+        }
       }
     }
   }
@@ -771,7 +594,7 @@ function generatePaperDB() {
 // ║                    STATE & STORAGE                      ║
 // ╚══════════════════════════════════════════════════════════╝
 
-const STORAGE_KEY = 'warden_mock_portal_v3';
+const STORAGE_KEY = 'warden_mock_portal_v4';
 
 let paperDB = [];
 let filteredPapers = [];
@@ -826,7 +649,7 @@ const FILTER_DEFS = [
   {
     key: 'years', label: '📅 年份',
     options: [
-      { value: 2025, label: '2025' },
+      { value: 2025, label: '2025 🟢' },
       { value: 2024, label: '2024' },
       { value: 2023, label: '2023' },
       { value: 2022, label: '2022' },
@@ -837,8 +660,8 @@ const FILTER_DEFS = [
   {
     key: 'papers', label: '📄 卷型',
     options: [
-      { value: 'P1', label: 'P1 (Core MCQ)' },
-      { value: 'P2', label: 'P2 (Ext. MCQ)' },
+      { value: 'P1', label: 'P1 (Core)' },
+      { value: 'P2', label: 'P2 (Extended)' },
       { value: 'P3', label: 'P3 (Core Theory)' },
       { value: 'P4', label: 'P4 (Ext. Theory)' },
       { value: 'P5', label: 'P5 (Practical)' },
@@ -846,20 +669,30 @@ const FILTER_DEFS = [
     ]
   },
   {
-    key: 'durations', label: '⏱ 时长',
+    key: 'sessions', label: '🗓 考季',
     options: [
-      { value: '45',  label: '45 min (P1/P2 理科)' },
-      { value: '90',  label: '90 min (P1/P2 数学)' },
-      { value: '120', label: '91–120 min (P3/P4/P5 理科)' },
-      { value: '150', label: '150 min (P4 数学)' },
+      { value: 'March',    label: 'March (仅V2)' },
+      { value: 'May/June', label: 'May/June (V1-3)' },
+      { value: 'Oct/Nov',  label: 'Oct/Nov (V1-3)' },
     ]
   },
   {
-    key: 'variants', label: '🌍 变体',
+    key: 'variants', label: '🌍 变体/时区',
     options: [
-      { value: 1, label: '🇬🇧 Variant 1 (英/欧/非/美)' },
-      { value: 2, label: '🇨🇳 Variant 2 (中/东亚/巴)' },
-      { value: 3, label: '🇦🇺 Variant 3 (澳/新/东南亚)' },
+      { value: 1, label: '🇬🇧 V1 (英/欧/非/美)' },
+      { value: 2, label: '🇨🇳 V2 (中/东亚/巴)' },
+      { value: 3, label: '🇦🇺 V3 (澳/新/东南亚)' },
+    ]
+  },
+  {
+    key: 'durations', label: '⏱ 时长',
+    options: [
+      { value: '45',  label: '45 min' },
+      { value: '60',  label: '60 min' },
+      { value: '75',  label: '75 min' },
+      { value: '90',  label: '90 min' },
+      { value: '120', label: '120 min' },
+      { value: '150', label: '150 min' },
     ]
   },
   {
@@ -868,14 +701,6 @@ const FILTER_DEFS = [
       { value: 'todo',   label: '未做' },
       { value: 'inprog', label: '进行中' },
       { value: 'done',   label: '已完成' },
-    ]
-  },
-  {
-    key: 'sessions', label: '🗓 考季',
-    options: [
-      { value: 'March',    label: 'March (二月考季)' },
-      { value: 'May/June', label: 'May/June (六月考季)' },
-      { value: 'Oct/Nov',  label: 'Oct/Nov (十一月考季)' },
     ]
   },
 ];
@@ -948,12 +773,7 @@ function updateFilterCounts() {
         if (def.key === 'subjects')  return p.subject === opt.value;
         if (def.key === 'years')     return p.year === opt.value;
         if (def.key === 'papers')    return p.paper.startsWith(opt.value);
-        if (def.key === 'durations') {
-          if (opt.value === '45')  return p.duration <= 45;
-          if (opt.value === '90')  return p.duration === 90;
-          if (opt.value === '120') return p.duration > 90 && p.duration < 150;
-          if (opt.value === '150') return p.duration >= 150;
-        }
+        if (def.key === 'durations') return p.duration === Number(opt.value);
         if (def.key === 'variants')  return String(p.paper).endsWith(String(opt.value));
         if (def.key === 'statuses')  return (state.paperStatus[p.id] || 'todo') === opt.value;
         if (def.key === 'sessions')  return p.session === opt.value;
@@ -968,31 +788,18 @@ function updateFilterCounts() {
 // ║                  FILTER & SORT LOGIC                    ║
 // ╚══════════════════════════════════════════════════════════╝
 
-function isSubjectUnlocked(subject) {
-  return true;
-}
-
 function applyFilters() {
   const { subjects, years, papers, durations, statuses, sessions, variants } = state.filters;
   const sort = document.getElementById('sortSel')?.value || 'year-desc';
 
   let result = paperDB.filter(p => {
-    if (subjects.length  && !subjects.includes(p.subject))                         return false;
-    if (years.length     && !years.includes(p.year))                               return false;
-    if (papers.length    && !papers.some(pt => p.paper.startsWith(pt)))            return false;
-    if (durations.length) {
-      const inRange = durations.some(d => {
-        if (d === '45')  return p.duration <= 45;
-        if (d === '90')  return p.duration === 90;
-        if (d === '120') return p.duration > 90 && p.duration < 150;
-        if (d === '150') return p.duration >= 150;
-        return false;
-      });
-      if (!inRange) return false;
-    }
-    if (variants.length && !variants.some(v => String(p.paper).endsWith(String(v)))) return false;
-    if (statuses.length && !(statuses.includes(state.paperStatus[p.id] || 'todo'))) return false;
-    if (sessions.length && !sessions.includes(p.session))                           return false;
+    if (subjects.length  && !subjects.includes(p.subject))                           return false;
+    if (years.length     && !years.includes(p.year))                                 return false;
+    if (papers.length    && !papers.some(pt => p.paper.startsWith(pt)))              return false;
+    if (durations.length && !durations.some(d => p.duration === Number(d)))          return false;
+    if (variants.length  && !variants.some(v => String(p.paper).endsWith(String(v)))) return false;
+    if (statuses.length  && !(statuses.includes(state.paperStatus[p.id] || 'todo'))) return false;
+    if (sessions.length  && !sessions.includes(p.session))                           return false;
     return true;
   });
 
@@ -1024,9 +831,9 @@ const STATUS_MAP = {
 };
 
 function renderCards() {
-  const grid      = document.getElementById('cardGrid');
-  const empty     = document.getElementById('emptyState');
-  const countEl   = document.getElementById('filterCount');
+  const grid    = document.getElementById('cardGrid');
+  const empty   = document.getElementById('emptyState');
+  const countEl = document.getElementById('filterCount');
 
   grid.innerHTML = '';
   countEl.textContent = `筛选到 ${filteredPapers.length} 张卷子`;
@@ -1054,14 +861,14 @@ function makeCard(p) {
   div.dataset.id = p.id;
 
   div.innerHTML = `
-    <!-- 复选框 -->
     <div style="position:absolute;top:12px;left:12px;z-index:1" onclick="event.stopPropagation()">
       <div onclick="toggleSel('${p.id}')" style="width:20px;height:20px;border-radius:5px;border:2px solid ${isSel ? 'var(--primary)' : '#DADCE0'};background:${isSel ? 'var(--primary)' : 'white'};cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s">
         ${isSel ? '<span class="mi" style="font-size:13px;color:white">check</span>' : ''}
       </div>
     </div>
 
-    <!-- 顶部信息 -->
+    ${p.isPredicted ? `<div style="position:absolute;top:10px;right:10px;font-size:9px;padding:2px 6px;border-radius:8px;background:#E8F5E9;color:#2E7D32;font-weight:700">🟢 25预测</div>` : ''}
+
     <div class="flex items-start justify-between pt-5 mb-2">
       <div class="flex items-center gap-2">
         <div style="width:34px;height:34px;border-radius:10px;background:${p.subjectColor}1A;display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -1078,16 +885,14 @@ function makeCard(p) {
       </div>
     </div>
 
-    <!-- 卷号 + 全称 -->
     <div class="mb-2">
       <div class="font-bold" style="font-size:22px;color:#202124;letter-spacing:-.5px">${p.paper}</div>
       <div style="font-size:11px;color:var(--text-sub)">${p.paperFull}</div>
       <div style="font-size:10px;color:#9AA0A6;margin-top:4px">${p.variantRegion}</div>
       <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;margin-top:4px;background:${p.subjectColor}15;color:${p.subjectColor}">${p.tier}</span>
-      ${p.syllabusInfo ? `<span class="variant-badge" style="background:#FEF7E0;color:#D97706">${p.syllabusInfo}</span>` : ''}
+      ${p.syllabusInfo ? `<span class="variant-badge" style="background:#FEF7E0;color:#D97706">⚠️ ${p.syllabusInfo}</span>` : ''}
     </div>
 
-    <!-- 时长 / 分数 -->
     <div class="flex gap-3 mb-2" style="font-size:11px;color:var(--text-sub)">
       <div class="flex items-center gap-1">
         <span class="mi" style="font-size:14px;color:#9AA0A6">timer</span>${fmtDurationMin(p.duration)}
@@ -1098,17 +903,14 @@ function makeCard(p) {
       ${tStr ? `<div class="flex items-center gap-1 ml-auto"><span class="mi" style="font-size:14px;color:#9AA0A6">history</span>${tStr}</div>` : ''}
     </div>
 
-    <!-- 进度条 -->
     <div class="sbar mb-2">
       <div class="sbar-fill" style="width:${barPct}%;background:${sc.color}"></div>
     </div>
 
-    <!-- 状态标签 -->
     <div class="mb-3">
       <span style="font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;background:${sc.bg};color:${sc.color}">${sc.label}</span>
     </div>
 
-    <!-- 操作按钮 -->
     <div class="flex gap-2">
       <button onclick="event.stopPropagation();toggleCart('${p.id}')"
         class="btn ${inCart ? 'btn-p' : 'btn-o'} flex-1" style="font-size:11px;padding:6px 10px">
@@ -1142,10 +944,7 @@ function toggleSel(id) {
   const el = document.querySelector(`[data-id="${id}"]`);
   if (el) {
     const p = paperDB.find(x => x.id === id);
-    if (p) {
-      const newCard = makeCard(p);
-      el.replaceWith(newCard);
-    }
+    if (p) el.replaceWith(makeCard(p));
   }
 }
 
@@ -1182,15 +981,11 @@ function closeCartDrawer() {
   document.getElementById('cartOverlay').classList.add('hidden');
 }
 
-// Keep for backward compat (exam calls this)
-function toggleCartPanel() { openCartDrawer(); }
-
 function toggleCart(id) {
   const idx = state.cart.indexOf(id);
   if (idx === -1) {
     state.cart.push(id);
     showToast('✅ 已加入今日清单');
-    // Pop animation on FAB
     const fab = document.getElementById('cartFab');
     fab.classList.remove('fab-pop');
     void fab.offsetWidth;
@@ -1243,7 +1038,6 @@ function updateCartBar() {
     return s + (p ? p.totalMarks : 0);
   }, 0);
 
-  // Update drawer stats
   document.getElementById('cartStatCount').textContent = n;
   document.getElementById('cartStatTime').textContent = n ? fmtDurationMin(total) : '--';
   document.getElementById('cartStatMarks').textContent = n ? totalMarks : '0';
@@ -1251,11 +1045,9 @@ function updateCartBar() {
     ? `${n} 张卷子 · 共 ${fmtDurationMin(total)}`
     : '暂无卷子，从卡片加入';
 
-  // Clear button state
   const clearBtn = document.getElementById('cartClearBtn');
   if (clearBtn) clearBtn.disabled = n === 0;
 
-  // Subject summary tags
   const summaryDiv = document.getElementById('cartSubjectSummary');
   const tagsDiv = document.getElementById('cartSubjectTags');
   if (n > 0) {
@@ -1302,7 +1094,7 @@ function renderCartList() {
     const status = state.paperStatus[p.id] || 'todo';
     const sc = STATUS_MAP[status];
     const sCode = p.session === 'May/June' ? 'M/J' : p.session === 'March' ? 'Mar' : 'O/N';
-    const tierColor = p.tier.includes('Extended') ? '#9334E8' : p.tier.includes('Practical') ? '#EA4335' : '#34A853';
+    const tierColor = p.tier.includes('Extended') ? '#9334E8' : p.tier.includes('Practical') || p.tier.includes('Alt') ? '#EA4335' : '#34A853';
 
     const item = document.createElement('div');
     item.className = 'cart-item';
@@ -1310,27 +1102,21 @@ function renderCartList() {
     item.dataset.id = id;
 
     item.innerHTML = `
-      <!-- 彩色左边条 -->
       <div style="display:flex">
         <div style="width:5px;background:${p.subjectColor};border-radius:16px 0 0 16px;flex-shrink:0"></div>
         <div style="flex:1;padding:12px 14px 12px 12px">
-          <!-- 行1: 顺序号 + 科目标识 + 操作 -->
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            <!-- 拖拽 + 序号 -->
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
               <span class="mi drag-handle" style="font-size:20px">drag_indicator</span>
               <span style="font-size:12px;font-weight:700;color:#9AA0A6;min-width:16px;text-align:center">${i+1}</span>
             </div>
-            <!-- 科目图标 -->
             <div style="width:36px;height:36px;border-radius:10px;background:${p.subjectColor}18;display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <span class="mi" style="color:${p.subjectColor};font-size:18px">${p.subjectIcon}</span>
             </div>
-            <!-- 标题 -->
             <div style="flex:1;min-width:0">
               <div style="font-weight:700;font-size:14px;color:#202124">${p.subject} · ${p.paper}</div>
               <div style="font-size:11px;color:var(--text-sub);margin-top:1px">${p.subjectName}</div>
             </div>
-            <!-- 删除 -->
             <button onclick="removeFromCart('${id}')" title="移出清单"
               style="background:none;border:none;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;color:#9AA0A6"
               onmouseover="this.style.background='#FEE2E2';this.style.color='var(--danger)'"
@@ -1338,38 +1124,25 @@ function renderCartList() {
               <span class="mi" style="font-size:18px">delete</span>
             </button>
           </div>
-
-          <!-- 行2: 详细信息标签 -->
           <div style="display:flex;flex-wrap:wrap;gap:6px;padding-left:56px">
             <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:#F1F3F4;color:#5F6368;font-weight:500">
-              <span class="mi" style="font-size:12px">calendar_today</span>
-              ${p.year} ${sCode}
+              <span class="mi" style="font-size:12px">calendar_today</span>${p.year} ${sCode}
             </span>
             <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:#F1F3F4;color:#5F6368;font-weight:500">
-              <span class="mi" style="font-size:12px">timer</span>
-              ${fmtDurationMin(p.duration)}
+              <span class="mi" style="font-size:12px">timer</span>${fmtDurationMin(p.duration)}
             </span>
             <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:#F1F3F4;color:#5F6368;font-weight:500">
-              <span class="mi" style="font-size:12px">grading</span>
-              ${p.totalMarks} 分
+              <span class="mi" style="font-size:12px">grading</span>${p.totalMarks} 分
             </span>
-            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:${tierColor}15;color:${tierColor};font-weight:600">
-              ${p.tier}
-            </span>
-            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:${sc.bg};color:${sc.color};font-weight:600">
-              ${sc.label}
-            </span>
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:${tierColor}15;color:${tierColor};font-weight:600">${p.tier}</span>
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:${sc.bg};color:${sc.color};font-weight:600">${sc.label}</span>
+            ${p.isPredicted ? '<span style="font-size:11px;padding:3px 8px;border-radius:8px;background:#E8F5E9;color:#2E7D32;font-weight:600">🟢 预测</span>' : ''}
           </div>
-
-          ${p.syllabusInfo ? `
-          <div style="margin-top:6px;padding-left:56px">
-            <span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#FEF7E0;color:#D97706;font-weight:600">${p.syllabusInfo}</span>
-          </div>` : ''}
+          ${p.syllabusInfo ? `<div style="margin-top:6px;padding-left:56px"><span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#FEF7E0;color:#D97706;font-weight:600">⚠️ ${p.syllabusInfo}</span></div>` : ''}
         </div>
       </div>
     `;
 
-    // Drag events
     item.addEventListener('dragstart', e => {
       e.dataTransfer.setData('text/plain', id);
       setTimeout(() => item.classList.add('dragging'), 0);
@@ -1446,7 +1219,6 @@ function renderGachaConfig() {
       </button>
     </div>
 
-    <!-- 科目 -->
     <div class="mb-4">
       <p class="text-sm font-semibold mb-2" style="color:#202124">科目</p>
       <div class="flex flex-wrap gap-2" id="gSubj">
@@ -1456,7 +1228,6 @@ function renderGachaConfig() {
       </div>
     </div>
 
-    <!-- 数量 -->
     <div class="mb-4">
       <p class="text-sm font-semibold mb-2" style="color:#202124">抽取数量</p>
       <div class="flex gap-2">
@@ -1466,27 +1237,24 @@ function renderGachaConfig() {
       </div>
     </div>
 
-    <!-- 年份 -->
     <div class="mb-4">
-      <p class="text-sm font-semibold mb-2" style="color:#202124">年份范围</p>
+      <p class="text-sm font-semibold mb-2" style="color:#202124">年份</p>
       <div class="flex flex-wrap gap-2" id="gYear">
         ${[2025,2024,2023,2022,2021,2020].map(y =>
-          `<div class="fchip on" data-v="${y}" onclick="this.classList.toggle('on')">${y}</div>`
+          `<div class="fchip${y===2025?' on':' on'}" data-v="${y}" onclick="this.classList.toggle('on')">${y}${y===2025?' 🟢':''}</div>`
         ).join('')}
       </div>
     </div>
 
-    <!-- 卷型 -->
     <div class="mb-4">
       <p class="text-sm font-semibold mb-2" style="color:#202124">卷型</p>
       <div class="flex flex-wrap gap-2" id="gPaper">
-        ${['P1','P2','P3','P4','P6'].map(p =>
+        ${['P1','P2','P3','P4','P5','P6'].map(p =>
           `<div class="fchip on" data-v="${p}" onclick="this.classList.toggle('on')">${p}</div>`
         ).join('')}
       </div>
     </div>
 
-    <!-- 只抽未做 -->
     <div class="flex items-center gap-3 mb-6">
       <div class="tgl on" id="gOnlyTodo" onclick="this.classList.toggle('on')"></div>
       <span class="text-sm" style="color:#202124">只从 <b>未做</b> 的卷子中抽取</span>
@@ -1508,15 +1276,14 @@ function setGachaCount(n) {
 
 function runGacha() {
   const box = document.getElementById('gachaBox');
-
   const subjects  = [...document.querySelectorAll('#gSubj .fchip.on')].map(e => e.dataset.v);
   const years     = [...document.querySelectorAll('#gYear .fchip.on')].map(e => Number(e.dataset.v));
   const papers    = [...document.querySelectorAll('#gPaper .fchip.on')].map(e => e.dataset.v);
   const onlyTodo  = document.getElementById('gOnlyTodo')?.classList.contains('on');
 
   let pool = paperDB.filter(p => {
-    if (!subjects.includes(p.subject))             return false;
-    if (!years.includes(p.year))                   return false;
+    if (!subjects.includes(p.subject))              return false;
+    if (!years.includes(p.year))                    return false;
     if (!papers.some(pt => p.paper.startsWith(pt))) return false;
     if (onlyTodo && state.paperStatus[p.id] === 'done') return false;
     return true;
@@ -1544,7 +1311,7 @@ function runGacha() {
             </div>
             <div>
               <div class="font-bold text-sm" style="color:#202124">${p.subject} · ${p.paper}</div>
-              <div style="font-size:11px;color:var(--text-sub)">${p.year} ${p.session==='May/June'?'M/J':'O/N'} · ${p.duration}min</div>
+              <div style="font-size:11px;color:var(--text-sub)">${p.year} ${p.session==='May/June'?'M/J':p.session==='March'?'Mar':'O/N'} · ${p.duration}min</div>
             </div>
           </div>
         `).join('')}
@@ -1584,8 +1351,8 @@ function showGachaResults() {
             <span class="mi" style="color:${p.subjectColor}">${p.subjectIcon}</span>
           </div>
           <div style="flex:1">
-            <div class="font-bold text-sm" style="color:#202124">${p.subject} · ${p.paper}</div>
-            <div style="font-size:11px;color:var(--text-sub)">${p.paperFull} · ${p.year} ${p.session==='May/June'?'M/J':'O/N'} · ${p.duration}min</div>
+            <div class="font-bold text-sm" style="color:#202124">${p.subject} · ${p.paper} ${p.isPredicted ? '<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:#E8F5E9;color:#2E7D32">预测</span>' : ''}</div>
+            <div style="font-size:11px;color:var(--text-sub)">${p.paperFull} · ${p.year} ${p.session==='May/June'?'M/J':p.session==='March'?'Mar':'O/N'} · ${p.duration}min</div>
           </div>
         </div>
       `).join('')}
@@ -1633,7 +1400,6 @@ function startExam() {
 
   if (cartDrawerOpen) closeCartDrawer();
 
-  // 自动进入全屏，若失败则弹出警告
   document.documentElement.requestFullscreen?.().catch(err => {
     console.warn('全屏请求失败:', err);
     showToast('⚠️ 全屏失败，建议手动按 F11');
@@ -1649,7 +1415,6 @@ function showExamOverlay() {
   ov.style.flexDirection = 'column';
   ov.style.alignItems = 'center';
   ov.style.justifyContent = 'center';
-
   document.addEventListener('fullscreenchange', onFSChange);
 }
 
@@ -1666,7 +1431,6 @@ function loadExamPaper() {
   saveState();
 
   document.getElementById('examWm').textContent = id;
-
   renderExamUI(p);
 
   clearInterval(examState.timer);
@@ -1679,7 +1443,6 @@ function renderExamUI(p) {
   const sCode    = p.session === 'May/June' ? 'May/June' : p.session === 'March' ? 'March' : 'Oct/Nov';
 
   content.innerHTML = `
-    <!-- 科目信息 -->
     <div class="flex items-center gap-3 mb-4">
       <div style="width:48px;height:48px;border-radius:14px;background:${p.subjectColor}22;display:flex;align-items:center;justify-content:center">
         <span class="mi" style="color:${p.subjectColor};font-size:26px">${p.subjectIcon}</span>
@@ -1689,26 +1452,17 @@ function renderExamUI(p) {
         <div style="font-size:13px;color:rgba(255,255,255,.55)">${p.subjectName} · ${sCode} ${p.year}</div>
       </div>
     </div>
-
-    <!-- 试卷详情 -->
     <div style="font-size:14px;color:rgba(255,255,255,.45);margin-bottom:24px">
       ${p.paperFull} &nbsp;·&nbsp; ${p.totalMarks} 分
+      ${p.isPredicted ? '<span style="font-size:11px;padding:2px 8px;border-radius:8px;background:#1B5E2033;color:#4ade80;margin-left:8px">🟢 预测卷</span>' : ''}
     </div>
-
-    <!-- 大计时器 -->
     <div class="timer-num" id="timerDisp">--:--</div>
-
-    <!-- 进度条 -->
     <div class="exam-prog mt-6 mb-4" style="width:min(480px,80vw)">
       <div class="exam-prog-fill" id="examProgFill" style="width:100%"></div>
     </div>
-
-    <!-- 剩余张数 -->
     <div style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:28px">
       第 ${examState.currentIdx + 1} / ${examState.queue.length} 张 &nbsp;·&nbsp; ${p.duration} min
     </div>
-
-    <!-- 操作按钮 -->
     <div class="flex gap-3">
       ${!isStrict ? `
         <button id="pauseBtn" onclick="togglePause()" class="btn" style="background:rgba(255,255,255,.12);color:white;padding:10px 24px">
@@ -1718,12 +1472,8 @@ function renderExamUI(p) {
           <span class="mi" style="font-size:18px">replay</span>&nbsp;重置
         </button>
       ` : ''}
-      <button onclick="skipPaper()" class="btn" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.55);padding:10px 20px;font-size:12px">
-        跳过
-      </button>
-      <button onclick="confirmExitExam()" class="btn" style="background:rgba(234,67,53,.25);color:#F87171;padding:10px 20px;font-size:12px">
-        结束模考
-      </button>
+      <button onclick="skipPaper()" class="btn" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.55);padding:10px 20px;font-size:12px">跳过</button>
+      <button onclick="confirmExitExam()" class="btn" style="background:rgba(234,67,53,.25);color:#F87171;padding:10px 20px;font-size:12px">结束模考</button>
     </div>
   `;
   updateTimerDisplay();
@@ -1733,22 +1483,16 @@ function examTick() {
   if (examState.paused) return;
   examState.timeLeft--;
   updateTimerDisplay();
-
-  if (examState.timeLeft <= 0) {
-    clearInterval(examState.timer);
-    onTimeUp();
-  }
+  if (examState.timeLeft <= 0) { clearInterval(examState.timer); onTimeUp(); }
 }
 
 function updateTimerDisplay() {
   const el = document.getElementById('timerDisp');
   const pb = document.getElementById('examProgFill');
   if (!el) return;
-
   el.textContent = fmtTime(examState.timeLeft);
-  if (examState.timeLeft <= 60)  el.classList.add('timer-warn');
-  else                            el.classList.remove('timer-warn');
-
+  if (examState.timeLeft <= 60) el.classList.add('timer-warn');
+  else el.classList.remove('timer-warn');
   if (pb) {
     const pct = examState.totalTime > 0 ? (examState.timeLeft / examState.totalTime) * 100 : 0;
     pb.style.width = pct + '%';
@@ -1778,14 +1522,12 @@ function onTimeUp() {
   const p  = paperDB.find(x => x.id === id);
   const spent = p ? p.duration * 60 : 0;
   recordResult(id, spent);
-
   const content = document.getElementById('examContent');
   content.innerHTML = `
-    <div style="font-size:72px;animation:twarn 0s">✅</div>
+    <div style="font-size:72px">✅</div>
     <h2 class="font-bold mt-4" style="font-size:32px;color:#4ade80">Time's Up!</h2>
     <p style="color:rgba(255,255,255,.55);margin-top:8px">${p?.subject} ${p?.paper} 完成！</p>
   `;
-
   setTimeout(() => nextPaper(), 2200);
 }
 
@@ -1806,11 +1548,8 @@ function skipPaper() {
 
 function nextPaper() {
   examState.currentIdx++;
-  if (examState.currentIdx >= examState.queue.length) {
-    endAllExams();
-  } else {
-    loadExamPaper();
-  }
+  if (examState.currentIdx >= examState.queue.length) endAllExams();
+  else loadExamPaper();
 }
 
 function endAllExams() {
@@ -1820,18 +1559,14 @@ function endAllExams() {
 }
 
 function showSummary() {
-  const ov = document.getElementById('examOv');
   const content = document.getElementById('examContent');
   const totalSec = examState.results.reduce((s, r) => s + r.timeSpent, 0);
-
   content.innerHTML = `
     <div style="font-size:56px;margin-bottom:16px">🏆</div>
     <h1 class="font-bold mb-1" style="font-size:28px;color:white">模考完成！</h1>
     <p style="color:rgba(255,255,255,.5);margin-bottom:32px;font-size:14px">
       共完成 ${examState.results.length} 张卷子 &nbsp;·&nbsp; 累计 ${fmtDuration(totalSec)}
     </p>
-
-    <!-- 条形图 -->
     <div style="width:min(520px,90vw);margin-bottom:32px">
       ${examState.results.map(r => {
         const p   = paperDB.find(x => x.id === r.id);
@@ -1847,7 +1582,6 @@ function showSummary() {
         `;
       }).join('')}
     </div>
-
     <button onclick="closeExam()" class="btn btn-p" style="padding:12px 36px;font-size:15px">
       <span class="mi" style="font-size:18px">home</span>&nbsp;返回主页
     </button>
@@ -1858,7 +1592,7 @@ function closeExam() {
   clearInterval(examState.timer);
   document.removeEventListener('fullscreenchange', onFSChange);
   document.getElementById('examOv').style.display = 'none';
-  document.exitFullscreen?.().catch(err => { console.warn('退出全屏失败:', err); });
+  document.exitFullscreen?.().catch(() => {});
   state.cart = [];
   saveState();
   updateCartBar();
@@ -1870,26 +1604,19 @@ function confirmExitExam() {
   if (confirm('确定要提前结束模考吗？当前进度将被保存。')) {
     clearInterval(examState.timer);
     const id = examState.queue[examState.currentIdx];
-    if (id) {
-      const spent = examState.totalTime - examState.timeLeft;
-      recordResult(id, spent);
-    }
+    if (id) { const spent = examState.totalTime - examState.timeLeft; recordResult(id, spent); }
     endAllExams();
   }
 }
 
-/** 监听全屏变化 - 自动恢复全屏（严格模式） */
 function onFSChange() {
   if (!document.fullscreenElement) {
     const banner = document.getElementById('warnBanner');
-    banner.classList.add('show');
+    banner.style.transform = 'translateY(0)';
     setTimeout(() => {
-      banner.classList.remove('show');
-      // 严格模式下自动恢复全屏
+      banner.style.transform = 'translateY(-100%)';
       if (state.settings.mode === 'strict') {
-        document.documentElement.requestFullscreen?.().catch(err => {
-          console.warn('自动全屏恢复失败:', err);
-        });
+        document.documentElement.requestFullscreen?.().catch(() => {});
       }
     }, 2000);
   }
@@ -1906,9 +1633,8 @@ function playBeep() {
     osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.8);
     gain.gain.setValueAtTime(0.5, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 1.2);
-  } catch (e) { console.warn('Web Audio 提示音失败:', e); }
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 1.2);
+  } catch (e) {}
 }
 
 // ╔══════════════════════════════════════════════════════════╗
@@ -1928,22 +1654,21 @@ function closeSettings() {
 
 function updateSettingsUI() {
   const mode = state.settings.mode;
-  const ms   = document.getElementById('modeStrict');
-  const mp   = document.getElementById('modePrac');
+  const ms = document.getElementById('modeStrict');
+  const mp = document.getElementById('modePrac');
   if (ms && mp) {
-    ms.style.background = mode === 'strict'   ? 'var(--primary)' : 'white';
-    ms.style.color      = mode === 'strict'   ? 'white'          : 'var(--text-sub)';
+    ms.style.background = mode === 'strict' ? 'var(--primary)' : 'white';
+    ms.style.color = mode === 'strict' ? 'white' : 'var(--text-sub)';
     mp.style.background = mode === 'practice' ? 'var(--primary)' : 'white';
-    mp.style.color      = mode === 'practice' ? 'white'          : 'var(--text-sub)';
+    mp.style.color = mode === 'practice' ? 'white' : 'var(--text-sub)';
   }
   const done = Object.values(state.paperStatus).filter(v => v === 'done').length;
-  const ttl  = paperDB.length;
   const secs = Object.values(state.paperTimes).reduce((a, b) => a + b, 0);
-  const el1  = document.getElementById('statDone');
-  const el2  = document.getElementById('statTotal');
-  const el3  = document.getElementById('statTime');
+  const el1 = document.getElementById('statDone');
+  const el2 = document.getElementById('statTotal');
+  const el3 = document.getElementById('statTime');
   if (el1) el1.textContent = done;
-  if (el2) el2.textContent = ttl;
+  if (el2) el2.textContent = paperDB.length;
   if (el3) el3.textContent = fmtDuration(secs);
 }
 
@@ -1958,15 +1683,8 @@ function toggleTheme() {}
 
 function confirmReset() {
   if (confirm('⚠️ 确定要重置所有进度吗？此操作不可撤销！')) {
-    state.paperStatus = {};
-    state.paperTimes  = {};
-    state.cart        = [];
-    saveState();
-    updateCartBar();
-    renderCards();
-    updateProgress();
-    updateSettingsUI();
-    closeSettings();
+    state.paperStatus = {}; state.paperTimes = {}; state.cart = [];
+    saveState(); updateCartBar(); renderCards(); updateProgress(); updateSettingsUI(); closeSettings();
     showToast('✅ 所有进度已重置');
   }
 }
@@ -2040,6 +1758,15 @@ function initScrollShadow() {
 
 function init() {
   paperDB = generatePaperDB();
+
+  // Debug: log total count
+  console.log(`📚 题库总数: ${paperDB.length} 张卷子`);
+  const mathCount = paperDB.filter(p => p.subject === '0580').length;
+  const bioCount  = paperDB.filter(p => p.subject === '0610').length;
+  const chemCount = paperDB.filter(p => p.subject === '0620').length;
+  const phyCount  = paperDB.filter(p => p.subject === '0625').length;
+  console.log(`  0580数学: ${mathCount} | 0610生物: ${bioCount} | 0620化学: ${chemCount} | 0625物理: ${phyCount}`);
+
   loadState();
   updateDate();
   renderFilterPanel();
