@@ -208,9 +208,82 @@
       display: inline-block; font-size: 10px; padding: 2px 8px;
       border-radius: 12px; background: #E8F5E9; color: #2E7D32; font-weight: 700;
     }
+
+    /* ── Countdown Banner ── */
+    #countdownBanner {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+      height: 38px;
+      background: linear-gradient(90deg, #0D1B2A 0%, #1A1A2E 40%, #0D1B2A 100%);
+      display: flex; align-items: center; justify-content: center; gap: 0;
+      overflow: hidden;
+    }
+    #countdownBanner::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(90deg, transparent, transparent 120px, rgba(255,255,255,.018) 120px, rgba(255,255,255,.018) 121px);
+      pointer-events: none;
+    }
+    .cd-block {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0 14px; position: relative;
+    }
+    .cd-block + .cd-block::before {
+      content: ':';
+      position: absolute; left: -2px; top: 50%; transform: translateY(-56%);
+      font-size: 16px; font-weight: 700; color: rgba(255,255,255,.25);
+      font-family: 'Roboto Mono', monospace;
+    }
+    .cd-num {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 18px; font-weight: 700; line-height: 1;
+      color: white; letter-spacing: .04em;
+      transition: color .4s ease;
+    }
+    .cd-label {
+      font-size: 8px; font-weight: 600; letter-spacing: .1em;
+      color: rgba(255,255,255,.35); text-transform: uppercase; line-height: 1; margin-top: 1px;
+    }
+    .cd-num.urgent { color: #F87171; animation: cdpulse 1s ease-in-out infinite; }
+    @keyframes cdpulse { 0%,100%{opacity:1}50%{opacity:.6} }
+
+    .cd-divider {
+      width: 1px; height: 22px; background: rgba(255,255,255,.1); margin: 0 4px;
+    }
+
+    #hitokobar {
+      flex: 1; max-width: 340px; overflow: hidden;
+      margin: 0 16px;
+    }
+    #hitokotext {
+      font-size: 11px; color: rgba(255,255,255,.45);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-style: italic; transition: opacity .5s ease;
+    }
+
+    #examDateTag {
+      font-size: 10px; color: rgba(255,255,255,.3);
+      letter-spacing: .05em; white-space: nowrap; padding-right: 16px;
+      cursor: pointer;
+    }
+    #examDateTag:hover { color: rgba(255,255,255,.6); }
+
+    /* ── Shift everything down by banner height ── */
+    #appbar { top: 38px !important; }
+    #filterPanel { top: 52px !important; }
+    #mainContent { padding-top: calc(3.5rem + 38px) !important; }
   </style>
 </head>
 <body>
+
+<!-- ══════════════════════ COUNTDOWN BANNER ══════════════════════ -->
+<div id="countdownBanner">
+  <!-- Countdown blocks inserted by JS -->
+  <div id="cdBlocks" class="flex items-center"></div>
+  <div class="cd-divider hidden sm:block"></div>
+  <div id="hitokobar" class="hidden sm:block">
+    <div id="hitokotext">loading...</div>
+  </div>
+  <span id="examDateTag" onclick="openSettings()" title="点击设置考试日期">📅 设置考试日期</span>
+</div>
 
 <header id="appbar" class="fixed top-0 left-0 right-0 z-50 bg-white h-14 flex items-center px-4 gap-3 select-none" style="box-shadow:0 1px 3px rgba(0,0,0,0.12)">
   <span class="mi" style="color:var(--primary);font-size:24px">bolt</span>
@@ -394,6 +467,33 @@
       <button onclick="confirmReset()" class="btn btn-d w-full" style="justify-content:center">
         <span class="mi" style="font-size:16px">delete_forever</span> 重置所有进度
       </button>
+    </div>
+
+    <!-- Countdown settings -->
+    <div style="background:#0D1B2A;border-radius:12px;padding:16px">
+      <p class="font-semibold text-sm mb-1" style="color:white">⏳ 考试倒计时设置</p>
+      <p class="text-xs mb-3" style="color:rgba(255,255,255,.4)">显示在顶部横幅，时刻保持紧迫感</p>
+
+      <div class="mb-3">
+        <label class="text-xs font-semibold mb-1 block" style="color:rgba(255,255,255,.6)">考试日期</label>
+        <input id="examDateInput" type="date"
+          class="rounded-lg text-sm focus:outline-none w-full"
+          style="border:1.5px solid rgba(255,255,255,.15);padding:7px 10px;font-family:inherit;color:white;background:rgba(255,255,255,.08);transition:border .15s"
+          onfocus="this.style.borderColor='var(--primary)'"
+          onblur="this.style.borderColor='rgba(255,255,255,.15)'"
+          onchange="saveExamDate(this.value)" />
+        <p class="text-xs mt-1" style="color:rgba(255,255,255,.3)">参考时间表：May/June 2026 从 4月28日 开始</p>
+      </div>
+
+      <div>
+        <label class="text-xs font-semibold mb-2 block" style="color:rgba(255,255,255,.6)">显示单位</label>
+        <div class="flex flex-wrap gap-2" id="cdUnitBtns">
+          <button onclick="setCdUnit('wdh')" id="cdu-wdh" class="gcnt" style="font-size:11px;width:auto;padding:0 10px;height:32px">周/天/时</button>
+          <button onclick="setCdUnit('dh')"  id="cdu-dh"  class="gcnt" style="font-size:11px;width:auto;padding:0 10px;height:32px">天/时</button>
+          <button onclick="setCdUnit('d')"   id="cdu-d"   class="gcnt" style="font-size:11px;width:auto;padding:0 10px;height:32px">天</button>
+          <button onclick="setCdUnit('h')"   id="cdu-h"   class="gcnt" style="font-size:11px;width:auto;padding:0 10px;height:32px">小时</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1140,7 +1240,12 @@ function renderCartList() {
     if (!p) return;
     const status = state.paperStatus[p.id] || 'todo';
     const sc = STATUS_MAP[status];
-    const sCode = p.session === 'May/June' ? 'M/J' : p.session === 'March' ? 'Mar' : 'O/N';
+    // IGCSE canonical code: 0580/41
+    const variantNum = p.paper.slice(-1); // last char is variant
+    const paperNum = p.paper.slice(1, -1); // middle is paper number
+    const igcseCode = `${p.subject}/${paperNum}${variantNum}`;
+    // IGCSE session format: May/June 2021
+    const sessionFull = p.session === 'Oct/Nov' ? `October/November ${p.year}` : `${p.session} ${p.year}`;
     const tierColor = p.tier.includes('Extended') ? '#9334E8' : p.tier.includes('Practical') || p.tier.includes('Alt') ? '#EA4335' : '#34A853';
 
     const item = document.createElement('div');
@@ -1152,40 +1257,52 @@ function renderCartList() {
       <div style="display:flex">
         <div style="width:5px;background:${p.subjectColor};border-radius:16px 0 0 16px;flex-shrink:0"></div>
         <div style="flex:1;padding:12px 14px 12px 12px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
-              <span class="mi drag-handle" style="font-size:20px">drag_indicator</span>
-              <span style="font-size:12px;font-weight:700;color:#9AA0A6;min-width:16px;text-align:center">${i+1}</span>
+
+          <!-- Row 1: drag + number + code + delete -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:3px;flex-shrink:0">
+              <span class="mi drag-handle" style="font-size:18px">drag_indicator</span>
+              <span style="font-size:11px;font-weight:700;color:#BDC1C6;min-width:14px;text-align:center">${i+1}</span>
             </div>
-            <div style="width:36px;height:36px;border-radius:10px;background:${p.subjectColor}18;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-              <span class="mi" style="color:${p.subjectColor};font-size:18px">${p.subjectIcon}</span>
+            <!-- Subject icon -->
+            <div style="width:32px;height:32px;border-radius:9px;background:${p.subjectColor}18;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <span class="mi" style="color:${p.subjectColor};font-size:16px">${p.subjectIcon}</span>
             </div>
+            <!-- Main code -->
             <div style="flex:1;min-width:0">
-              <div style="font-weight:700;font-size:14px;color:#202124">${p.subject} · ${p.paper}</div>
+              <div style="font-weight:800;font-size:16px;color:#202124;letter-spacing:-.3px;font-family:'Roboto Mono',monospace">${igcseCode}</div>
               <div style="font-size:11px;color:var(--text-sub);margin-top:1px">${p.subjectName}</div>
             </div>
-            <button onclick="removeFromCart('${id}')" title="移出清单"
-              style="background:none;border:none;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;color:#9AA0A6"
-              onmouseover="this.style.background='#FEE2E2';this.style.color='var(--danger)'"
-              onmouseout="this.style.background='none';this.style.color='#9AA0A6'">
-              <span class="mi" style="font-size:18px">delete</span>
-            </button>
+            <!-- Status + delete -->
+            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+              <span style="font-size:10px;padding:2px 7px;border-radius:8px;background:${sc.bg};color:${sc.color};font-weight:600">${sc.label}</span>
+              <button onclick="removeFromCart('${id}')" title="移出清单"
+                style="background:none;border:none;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .15s;color:#DADCE0"
+                onmouseover="this.style.background='#FEE2E2';this.style.color='var(--danger)'"
+                onmouseout="this.style.background='none';this.style.color='#DADCE0'">
+                <span class="mi" style="font-size:16px">close</span>
+              </button>
+            </div>
           </div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;padding-left:56px">
-            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:#F1F3F4;color:#5F6368;font-weight:500">
-              <span class="mi" style="font-size:12px">calendar_today</span>${p.year} ${sCode}
+
+          <!-- Row 2: IGCSE info chips -->
+          <div style="display:flex;flex-wrap:wrap;gap:5px;padding-left:55px">
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 9px;border-radius:6px;background:#F1F3F4;color:#5F6368;font-weight:600">
+              📅 ${sessionFull}
             </span>
-            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:#F1F3F4;color:#5F6368;font-weight:500">
-              <span class="mi" style="font-size:12px">timer</span>${fmtDurationMin(p.duration)}
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 9px;border-radius:6px;background:#F1F3F4;color:#5F6368;font-weight:500">
+              ⏱ ${fmtDurationMin(p.duration)}
             </span>
-            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:#F1F3F4;color:#5F6368;font-weight:500">
-              <span class="mi" style="font-size:12px">grading</span>${p.totalMarks} 分
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 9px;border-radius:6px;background:${tierColor}12;color:${tierColor};font-weight:600">
+              ${p.tier}
             </span>
-            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:${tierColor}15;color:${tierColor};font-weight:600">${p.tier}</span>
-            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 8px;border-radius:8px;background:${sc.bg};color:${sc.color};font-weight:600">${sc.label}</span>
-            ${p.isPredicted ? '<span style="font-size:11px;padding:3px 8px;border-radius:8px;background:#E8F5E9;color:#2E7D32;font-weight:600">🟢 预测</span>' : ''}
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 9px;border-radius:6px;background:#F1F3F4;color:#5F6368;font-weight:500">
+              ${p.totalMarks} marks
+            </span>
+            ${p.isPredicted ? '<span style="font-size:11px;padding:3px 7px;border-radius:6px;background:#E8F5E9;color:#2E7D32;font-weight:600">🟢 预测</span>' : ''}
+            ${p.isCustom ? '<span style="font-size:11px;padding:3px 7px;border-radius:6px;background:#E8F0FE;color:var(--primary);font-weight:600">✏️ 自添加</span>' : ''}
           </div>
-          ${p.syllabusInfo ? `<div style="margin-top:6px;padding-left:56px"><span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#FEF7E0;color:#D97706;font-weight:600">⚠️ ${p.syllabusInfo}</span></div>` : ''}
+          ${p.syllabusInfo ? `<div style="margin-top:5px;padding-left:55px"><span style="font-size:10px;padding:2px 8px;border-radius:6px;background:#FEF7E0;color:#D97706;font-weight:600">⚠️ ${p.syllabusInfo}</span></div>` : ''}
         </div>
       </div>
     `;
@@ -1717,6 +1834,11 @@ function updateSettingsUI() {
   if (el1) el1.textContent = done;
   if (el2) el2.textContent = paperDB.length;
   if (el3) el3.textContent = fmtDuration(secs);
+
+  // Restore countdown settings UI
+  const dateInput = document.getElementById('examDateInput');
+  if (dateInput) dateInput.value = state.settings.examDate || DEFAULT_EXAM_DATE;
+  updateCdUnitUI();
 }
 
 function setMode(m) {
@@ -2158,16 +2280,192 @@ function defaultMarks(subject, paperNum) {
   return { '1': 40, '2': 40, '3': 80, '4': 80, '5': 40, '6': 40 }[paperNum] || 40;
 }
 
+// ╔══════════════════════════════════════════════════════════╗
+// ║           COUNTDOWN + HITOKOTO SYSTEM                   ║
+// ╚══════════════════════════════════════════════════════════╝
+
+let cdInterval = null;
+
+// Default: May/June 2026 starts Apr 28
+const DEFAULT_EXAM_DATE = '2026-04-28';
+
+function getExamDate() {
+  return state.settings.examDate || DEFAULT_EXAM_DATE;
+}
+
+function getCdUnit() {
+  return state.settings.cdUnit || 'dh';
+}
+
+function saveExamDate(val) {
+  state.settings.examDate = val;
+  saveState();
+  renderCountdown();
+  showToast('✅ 考试日期已保存');
+}
+
+function setCdUnit(unit) {
+  state.settings.cdUnit = unit;
+  saveState();
+  renderCountdown();
+  updateCdUnitUI();
+}
+
+function updateCdUnitUI() {
+  const unit = getCdUnit();
+  ['wdh','dh','d','h'].forEach(u => {
+    const el = document.getElementById(`cdu-${u}`);
+    if (el) el.classList.toggle('on', u === unit);
+  });
+}
+
+function renderCountdown() {
+  const examDate = getExamDate();
+  const unit = getCdUnit();
+  const now = new Date();
+  const target = new Date(examDate + 'T09:00:00');
+  const diffMs = target - now;
+
+  const cdBlocks = document.getElementById('cdBlocks');
+  const examTag = document.getElementById('examDateTag');
+
+  if (!cdBlocks) return;
+
+  if (diffMs <= 0) {
+    cdBlocks.innerHTML = `
+      <div class="cd-block">
+        <span class="cd-num" style="color:#4ade80;font-size:14px">EXAM DAY</span>
+        <span class="cd-label">加油！</span>
+      </div>
+    `;
+    if (examTag) examTag.textContent = '📅 今天考试！';
+    return;
+  }
+
+  const totalSecs = Math.floor(diffMs / 1000);
+  const totalMins = Math.floor(totalSecs / 60);
+  const totalHours = Math.floor(totalMins / 60);
+  const totalDays = Math.floor(totalHours / 24);
+  const weeks = Math.floor(totalDays / 7);
+
+  const remDays = totalDays % 7;
+  const remHours = totalHours % 24;
+  const remMins = totalMins % 60;
+
+  const urgent = totalDays < 14;
+  const cls = urgent ? 'cd-num urgent' : 'cd-num';
+
+  let blocksHtml = '';
+
+  if (unit === 'wdh') {
+    blocksHtml = `
+      <div class="cd-block">
+        <span class="${cls}">${String(weeks).padStart(2,'0')}</span>
+        <span class="cd-label">WEEKS</span>
+      </div>
+      <div class="cd-block">
+        <span class="${cls}">${String(remDays).padStart(2,'0')}</span>
+        <span class="cd-label">DAYS</span>
+      </div>
+      <div class="cd-block">
+        <span class="${cls}">${String(remHours).padStart(2,'0')}</span>
+        <span class="cd-label">HRS</span>
+      </div>
+    `;
+  } else if (unit === 'dh') {
+    blocksHtml = `
+      <div class="cd-block">
+        <span class="${cls}">${String(totalDays).padStart(3,'0')}</span>
+        <span class="cd-label">DAYS</span>
+      </div>
+      <div class="cd-block">
+        <span class="${cls}">${String(remHours).padStart(2,'0')}</span>
+        <span class="cd-label">HRS</span>
+      </div>
+    `;
+  } else if (unit === 'd') {
+    blocksHtml = `
+      <div class="cd-block">
+        <span class="${cls}" style="font-size:22px">${totalDays}</span>
+        <span class="cd-label">DAYS REMAINING</span>
+      </div>
+    `;
+  } else { // h
+    blocksHtml = `
+      <div class="cd-block">
+        <span class="${cls}" style="font-size:20px">${totalHours}</span>
+        <span class="cd-label">HOURS REMAINING</span>
+      </div>
+    `;
+  }
+
+  cdBlocks.innerHTML = blocksHtml;
+
+  // Update exam date tag
+  if (examTag) {
+    const d = target.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    examTag.textContent = `📅 ${d}`;
+  }
+}
+
+function startCountdown() {
+  renderCountdown();
+  clearInterval(cdInterval);
+  cdInterval = setInterval(renderCountdown, 1000);
+}
+
+// ── Hitokoto ──
+let hitokoTimer = null;
+
+async function fetchHitokoto() {
+  const el = document.getElementById('hitokotext');
+  if (!el) return;
+  try {
+    // Fetch philosophical / literary quotes — types k (哲学), d (文学), e (原创), f (网络), i (诗词)
+    const types = ['k','d','e','f','i'];
+    const t = types[Math.floor(Math.random() * types.length)];
+    const res = await fetch(`https://v1.hitokoto.cn?c=${t}&encode=json&max_length=50`);
+    if (!res.ok) throw new Error('fetch fail');
+    const data = await res.json();
+    const text = data.hitokoto;
+    const from = data.from ? ` ——《${data.from}》` : '';
+
+    // Fade out
+    el.style.opacity = '0';
+    await new Promise(r => setTimeout(r, 500));
+    el.textContent = text + from;
+    el.style.opacity = '1';
+  } catch (e) {
+    // Fallback quotes
+    const fallbacks = [
+      '不经一番寒彻骨，怎得梅花扑鼻香。',
+      'The secret of getting ahead is getting started.',
+      '千里之行，始于足下。',
+      'Pressure is a privilege.',
+      '合抱之木，生于毫末。',
+      'Do it now. Sometimes "later" becomes "never".',
+    ];
+    const el2 = document.getElementById('hitokotext');
+    if (el2) {
+      el2.style.opacity = '0';
+      await new Promise(r => setTimeout(r, 400));
+      el2.textContent = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+      el2.style.opacity = '1';
+    }
+  }
+}
+
+function startHitokoto() {
+  fetchHitokoto();
+  clearInterval(hitokoTimer);
+  hitokoTimer = setInterval(fetchHitokoto, 18000); // rotate every 18s
+}
+
 function init() {
   paperDB = generatePaperDB();
 
   // Debug: log total count
   console.log(`📚 题库总数: ${paperDB.length} 张卷子`);
-  const mathCount = paperDB.filter(p => p.subject === '0580').length;
-  const bioCount  = paperDB.filter(p => p.subject === '0610').length;
-  const chemCount = paperDB.filter(p => p.subject === '0620').length;
-  const phyCount  = paperDB.filter(p => p.subject === '0625').length;
-  console.log(`  0580数学: ${mathCount} | 0610生物: ${bioCount} | 0620化学: ${chemCount} | 0625物理: ${phyCount}`);
 
   loadState();
   updateDate();
@@ -2176,6 +2474,13 @@ function init() {
   updateCartBar();
   updateProgress();
   initScrollShadow();
+  startCountdown();
+  startHitokoto();
+
+  // Restore exam date input
+  const dateInput = document.getElementById('examDateInput');
+  if (dateInput) dateInput.value = state.settings.examDate || DEFAULT_EXAM_DATE;
+  updateCdUnitUI();
 
   if (state.cart.length > 0) {
     showToast(`📋 清单中还有 ${state.cart.length} 张卷子`);
